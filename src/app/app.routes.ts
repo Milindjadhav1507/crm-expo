@@ -41,8 +41,8 @@ export const routes: Routes = [
   {
     path: 'followup',
     loadChildren: () => import('./follow-up/follow-up.module').then(m => m.FollowUpModule),
-    canActivate: [AuthguardService],
-    data: { pageName: 'Followup' }
+    // canActivate: [AuthguardService],
+    // data: { pageName: 'Followup' }
   },
   {
     path: 'ticket',
