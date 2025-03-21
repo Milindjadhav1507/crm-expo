@@ -1,2 +1,35 @@
-node_modules
+# Node.js dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Angular build and cache files
 /.angular
+/.cache
+/dist
+/tmp
+/out-tsc
+
+# Environment files
+/src/environments/environment*.ts
+
+# Logs and debugging files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+*.gz
+
+# IDE and editor files
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Misc
+.DS_Store
+Thumbs.db
+*.bak
