@@ -7,11 +7,11 @@ import { AuthguardService } from '../auth/authguard.service';
 const routes: Routes = [{
   path:'lead',
   component: CreateLeadComponent
-  ,canActivate: [AuthguardService]
+  // ,canActivate: [AuthguardService]
 },{
   path:'lead-list',
   component: LeadListComponent
-  ,canActivate: [AuthguardService]
+  // ,canActivate: [AuthguardService]
 }];
 
 @NgModule({

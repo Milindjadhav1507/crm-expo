@@ -1,5 +1,5 @@
 <mat-tab-group>
-  <mat-tab label="Create Branch"> 
+  <mat-tab label="Create Branch">
     <app-branch ></app-branch>
 </mat-tab>
     <mat-tab label="Branch List">
@@ -14,7 +14,7 @@
                 <mat-icon matSuffix>search</mat-icon>
               </mat-form-field> -->
             <mat-card-content>
-               
+
               <!-- <input matInput placeholder="Search" (keyup)="applyFilter($event)"/> -->
               <div class="col-md-4">
                 <mat-form-field>
@@ -24,10 +24,10 @@
                     <button mat-button matSuffix mat-icon-button *ngIf="filterText" (click)="clearFilter()">
                         <mat-icon>clear</mat-icon>
                     </button>
-    
+
                 </mat-form-field>
                 <!-- src="../../../assets/images/enter.png" -->
-                <img alt="" *ngIf="filterText" (click)="sea(filterText)" style="width: 24px;
+                <img alt="" *ngIf="filterText" (click)="filter(filterText)" style="width: 24px;
                 height: 24px;
                 background: #e8e8e8;
                 border-radius: 16px;
@@ -65,7 +65,7 @@
                     <button mat-icon-button color="primary" (click)="editBranch(branch.id)">
                         <mat-icon>edit</mat-icon>
                       </button>
-                    
+
                       <button mat-icon-button color="warn" (click)="deleteBranch(branch.id)">
                         <mat-icon>delete</mat-icon>
                       </button>
@@ -75,11 +75,11 @@
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
               </table>
-              <mat-paginator [pageSizeOptions]=[10,20,50,100] (page)="onPageChange($event)" [length]="totalData" 
+              <mat-paginator [pageSizeOptions]=[10,20,50,100] (page)="onPageChange($event)" [length]="totalData"
                showFirstLastButtons></mat-paginator>
             </mat-card-content>
           </mat-card>
         </div>
     </mat-tab>
-    
+
 </mat-tab-group>

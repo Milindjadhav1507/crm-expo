@@ -2,9 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
-import { BranchComponent } from '../branch/branch.component';
 import { MatCardContent, MatCardHeader, MatCardModule } from '@angular/material/card';
-import { CrmApiService } from '../../crm-api.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -28,143 +26,183 @@ import { MatSort } from '@angular/material/sort';
 })
 export class DepartmentlistComponent {
     @ViewChild(MatSort) set matSort(sort: MatSort){ this.dataSource.sort=sort;}
-  departmentData: any = []
-  filterText:any
-  searchControl=new FormControl('')
+  departmentData: any = [];
+  filterText: string = '';
+  searchControl = new FormControl('');
   dataSource = new MatTableDataSource(this.departmentData);
-
   displayedColumns: string[] = ['srNo', 'name', 'branch_name', 'actions'];
-
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   filteredBranches: any;
   dialogRef: any;
-
-  totalData: any;
-  limit: any;
-  totalPages: any;
+  totalData: number = 0;
+  limit: number = 10;
+  totalPages: number = 0;
   pageNumber: number = 1;
-  nextPage: any;
-  previousPage: any;
-  pagination: any;
-  selectedPageIndex: number = 1;
-  selectedPageSize: number = 10;
-  pageSizeOptions = 10
-  c: any;
-  loading:boolean=false
-  y='';
-  constructor(private api: CrmApiService,private dialog: MatDialog) { }
-  ngOnInit() {
-    this.getdepartmentall();
-  }
-  getdepartmentall(){
-    this.api.post('api/get_departments/s=',{"pagination":true}).subscribe((res:any)=>{
-     
-      this.departmentData = res.data;
-      this.filteredBranches = this.departmentData;
-      this.pagination = res.pagination_data
-      this.totalData = res.pagination_data.total_data;
-      this.limit = res.pagination_data.limit;
-      this.totalPages = res.pagination_data.total_pages;
-      this.pageNumber = res.pagination_data.page_number;
-      this.nextPage = res.pagination_data.next_page;
-      this.previousPage = res.pagination_data.previous_page;
-      this.departmentData = new MatTableDataSource(this.departmentData);
-      this.departmentData.paginator = this.paginator;
-      this.dataSource.sort = this.matSort
-    })
-  }
-  deleteBranch(id: number) {
-    // Implement delete functionality here
-    console.log('Delete branch with ID:', id);
-    this.departmentData = this.departmentData.filter((branch: any) => branch.id !== id);
+  nextPage: boolean = false;
+  previousPage: boolean = false;
+  loading: boolean = false;
+
+  constructor(private dialog: MatDialog) {
+    this.initializeDummyData();
   }
 
-  applyPagination() {
+  ngOnInit() {
+    // No need to call API anymore
+  }
+
+  private initializeDummyData() {
+    const dummyResponse = {
+      data: [
+        {
+          id: 1,
+          name: "Sales",
+          description: "",
+          branch: 1,
+          branch_name: "MAINy"
+        },
+        {
+          id: 2,
+          name: "ACCOUNTING",
+          description: "ACCOUNTING department",
+          branch: 3,
+          branch_name: "Mumbai Main Branch"
+        },
+        {
+          id: 3,
+          name: "Marketing",
+          description: "Responsible for creating and executing campaigns to attract, engage, and retain customers, as well as analyzing customer behavior and market trends.",
+          branch: 4,
+          branch_name: "Ambivali"
+        },
+        {
+          id: 4,
+          name: "Executive/Management",
+          description: "Leads and makes strategic decisions based on CRM data, ensuring alignment with business objectives and customer needs.",
+          branch: 5,
+          branch_name: "ssssssssss"
+        },
+        {
+          id: 5,
+          name: "IT/Technical Support",
+          description: "Maintains the technical infrastructure of CRM systems, providing technical support and system integrations.",
+          branch: 1,
+          branch_name: "MAINy"
+        },
+        {
+          id: 6,
+          name: "Operations",
+          description: "Handles the day-to-day operations that support customer interactions, ensuring efficient product/service delivery.",
+          branch: 3,
+          branch_name: "Mumbai Main Branch"
+        },
+        {
+          id: 7,
+          name: "Human Resources (HR)",
+          description: "Manages employee performance, training, and internal processes, ensuring employees meet the needs of customers.",
+          branch: 4,
+          branch_name: "Ambivali"
+        },
+        {
+          id: 8,
+          name: "Finance and Accounting",
+          description: "Manages billing, payments, and financial transactions for customer accounts, ensuring accuracy and compliance.",
+          branch: 5,
+          branch_name: "ssssssssss"
+        },
+        {
+          id: 9,
+          name: "Product Management",
+          description: "Oversees the development and improvement of products based on customer feedback and market trends.",
+          branch: 1,
+          branch_name: "MAINy"
+        },
+        {
+          id: 10,
+          name: "Customer Support/Service",
+          description: "Ensures customer satisfaction by resolving inquiries, managing service tickets, and providing ongoing support.",
+          branch: 3,
+          branch_name: "Mumbai Main Branch"
+        }
+      ],
+      pagination_data: {
+        total_data: 15,
+        limit: 10,
+        total_pages: 2,
+        page_number: 1,
+        next_page: true,
+        previous_page: false
+      },
+      status: 200
+    };
+
+    this.departmentData = dummyResponse.data;
+    this.filteredBranches = this.departmentData;
+    this.totalData = dummyResponse.pagination_data.total_data;
+    this.limit = dummyResponse.pagination_data.limit;
+    this.totalPages = dummyResponse.pagination_data.total_pages;
+    this.pageNumber = dummyResponse.pagination_data.page_number;
+    this.nextPage = dummyResponse.pagination_data.next_page;
+    this.previousPage = dummyResponse.pagination_data.previous_page;
     this.dataSource = new MatTableDataSource(this.departmentData);
     this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.matSort;
   }
 
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    
-    this.filteredBranches = this.departmentData.filter((a:any) =>
-      a.name.toLowerCase().includes(filterValue)
-    );
+  deleteBranch(id: number) {
+    if (confirm('Are you sure you want to delete this department?')) {
+      this.departmentData = this.departmentData.filter((dept: any) => dept.id !== id);
+      this.dataSource = new MatTableDataSource(this.departmentData);
+    }
   }
 
   editBranch(departmentId: any): void {
-    console.log('Editing branch with ID:', departmentId);
-   
    const dialogRef = this.dialog.open(DepartmentComponent, {
       width: '600px',
-      data: { departmentId: departmentId }  // Pass the branch ID if needed
+      data: { departmentId: departmentId }
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      // Handle any actions after the dialog is closed
+      if (result) {
+        const index = this.departmentData.findIndex((d: any) => d.id === departmentId);
+        if (index !== -1) {
+          this.departmentData[index] = result;
+          this.dataSource = new MatTableDataSource(this.departmentData);
+        }
+      }
     });
   }
+
   onPageChange(event: any) {
-    console.log( 'eventworking');
-    
-    this.limit = event.pageSize; // Update 'limit' based on selected page size
-    this.pageNumber = event.pageIndex + 0;
-    this.pageNumber++
-    // this.pagination.page_number = this.pageNumber
-   
-    // this.branch_data.page_number = this.pageNumber
-    // this.branch_data.limit = this.limit
-    let d={
-      limit:this.limit,
-      "pagination":true,
-      page_number:this.pageNumber,
-      
-    }
-    this.api.post('api/get_departments/s='+this.y, d).subscribe((response: any) => {
-     
-      this.departmentData = new MatTableDataSource(response.data)
-    })
-  }
-  search(e:any) {
-    this.y=e
-    this.api.post('api/get_departments/s='+e, this.departmentData).subscribe((response: any) => {
-      //*console.log(response, 'salesssss');
-      this.c = response.data
-      this.departmentData = new MatTableDataSource(this.c)
-      this.loading=false
-      this.pagination = response.pagination_data
-      this.totalData = response.pagination_data.total_data;
-      this.limit = response.pagination_data.limit;
-      this.totalPages = response.pagination_data.total_pages;
-      this.pageNumber = response.pagination_data.page_number;
-      this.nextPage = response.pagination_data.next_page;
-      this.previousPage = response.pagination_data.previous_page;
-    })
+    this.limit = event.pageSize;
+    this.pageNumber = event.pageIndex + 1;
   }
 
-  searchChange(event:any) {
+  searchChange(event: any) {
     const val = event.target.value;
-    //*console.log(event, "lll");
-    if (val == '') {
-      this.search('')
-    }else{
-    this.search(val);
-    this.loading=true
+    if (val === '') {
+      this.filter('');
+    } else {
+      this.filter(val);
+      this.loading = true;
     }
   }
-  sea(event:any){
-    const vallv= event
-    this.search(vallv);
-    this.loading=true
-  }
-  filter(a:any){
-    if (a == '') {
-      this.search('')
-      this.loading=true
+
+  filter(searchText: string) {
+    if (searchText === '') {
+      this.dataSource = new MatTableDataSource(this.departmentData);
+      this.loading = false;
+    } else {
+      const filteredData = this.departmentData.filter((dept: any) =>
+        dept.name.toLowerCase().includes(searchText.toLowerCase()) ||
+        dept.branch_name.toLowerCase().includes(searchText.toLowerCase())
+      );
+      this.dataSource = new MatTableDataSource(filteredData);
+      this.loading = false;
     }
   }
+
   clearFilter() {
-    this.filterText = '';   
-    this.search('')
+    this.filterText = '';
+    this.filter('');
   }
 }
