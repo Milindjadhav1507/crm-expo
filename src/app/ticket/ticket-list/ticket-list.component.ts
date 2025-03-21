@@ -95,8 +95,7 @@ export class TicketListComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
-    private snackBar: MatSnackBar,
-    private api: CrmApiService
+    private snackBar: MatSnackBar
   ) {
     this.searchSubject
       .pipe(
@@ -109,7 +108,7 @@ export class TicketListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.ticketlist();
+    // this.ticketlist();
     
     this.searchControl.valueChanges.subscribe(value => {
       this.searchSubject.next(value || '');
@@ -125,19 +124,58 @@ export class TicketListComponent implements OnInit {
   }
 
   ticketlist() {
-    this.api.post('ticket/list_tickets/',null).subscribe({
-      next: (response: any) => {
-        if (response.status === 200) {
-          this.tickets = response.data;
-          this.filteredTickets = [...this.tickets];
-        }
+    // Hardcoded ticket data
+    this.tickets = [
+      {
+        id: 1,
+        title: 'Fix login issue',
+        category_id: 1,
+        priority_id: 1,
+        description: 'Users are unable to log in due to a server error.',
+        attachments: null,
+        contact_email: 'user1@example.com',
+        contact_phone: '123-456-7890',
+        expected_resolution_date: '2025-03-25',
+        additional_notes: 'Critical issue affecting all users.',
+        status_id: 1,
+        assigned_to_id: 2,
+        created_by_id: 1,
+        created_at: '2025-03-20T10:00:00',
+        updated_at: '2025-03-21T12:00:00',
+        deleted: false,
+        statusName: 'Open',
+        categoryName: 'Bug',
+        priorityName: 'High',
+        assignedToName: 'Jane Smith',
+        createdByName: 'John Doe'
       },
-      error: (error) => {
-        this.snackBar.open('Error fetching tickets', 'Close', {
-          duration: 3000
-        });
+      {
+        id: 2,
+        title: 'Add new feature to dashboard',
+        category_id: 2,
+        priority_id: 2,
+        description: 'Implement a new analytics widget on the dashboard.',
+        attachments: null,
+        contact_email: 'user2@example.com',
+        contact_phone: '987-654-3210',
+        expected_resolution_date: '2025-03-30',
+        additional_notes: 'Requested by the marketing team.',
+        status_id: 2,
+        assigned_to_id: null,
+        created_by_id: 2,
+        created_at: '2025-03-18T09:00:00',
+        updated_at: null,
+        deleted: false,
+        statusName: 'In Progress',
+        categoryName: 'Feature',
+        priorityName: 'Medium',
+        assignedToName: null,
+        createdByName: 'Alice Johnson'
       }
-    });
+    ];
+
+    // Initialize filtered tickets with the hardcoded data
+    this.filteredTickets = [...this.tickets];
   }
 
   applyFilters() {
@@ -200,6 +238,7 @@ export class TicketListComponent implements OnInit {
       }
     });
   }
+
   openTicketcreation(ticket: Ticket): void {
     const dialogRef = this.dialog.open(TicketGenerationFormComponent, {
       width: '800px',

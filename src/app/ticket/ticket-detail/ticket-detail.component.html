@@ -72,11 +72,11 @@
               <h3>Attachments</h3>
               <div class="attachment-list">
                 <a *ngFor="let attachment of ticket.attachments" 
-                   [href]="attachment.url" 
+                   [href]="attachment.url || attachment" 
                    class="attachment-item" 
                    target="_blank">
                   <mat-icon>attach_file</mat-icon>
-                  <span>{{attachment.name}}</span>
+                  <span>{{attachment?.name ? attachment.name : attachment}}</span>
                 </a>
               </div>
             </div>

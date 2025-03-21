@@ -27,7 +27,36 @@ import { Ticket } from '../ticket-list/ticket-list.component';
   styleUrls: ['./ticket-detail.component.scss']
 })
 export class TicketDetailComponent implements OnInit {
-  ticket: Ticket | null = null;
+  ticket:any = {
+    id: 12345,
+    title: 'Sample Ticket Title',
+    status: 'open',
+    priority: 'high',
+    category: 'Bug',
+    createdBy: 'John Doe',
+    assignedTo: 'Jane Smith',
+    createdAt: new Date('2025-03-01T10:00:00'),
+    updatedAt: new Date('2025-03-20T15:30:00'),
+    description: 'This is a sample description for the ticket.',
+    attachments: [
+      { name: 'Document.pdf', url: 'https://example.com/document.pdf' },
+      { name: 'Screenshot.png', url: 'https://example.com/screenshot.png' }
+    ],
+    communicationHistory: [
+      {
+        author: 'John Doe',
+        timestamp: new Date('2025-03-01T11:00:00'),
+        message: 'Initial ticket creation.',
+        type: 'comment'
+      },
+      {
+        author: 'Jane Smith',
+        timestamp: new Date('2025-03-02T14:00:00'),
+        message: 'Assigned to me for resolution.',
+        type: 'update'
+      }
+    ]
+  };
   isDialog = false;
 
   constructor(
@@ -38,8 +67,13 @@ export class TicketDetailComponent implements OnInit {
     @Optional() @Inject(MAT_DIALOG_DATA) public data: { ticket: Ticket }
   ) {
     this.isDialog = !!dialogRef;
+
+    // Use the provided ticket data if it exists, otherwise keep the hardcoded ticket
     if (this.data?.ticket) {
-      this.ticket = this.data.ticket;
+      // Merge the provided ticket data with the hardcoded ticket
+      this.ticket = { ...this.ticket, ...this.data.ticket };
+    } else {
+      console.warn('No ticket data provided via dialog. Using hardcoded ticket.');
     }
   }
 
@@ -49,107 +83,44 @@ export class TicketDetailComponent implements OnInit {
       if (id) {
         // TODO: Fetch ticket details from API
         // this.ticket = {
-          // id: parseInt(id),
-          // title: 'Sample Ticket',
-          // description: 'Sample Description',
-          // status: 'pending',
-          // priority: 'medium',
-          // category: 'general',
-          // createdAt: new Date(),
-          // communicationHistory: []
+        //   id: parseInt(id),
+        //   title: 'Sample Ticket',
+        //   description: 'Sample Description',
+        //   status: 'pending',
+        //   priority: 'medium',
+        //   category: 'general',
+        //   createdAt: new Date(),
+        //   communicationHistory: []
         // };
       }
     }
   }
 
   getStatusColor(status: string): string {
-    const colors: { [key: string]: string } = {
-      open: 'accent',
-      'in-progress': 'primary',
-      resolved: 'primary',
-      closed: 'warn',
-      pending: 'accent'
-    };
-    return colors[status] || 'primary';
+    return status === 'open' ? 'primary' : 'warn';
   }
 
   getPriorityColor(priority: string): string {
-    const colors: { [key: string]: string } = {
-      high: 'warn',
-      medium: 'accent',
-      low: 'primary'
-    };
-    return colors[priority] || 'primary';
+    return priority === 'high' ? 'warn' : 'accent';
   }
 
   formatDate(date: Date): string {
-    return new Date(date).toLocaleString();
+    return date.toLocaleString();
   }
 
   onEdit(): void {
-    if (this.ticket) {
-      if (this.isDialog) {
-        this.dialogRef.close();
-      }
-      this.router.navigate(['/ticket/', this.ticket.id, "/edit"]);
-    }
+    console.log('Edit Ticket');
   }
 
   onClose(): void {
-    if (!this.ticket) return;
-
-    if (confirm('Are you sure you want to close this ticket?')) {
-      // TODO: API call to close ticket
-      // this.ticket.status = 'closed';
-      this.snackBar.open('Ticket closed successfully', 'Close', {
-        duration: 3000
-      });
-      if (this.isDialog) {
-        this.dialogRef.close(this.ticket);
-      }
-    }
-  }
-
-  onAcceptChanges(): void {
-    if (!this.ticket) return;
-
-    if (confirm('Are you sure you want to accept the changes?')) {
-      // TODO: API call to accept changes
-      // this.ticket.status = 'in-progress';
-      
-      // Add a system comment about accepting changes
-      // this.ticket.communicationHistory.push({
-      //   id: this.ticket.communicationHistory.length + 1,
-      //   message: 'Changes accepted by user',
-      //   author: 'System',
-      //   timestamp: new Date(),
-      //   type: 'system'
-      // });
-
-      this.snackBar.open('Changes accepted successfully', 'Close', { duration: 3000 });
-      
-      if (this.isDialog) {
-        this.dialogRef.close(this.ticket);
-      }
-    }
+    console.log('Close Ticket');
   }
 
   onAddComment(): void {
-    if (this.ticket) {
-      if (this.isDialog) {
-        this.dialogRef.close();
-      }
-      this.router.navigate(['/ticket', this.ticket.id, 'comment'], {
-        queryParams: { ticketId: this.ticket.id }
-      });
-    }
+    console.log('Add Comment');
   }
 
   onBack(): void {
-    if (this.isDialog) {
-      this.dialogRef.close();
-    } else {
-      this.router.navigate(['/ticket']);
-    }
+    console.log('Back to Tickets');
   }
 }
