@@ -4,10 +4,9 @@ import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { BranchComponent } from '../branch/branch.component';
 import { MatCardContent, MatCardHeader, MatCardModule } from '@angular/material/card';
-import { CrmApiService } from '../../crm-api.service';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatTableDataSource } from '@angular/material/table';
-import { MatFormFieldControl, MatFormFieldModule } from '@angular/material/form-field';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -25,149 +24,209 @@ import { MatInputModule } from '@angular/material/input';
   styleUrls: ['./branchlist.component.scss']
 })
 export class BranchlistComponent {
-  branch_data: any = {};
   @ViewChild(MatSort) set matSort(sort: MatSort){ this.dataSource.sort=sort;}
-  branches: any = []
-  filterText:any=''
-  searchControl=new FormControl('')
+  branches: any = [];
+  filterText: string = '';
+  searchControl = new FormControl('');
   dataSource = new MatTableDataSource(this.branches);
-
   displayedColumns: string[] = ['srNo', 'branchName', 'address', 'city', 'pincode', 'actions'];
-
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   filteredBranches: any;
   dialogRef: any;
-  totalData: any;
-  limit: any;
-  totalPages: any;
+  totalData: number = 0;
+  limit: number = 10;
+  totalPages: number = 0;
   pageNumber: number = 1;
-  nextPage: any;
-  previousPage: any;
-  pagination: any;
-  selectedPageIndex: number = 1;
-  selectedPageSize: number = 10;
-  pageSizeOptions = 10
-  c: any;
-  loading:boolean=false
-  y='';
-  constructor(private api: CrmApiService,private dialog: MatDialog) { }
+  nextPage: boolean = false;
+  previousPage: boolean = false;
+  loading: boolean = false;
 
-  ngOnInit() {
-    this.branchget();
+  constructor(private dialog: MatDialog) {
+    // Initialize with dummy data
+    this.initializeDummyData();
   }
 
- 
+  ngOnInit() {
+    // No need to call API anymore
+  }
 
-  branchget() {
-    this.api.post('api/allbranch/s=',{pagination:true}).subscribe((res: any) => {
-      this.branches = res.data;
-      this.filteredBranches = this.branches;
-      this.pagination = res.pagination_data
-      this.totalData = res.pagination_data.total_data;
-      this.limit = res.pagination_data.limit;
-      this.totalPages = res.pagination_data.total_pages;
-      this.pageNumber = res.pagination_data.page_number;
-      this.nextPage = res.pagination_data.next_page;
-      this.previousPage = res.pagination_data.previous_page;
-      this.dataSource = new MatTableDataSource(this.branches);
-      this.dataSource.paginator = this.paginator;
-      this.dataSource.sort = this.matSort
-   
-    })
+  private initializeDummyData() {
+    // Dummy data from your JSON
+    const dummyResponse = {
+      data: [
+        {
+          id: 1,
+          branchName: "MAINy",
+          address: "456 Mumbai Avenue, Mumbai",
+          city: "Mumbai",
+          pincode: "400002",
+          deleted: false,
+          state: 1
+        },
+        {
+          id: 3,
+          branchName: "Mumbai Main Branch",
+          address: "123 Mumbai Street, Mumbai",
+          city: "Mumbai",
+          pincode: "400001",
+          deleted: false,
+          state: 2
+        },
+        {
+          id: 4,
+          branchName: "Ambivali",
+          address: "xyz",
+          city: "Kalyan",
+          pincode: "421102",
+          deleted: false,
+          state: 1
+        },
+        {
+          id: 5,
+          branchName: "ssssssssss",
+          address: "ddddddddddddd",
+          city: "jbnmskd kj",
+          pincode: "421102",
+          deleted: false,
+          state: 3
+        },
+        {
+          id: 6,
+          branchName: "Mumbai",
+          address: "123 Mumbai Street, Mumbai",
+          city: "Mumbai",
+          pincode: "400001",
+          deleted: false,
+          state: 27
+        },
+        {
+          id: 7,
+          branchName: "MAINM",
+          address: "456 Mumbai Avenue, Mumbai",
+          city: "Mumbai",
+          pincode: "400002",
+          deleted: false,
+          state: 1
+        },
+        {
+          id: 8,
+          branchName: "MAINMy",
+          address: "456 Mumbai Avenue, Mumbai",
+          city: "Mumbai",
+          pincode: "400002",
+          deleted: false,
+          state: 1
+        },
+        {
+          id: 9,
+          branchName: "Kalyan",
+          address: "456 Mumbai Avenue, Mumbai",
+          city: "Mumbai",
+          pincode: "400002",
+          deleted: false,
+          state: 6
+        },
+        {
+          id: 10,
+          branchName: "Mumbai1 Main Branch",
+          address: "123 Mumbai Street, Mumbai",
+          city: "Mumbai",
+          pincode: "400001",
+          deleted: false,
+          state: 1
+        },
+        {
+          id: 11,
+          branchName: "Mumbai2 Main Branch",
+          address: "123 Mumbai Street, Mumbai",
+          city: "Mumbai",
+          pincode: "400001",
+          deleted: false,
+          state: 1
+        }
+      ],
+      pagination_data: {
+        total_data: 14,
+        limit: 10,
+        total_pages: 2,
+        page_number: 1,
+        next_page: true,
+        previous_page: false
+      },
+      status: 200
+    };
+
+    this.branches = dummyResponse.data;
+    this.filteredBranches = this.branches;
+    this.totalData = dummyResponse.pagination_data.total_data;
+    this.limit = dummyResponse.pagination_data.limit;
+    this.totalPages = dummyResponse.pagination_data.total_pages;
+    this.pageNumber = dummyResponse.pagination_data.page_number;
+    this.nextPage = dummyResponse.pagination_data.next_page;
+    this.previousPage = dummyResponse.pagination_data.previous_page;
+    this.dataSource = new MatTableDataSource(this.branches);
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.matSort;
   }
 
   deleteBranch(id: number) {
-    // Implement delete functionality here
-    console.log('Delete branch with ID:', id);
-    this.branches = this.branches.filter((branch: any) => branch.id !== id);
-  }
-
-  applyPagination() {
-    this.dataSource = new MatTableDataSource(this.branches);
-    this.dataSource.paginator = this.paginator;
-  }
-
-  applyFilter(event: Event) {
-    const filterValue = (event.target as HTMLInputElement).value.trim().toLowerCase();
-    
-    this.filteredBranches = this.branches.filter((branch:any) =>
-      branch.branchName.toLowerCase().includes(filterValue)
-    );
+    if (confirm('Are you sure you want to delete this branch?')) {
+      this.branches = this.branches.filter((branch: any) => branch.id !== id);
+      this.dataSource = new MatTableDataSource(this.branches);
+    }
   }
 
   editBranch(branchId: any): void {
-    console.log('Editing branch with ID:', branchId);
-   
-   const dialogRef = this.dialog.open(BranchComponent, {
+    const dialogRef = this.dialog.open(BranchComponent, {
       width: '600px',
-      data: { branchId: branchId }  // Pass the branch ID if needed
+      data: { branchId: branchId }
     });
 
     dialogRef.afterClosed().subscribe((result: any) => {
-      // Handle any actions after the dialog is closed
+      if (result) {
+        // Update the branch in the list
+        const index = this.branches.findIndex((b: any) => b.id === branchId);
+        if (index !== -1) {
+          this.branches[index] = result;
+          this.dataSource = new MatTableDataSource(this.branches);
+        }
+      }
     });
   }
+
   onPageChange(event: any) {
-    console.log( 'eventworking');
-    
-    this.limit = event.pageSize; // Update 'limit' based on selected page size
-    this.pageNumber = event.pageIndex + 0;
-    this.pageNumber++
-    // this.pagination.page_number = this.pageNumber
-   
-    // this.branch_data.page_number = this.pageNumber
-    // this.branch_data.limit = this.limit
-    let d={
-      limit:this.limit,
-      "pagination":true,
-      page_number:this.pageNumber,
-      
-    }
-    this.api.post('api/allbranch/s='+this.y, d).subscribe((response: any) => {
-     
-      this.branches = new MatTableDataSource(response.data)
-    })
-  }
-  search(e:any) {
-    this.y=e
-    this.api.post('api/allbranch/s='+e, this.branch_data).subscribe((response: any) => {
-      //*console.log(response, 'salesssss');
-      this.c = response.data
-      this.branches = new MatTableDataSource(this.c)
-      this.loading=false
-      this.pagination = response.pagination_data
-      this.totalData = response.pagination_data.total_data;
-      this.limit = response.pagination_data.limit;
-      this.totalPages = response.pagination_data.total_pages;
-      this.pageNumber = response.pagination_data.page_number;
-      this.nextPage = response.pagination_data.next_page;
-      this.previousPage = response.pagination_data.previous_page;
-    })
+    this.limit = event.pageSize;
+    this.pageNumber = event.pageIndex + 1;
+    // Since we're using static data, we don't need to make an API call
   }
 
-  searchChange(event:any) {
+  searchChange(event: any) {
     const val = event.target.value;
-    //*console.log(event, "lll");
-    if (val == '') {
-      this.search('')
-    }else{
-    this.search(val);
-    this.loading=true
+    if (val === '') {
+      this.filter('');
+    } else {
+      this.filter(val);
+      this.loading = true;
     }
   }
-  sea(event:any){
-    const vallv= event
-    this.search(vallv);
-    this.loading=true
-  }
-  filter(a:any){
-    if (a == '') {
-      this.search('')
-      this.loading=true
+
+  filter(searchText: string) {
+    if (searchText === '') {
+      this.dataSource = new MatTableDataSource(this.branches);
+      this.loading = false;
+    } else {
+      const filteredData = this.branches.filter((branch: any) =>
+        branch.branchName.toLowerCase().includes(searchText.toLowerCase()) ||
+        branch.city.toLowerCase().includes(searchText.toLowerCase()) ||
+        branch.address.toLowerCase().includes(searchText.toLowerCase())
+      );
+      this.dataSource = new MatTableDataSource(filteredData);
+      this.loading = false;
     }
   }
+
   clearFilter() {
-    this.filterText = '';   
-    this.search('')
+    this.filterText = '';
+    this.filter('');
   }
 }

@@ -19,12 +19,12 @@ export const routes: Routes = [
   {
     path: 'organization',
     loadChildren: () => import('./organization/organization.module').then(m => m.OrganizationModule),
-    canActivate: [AuthguardService]
+    // canActivate: [AuthguardService]
   },
   {
     path: 'layout',
     loadChildren: () => import('./layout/layout.module').then(m => m.LayoutModule),
-    canActivate: [AuthguardService]
+    // canActivate: [AuthguardService]
   },
   {
     path: 'dashboard',
@@ -35,8 +35,8 @@ export const routes: Routes = [
   {
     path: 'lead',
     loadChildren: () => import('./lead/lead.module').then(m => m.LeadModule),
-    canActivate: [AuthguardService],
-    data: { pageName: 'Lead' }
+    // canActivate: [AuthguardService],
+    // data: { pageName: 'Lead' }
   },
   {
     path: 'followup',
@@ -47,8 +47,8 @@ export const routes: Routes = [
   {
     path: 'ticket',
     loadChildren: () => import('./ticket/ticket.module').then(m => m.TicketModule),
-    canActivate: [AuthguardService],
-    data: { pageName: 'Ticket' }
+    // canActivate: [AuthguardService],
+    // data: { pageName: 'Ticket' }
   },
   {
     path: 'app-sidebar',
