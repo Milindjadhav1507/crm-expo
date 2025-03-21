@@ -45,9 +45,9 @@
     <!-- Description -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Description</mat-label>
-      <textarea 
-        matInput 
-        formControlName="description" 
+      <textarea
+        matInput
+        formControlName="description"
         rows="6"
         placeholder="Detailed description of the issue...">
       </textarea>
@@ -60,10 +60,10 @@
     <div class="form-row">
       <mat-form-field appearance="outline">
         <mat-label>Contact Email</mat-label>
-        <input 
-          matInput 
-          type="email" 
-          formControlName="contact_email" 
+        <input
+          matInput
+          type="email"
+          formControlName="contact_email"
           placeholder="your@email.com">
         <mat-error *ngIf="getErrorMessage('contact_email')">
           {{ getErrorMessage('contact_email') }}
@@ -72,10 +72,10 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Contact Phone</mat-label>
-        <input 
-          matInput 
-          type="tel" 
-          formControlName="contact_phone" 
+        <input
+          matInput
+          type="tel"
+          formControlName="contact_phone"
           placeholder="10-digit phone number">
         <mat-error *ngIf="getErrorMessage('contact_phone')">
           {{ getErrorMessage('contact_phone') }}
@@ -86,8 +86,8 @@
     <!-- Expected Resolution Date -->
     <!-- <mat-form-field appearance="outline" class="full-width">
       <mat-label>Expected Resolution Date</mat-label>
-      <input 
-        matInput 
+      <input
+        matInput
         [matDatepicker]="picker"
         formControlName="expected_resolution_date"
         [min]="maxDate">
@@ -96,8 +96,8 @@
     </mat-form-field> -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Expected Resolution Date</mat-label>
-      <input 
-        matInput 
+      <input
+        matInput
         [matDatepicker]="picker"
         formControlName="expected_resolution_date"
         [min]="maxDate"
@@ -110,15 +110,15 @@
     <div class="file-upload-section">
       <label class="mat-body-1">Attachments</label>
       <div class="file-upload-container mat-elevation-z1">
-        <input 
-          type="file" 
+        <input
+          type="file"
           #fileInput
-          multiple 
+          multiple
           (change)="onFileSelected($event)"
           accept="image/*,.pdf,.doc,.docx"
           class="file-input">
-        <button 
-          mat-stroked-button 
+        <button
+          mat-stroked-button
           type="button"
           color="primary"
           (click)="fileInput.click()">
@@ -129,9 +129,9 @@
       <div class="attachments-list" *ngIf="ticketForm.get('attachments')?.value?.length">
         <div class="attachment-item mat-elevation-z1" *ngFor="let file of ticketForm.get('attachments')?.value; let i = index">
           <span class="file-name">{{ file.name }}</span>
-          <button 
-            mat-icon-button 
-            color="warn" 
+          <button
+            mat-icon-button
+            color="warn"
             type="button"
             (click)="removeAttachment(i)">
             <mat-icon>close</mat-icon>
@@ -143,9 +143,9 @@
     <!-- Additional Notes -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Additional Notes</mat-label>
-      <textarea 
-        matInput 
-        formControlName="additional_notes" 
+      <textarea
+        matInput
+        formControlName="additional_notes"
         rows="3"
         placeholder="Any additional information...">
       </textarea>
@@ -153,14 +153,14 @@
 
     <!-- Form Actions -->
     <div class="form-actions">
-      <button 
+      <button
         mat-stroked-button
         type="button"
         (click)="cancel()">
-        <mat-icon>close</mat-icon>
+        <mat-icon>close</mat-icon>   //milind
         Cancel
       </button>
-      <button 
+      <button
         mat-raised-button
         color="primary"
         type="submit"
