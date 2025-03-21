@@ -9,10 +9,11 @@
         <mat-icon>edit</mat-icon>
         Edit
       </button>
+      <!-- <button mat-stroked-button color="warn" (click)="onClose()" [disabled]="ticket.status === 'closed'">
       <button mat-stroked-button color="warn" (click)="onClose()" [disabled]="ticket.statusName === 'Closed'">
         <mat-icon>close</mat-icon>
         Close Ticket
-      </button>
+      </button> -->
     </div>
   </div>
 
@@ -24,7 +25,7 @@
           {{ticket.title}}
         </div>
       </mat-card-title>
-      <mat-card-subtitle>
+      <!-- <mat-card-subtitle>
         <div class="status-row">
           <mat-chip-set>
             <mat-chip [color]="getStatusColor(ticket.statusName)" selected>{{ticket.statusName}}</mat-chip>
@@ -32,7 +33,7 @@
             <mat-chip>{{ticket.categoryName}}</mat-chip>
           </mat-chip-set>
         </div>
-      </mat-card-subtitle>
+      </mat-card-subtitle> -->
     </mat-card-header>
 
     <mat-card-content>
@@ -43,18 +44,22 @@
             <div class="info-grid">
               <div class="info-item">
                 <label>Created By</label>
+                <!-- <span>{{ticket.createdBy || 'N/A'}}</span> -->
                 <span>{{ticket.createdByName || 'N/A'}}</span>
               </div>
               <div class="info-item">
                 <label>Assigned To</label>
+                <!-- <span>{{ticket.assignedTo || 'Unassigned'}}</span> -->
                 <span>{{ticket.assignedToName || 'Unassigned'}}</span>
               </div>
               <div class="info-item">
                 <label>Created At</label>
+                <!-- <span>{{formatDate(ticket.createdAt)}}</span> -->
                 <span>{{formatDate(ticket.created_at)}}</span>
               </div>
               <div class="info-item">
                 <label>Last Updated</label>
+                <!-- <span>{{ticket.updatedAt ? formatDate(ticket.updatedAt) : 'Not updated'}}</span> -->
                 <span>{{ticket.updated_at ? formatDate(ticket.updated_at) : 'Not updated'}}</span>
               </div>
             </div>
@@ -70,6 +75,10 @@
 
             <div class="attachments-section" *ngIf="ticket.attachments">
               <h3>Attachments</h3>
+              <!-- <div class="attachment-list">
+                <a *ngFor="let attachment of ticket.attachments" 
+                   [href]="attachment.url || attachment" 
+                   class="attachment-item" 
               <div class="attachment-list">
                 <a *ngFor="let attachment of ticket.attachments"
                    [href]="attachment"
@@ -78,7 +87,7 @@
                   <mat-icon>attach_file</mat-icon>
                   <span>{{attachment}}</span>
                 </a>
-              </div>
+              </div> -->
             </div>
           </div>
         </mat-tab>
@@ -94,11 +103,26 @@
               </button>
             </div>
 
+            <!-- <div class="communication-list">
+              <div *ngFor="let comm of ticket.communicationHistory" 
+                   class="communication-item"
+                   [ngClass]="comm.type">
+                <div class="message-header">
+                  <span class="sender">{{comm.author}}</span>
+                  <span class="timestamp">{{formatDate(comm.timestamp)}}</span>
+                </div>
+                <div class="message-content">
+                  {{comm.message}}
+                </div>
+              </div>
+              
+               <div *ngIf="!ticket.communicationHistory.length" class="no-communications">
+                <p>No communications yet.</p>
             <div class="communication-list">
               <div class="no-communications">
                 <p>No communications available.</p>
               </div>
-            </div>
+            </div> -->
           </div>
         </mat-tab>
       </mat-tab-group>
