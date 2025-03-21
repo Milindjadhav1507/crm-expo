@@ -36,7 +36,7 @@ export class TicketGenerationFormComponent implements OnInit {
   ticketForm!: FormGroup;
   isSubmitting = false;
   maxDate = new Date();
-  
+
   // priorities = [
   //   { value: 'high', label: 'High' },
   //   { value: 'medium', label: 'Medium' },
@@ -140,7 +140,7 @@ categories:any
       this.isSubmitting = true;
       try {
         const formData = this.ticketForm.value;
-  
+
         const newTicket: Partial<Ticket> = {
           title: formData.title,
           category: formData.category,
@@ -155,10 +155,10 @@ categories:any
           // createdAt: new Date(),
           // communicationHistory: []
         };
-  
+
         // API call using async/await
         const response = await this.api.post('ticket/create_ticket/', newTicket).toPromise();
-  
+
         if (response.status === 200) {
           console.log('Ticket created successfully:', response);
           this.snackBar.open('Ticket created successfully!', 'Close', {
@@ -166,7 +166,7 @@ categories:any
             horizontalPosition: 'end',
             verticalPosition: 'top'
           });
-  
+
           this.ticketCreated.emit(response.data); // Emit the created ticket
           this.router.navigate(['/tickets']);
         } else {
@@ -186,7 +186,7 @@ categories:any
       this.markFormGroupTouched(this.ticketForm);
     }
   }
-  
+
 
   private markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {

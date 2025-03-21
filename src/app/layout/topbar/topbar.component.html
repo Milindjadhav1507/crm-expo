@@ -36,6 +36,12 @@
       <a mat-button routerLink="/app-sidebar" routerLinkActive="active-link">
         <mat-icon>settings</mat-icon> Settings
       </a>
+      <a mat-button routerLink="/kanbanb" routerLinkActive="active-link">
+        <mat-icon>view_kanban</mat-icon> Kanban
+      </a>
+      <a mat-button routerLink="/cal" routerLinkActive="active-link">
+        <mat-icon>event</mat-icon> Calendar
+      </a>
     </nav>
   </div>
   <div class="toolbar-right">
@@ -47,7 +53,7 @@
         </button>
         <div class="dropdown-content" *ngIf="dropdownOpen" [ngClass]="{'show': dropdownOpen}">
           <button class="nav_list" mat-raised-button color="warn" (click)="logout()">
-            <mat-icon>logout</mat-icon> Logout 
+            <mat-icon>logout</mat-icon> Logout
             <!-- <mat-icon>exit_to_app</mat-icon> -->
           </button>
         </div>
