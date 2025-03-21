@@ -4,6 +4,8 @@ import { LoginComponent } from './account/login/login.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { AuthguardService } from './auth/authguard.service';
+import { KanbanComponent } from './layout/kanban/kanban.component';
+import { CalenderComponent } from './layout/calender/calender.component';
 
 export const routes: Routes = [
   {
@@ -51,5 +53,14 @@ export const routes: Routes = [
   {
     path: 'app-sidebar',
     component: SidebarComponent,
+  },
+  {
+    path: 'kanbanb',
+    component: KanbanComponent
+  },
+
+  {
+    path: 'cal',
+    component: CalenderComponent
   }
 ];

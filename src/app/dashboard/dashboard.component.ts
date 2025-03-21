@@ -129,7 +129,7 @@ getLeads() {
         disableClose: true, // Makes the backdrop static and disables keyboard close
         width: '600px', // Optional: Adjust dialog width
       });
-  
+
       dialogRef.afterClosed().subscribe(
         (result: any) => {
           console.log('Dialog closed with result:', result);
@@ -140,7 +140,7 @@ getLeads() {
           this.getLeads();
         }
       );
-  
+
     })
 
   }
@@ -230,7 +230,7 @@ fetchDashboardData() {
       const data = res.data;
       const chartDom = document.getElementById('doughnutChart')!;
       const myChart = echarts.init(chartDom);
-  
+
       const option = {
         title: {
           text: 'Leads Overview',
@@ -274,16 +274,16 @@ fetchDashboardData() {
           }
         ]
       };
-  
+
       // Set the option and render the chart
       myChart.setOption(option);
-  
+
       // Make the chart responsive
       window.addEventListener('resize', () => {
         myChart.resize();
       });
-    
-  
+
+
       // const dognutChart = {
       //   data: {
       //     datasets: [{

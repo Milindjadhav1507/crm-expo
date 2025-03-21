@@ -45,7 +45,7 @@ export class CommunicationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // Get ticket ID from route parameter instead of query param
+    // Get ticket ID from route parameter
     this.ticketId = Number(this.route.snapshot.paramMap.get('id'));
     if (!this.ticketId) {
       this.snackBar.open('Invalid ticket ID', 'Close', { duration: 3000 });
@@ -53,7 +53,12 @@ export class CommunicationComponent implements OnInit {
       return;
     }
 
-    // TODO: Fetch communication history from service
+    // Initialize with hardcoded communication history
+    this.initializeHardcodedHistory();
+  }
+
+  private initializeHardcodedHistory(): void {
+    // Hardcoded communication history
     this.history = [
       {
         id: 1,
@@ -68,6 +73,20 @@ export class CommunicationComponent implements OnInit {
         author: 'Support Agent',
         timestamp: new Date(Date.now() - 43200000),
         type: 'agent'
+      },
+      {
+        id: 3,
+        message: 'Initial assessment completed',
+        author: 'John Doe',
+        timestamp: new Date(Date.now() - 21600000),
+        type: 'user'
+      },
+      {
+        id: 4,
+        message: 'Working on a solution',
+        author: 'Support Agent',
+        timestamp: new Date(Date.now() - 10800000),
+        type: 'agent'
       }
     ];
   }
@@ -75,21 +94,19 @@ export class CommunicationComponent implements OnInit {
   onSubmit(): void {
     if (this.commentForm.valid && this.ticketId) {
       const comment: Communication = {
-        id: Date.now(), // Temporary ID generation
+        id: Date.now(), // Generate a unique ID
         message: this.commentForm.get('message')?.value,
-        author: 'Current User', // TODO: Get from auth service
+        author: 'Current User', // Hardcoded user for demo
         timestamp: new Date(),
         type: 'user'
       };
 
-      this.onNewCommunication.emit(comment);
-
-      // Add to local history for demo
+      // Add to local history
       this.history.push(comment);
 
-      // TODO: Implement actual API call
-      console.log('Adding comment:', comment);
-      
+      // Emit the new communication
+      this.onNewCommunication.emit(comment);
+
       this.snackBar.open('Comment added successfully', 'Close', {
         duration: 3000
       });

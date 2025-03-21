@@ -13,49 +13,49 @@
 //     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
 //     padding: 0 16px;
 //   }
-  
+
 //   .navbar-title {
 //     font-size: 1.5rem;
 //     font-weight: 600;
 //     margin-left: 8px;
 //     color: #fff;
 //   }
-  
+
 //   .spacer {
 //     flex: 1 1 auto;
 //   }
-  
+
 //   .nav-links a {
 //     text-transform: capitalize;
 //     margin: 0 8px;
 //     font-weight: 500;
 //     color: #fff;
 //   }
-  
+
 //   .nav-links a.active-link {
 //     border-bottom: 2px solid #ffca28;
 //   }
-  
+
 //   .auth-buttons button {
 //     margin-left: 8px;
 //   }
-  
+
 //   /* Sidenav Styling */
 //   .sidenav-container {
 //     // height: 100vh;
 //     display: flex;
 //   }
-  
+
 //   .sidenav {
 //     width: 250px;
 //     background: #f4f4f4;
 //   }
-  
+
 //   .sidenav mat-list-item {
 //     font-size: 1rem;
 //     font-weight: 500;
 //   }
-  
+
 //   .sidenav mat-list-item.active-link {
 //     background: #e3f2fd;
 //     border-left: 4px solid #1976d2;
@@ -74,41 +74,41 @@
 //     color: #474747; /* Black text */
 //     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 //   }
-  
+
 //   .navbar-title {
 //     font-size: 1.5rem;
 //     font-weight: bold;
 //     margin-left: 8px;
 //     color: #474747;
 //   }
-  
+
 //   .nav-links a {
 //     text-transform: capitalize;
 //     font-weight: 500;
 //     color: #474747;
 //     margin: 0 8px;
 //   }
-  
+
 //   .nav-links a.active-link {
 //     border-bottom: 2px solid #ffca28;
 //   }
-  
+
 //   .auth-buttons button {
 //     margin-left: 8px;
 //     border-color: #000;
 //     color: #474747;
 //   }
-  
+
 //   /* Sidenav Styling */
 //   .sidenav-container {
 //     display: flex;
 //   }
-  
+
 //   .sidenav {
 //     width: 250px;
 //     background: #f9f9f9; /* Light gray background */
 //   }
-  
+
 //   .sidenav mat-list-item {
 //     font-size: 1rem;
 //     font-weight: 500;
@@ -117,13 +117,13 @@
 //   .nav_list{
 //     color: #474747;
 //   }
-  
+
 //   .sidenav mat-list-item.active-link {
 //     background: #e3f2fd;
 //     border-left: 4px solid #1976d2;
 //     color: #1976d2; /* Highlight active link */
 //   }
-  
+
 //   /* Spacer to align elements */
 //   .spacer {
 //     flex: 1 1 auto;
@@ -132,7 +132,7 @@
     max-width: 100% !important;
     margin-top: 80px;
   }
-  
+
   @media (max-width: 768px) {
     #wrapper {
         flex-direction: column;
@@ -144,3 +144,15 @@
         margin-left: 0;
     }
   }
+
+
+  // #dp_1742542609199110607{
+  //   height:80vh !important;
+  //   }
+
+    .month_default_header_inner {
+      color: rgb(255 255 255 / 81%) !important;
+      font-weight: 800 !important;
+      background-color: #ff9f17 !important;
+      font-family: system-ui !important;
+    }

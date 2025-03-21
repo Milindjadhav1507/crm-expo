@@ -26,7 +26,7 @@ export class AppComponent {
       filter((event:any) => event instanceof NavigationEnd)
     ).subscribe((event: NavigationEnd) => {
       console.log(event.url);
-      
+
       this.isLoginPage = (event.url === '/login'  || event.url === '/'); // Set isLoginPage based on the route
     });
     console.log(this.isLoginPage,);

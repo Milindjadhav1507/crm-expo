@@ -19,7 +19,7 @@
           "options": {
             "stylePreprocessorOptions": {
               "includePaths": [""]
-            },          
+            },
             "outputPath": "dist/erp-crm",
             "index": "src/index.html",
             "browser": "src/main.ts",
@@ -41,9 +41,9 @@
               "node_modules/@fortawesome/fontawesome-free/css/all.min.css"
             ],
             "scripts": [
-            
+
               "node_modules/bootstrap/dist/js/bootstrap.min.js"
-             
+
             ]
           },
           "configurations": {
@@ -90,13 +90,13 @@
           "options": {
             "stylePreprocessorOptions": {
               "includePaths": [""]
-            },          
+            },
             "polyfills": ["zone.js", "zone.js/testing"],
             "tsConfig": "tsconfig.spec.json",
             "inlineStyleLanguage": "scss",
             "assets": [
               "src/favicon.ico",
-              "src/assets",            
+              "src/assets",
               {
                 "glob": "**/*",
                 "input": "public"

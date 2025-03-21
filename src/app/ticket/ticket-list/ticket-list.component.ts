@@ -14,7 +14,6 @@ import { RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { TicketDetailComponent } from '../ticket-detail/ticket-detail.component';
 import { TicketGenerationFormComponent } from '../ticket-generation-form/ticket-generation-form.component';
-import { CrmApiService } from '../../crm-api.service';
 
 export interface Communication {
   id: number;
@@ -58,7 +57,7 @@ export interface Ticket {
   standalone: true,
   imports: [
     CommonModule,
-    RouterLink,
+    // RouterLink,
     ReactiveFormsModule,
     MatCardModule,
     MatButtonModule,
@@ -93,6 +92,24 @@ export class TicketListComponent implements OnInit {
     'Low': 'primary'
   };
 
+  // Hardcoded status options
+  statusOptions = [
+    { value: '', label: 'All' },
+    { value: 'Open', label: 'Open' },
+    { value: 'In Progress', label: 'In Progress' },
+    { value: 'Resolved', label: 'Resolved' },
+    { value: 'Closed', label: 'Closed' },
+    { value: 'Pending', label: 'Pending' }
+  ];
+
+  // Hardcoded priority options
+  priorityOptions = [
+    { value: '', label: 'All' },
+    { value: 'High', label: 'High' },
+    { value: 'Medium', label: 'Medium' },
+    { value: 'Low', label: 'Low' }
+  ];
+
   constructor(
     private dialog: MatDialog,
     private snackBar: MatSnackBar
@@ -108,12 +125,15 @@ export class TicketListComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // this.ticketlist();
-    
+    // Initialize with hardcoded data
+    this.initializeHardcodedData();
+
+    // Set up search control subscription
     this.searchControl.valueChanges.subscribe(value => {
       this.searchSubject.next(value || '');
     });
 
+    // Set up filter subscriptions
     this.statusFilter.valueChanges.subscribe(() => {
       this.applyFilters();
     });
@@ -123,84 +143,106 @@ export class TicketListComponent implements OnInit {
     });
   }
 
-  ticketlist() {
+  private initializeHardcodedData(): void {
     // Hardcoded ticket data
     this.tickets = [
       {
         id: 1,
-        title: 'Fix login issue',
+        title: 'System Login Issue',
         category_id: 1,
         priority_id: 1,
-        description: 'Users are unable to log in due to a server error.',
+        description: 'Users unable to login to the system',
         attachments: null,
         contact_email: 'user1@example.com',
         contact_phone: '123-456-7890',
-        expected_resolution_date: '2025-03-25',
-        additional_notes: 'Critical issue affecting all users.',
+        expected_resolution_date: '2024-03-25',
+        additional_notes: 'Affecting multiple users',
         status_id: 1,
-        assigned_to_id: 2,
-        created_by_id: 1,
-        created_at: '2025-03-20T10:00:00',
-        updated_at: '2025-03-21T12:00:00',
+        assigned_to_id: 1,
+        created_by_id: 2,
+        created_at: '2024-03-20T10:00:00',
+        updated_at: null,
         deleted: false,
         statusName: 'Open',
-        categoryName: 'Bug',
+        categoryName: 'Technical',
         priorityName: 'High',
-        assignedToName: 'Jane Smith',
-        createdByName: 'John Doe'
+        assignedToName: 'John Doe',
+        createdByName: 'Admin'
       },
       {
         id: 2,
-        title: 'Add new feature to dashboard',
+        title: 'Payment Processing Error',
         category_id: 2,
         priority_id: 2,
-        description: 'Implement a new analytics widget on the dashboard.',
+        description: 'Payment gateway integration issues',
         attachments: null,
         contact_email: 'user2@example.com',
-        contact_phone: '987-654-3210',
-        expected_resolution_date: '2025-03-30',
-        additional_notes: 'Requested by the marketing team.',
+        contact_phone: '098-765-4321',
+        expected_resolution_date: '2024-03-26',
+        additional_notes: 'Affecting checkout process',
         status_id: 2,
-        assigned_to_id: null,
-        created_by_id: 2,
-        created_at: '2025-03-18T09:00:00',
-        updated_at: null,
+        assigned_to_id: 2,
+        created_by_id: 1,
+        created_at: '2024-03-19T15:30:00',
+        updated_at: '2024-03-20T09:00:00',
         deleted: false,
         statusName: 'In Progress',
-        categoryName: 'Feature',
+        categoryName: 'Billing',
         priorityName: 'Medium',
+        assignedToName: 'Jane Smith',
+        createdByName: 'Support'
+      },
+      {
+        id: 3,
+        title: 'Feature Request: Dark Mode',
+        category_id: 3,
+        priority_id: 3,
+        description: 'Add dark mode support to the application',
+        attachments: null,
+        contact_email: 'user3@example.com',
+        contact_phone: '555-555-5555',
+        expected_resolution_date: '2024-04-01',
+        additional_notes: 'User preference enhancement',
+        status_id: 3,
+        assigned_to_id: null,
+        created_by_id: 3,
+        created_at: '2024-03-18T11:20:00',
+        updated_at: null,
+        deleted: false,
+        statusName: 'Pending',
+        categoryName: 'Feature',
+        priorityName: 'Low',
         assignedToName: null,
-        createdByName: 'Alice Johnson'
+        createdByName: 'User'
       }
     ];
 
-    // Initialize filtered tickets with the hardcoded data
     this.filteredTickets = [...this.tickets];
   }
 
-  applyFilters() {
+  applyFilters(): void {
     let filtered = [...this.tickets];
-    const searchTerm = this.searchControl.value?.toLowerCase() || '';
-    const statusFilter = this.statusFilter.value?.toLowerCase() || '';
-    const priorityFilter = this.priorityFilter.value?.toLowerCase() || '';
 
+    // Apply search filter
+    const searchTerm = this.searchControl.value?.toLowerCase() || '';
     if (searchTerm) {
       filtered = filtered.filter(ticket =>
         ticket.title.toLowerCase().includes(searchTerm) ||
-        ticket.description.toLowerCase().includes(searchTerm)
+        ticket.description.toLowerCase().includes(searchTerm) ||
+        ticket.categoryName.toLowerCase().includes(searchTerm)
       );
     }
 
+    // Apply status filter
+    const statusFilter = this.statusFilter.value;
     if (statusFilter) {
-      filtered = filtered.filter(ticket =>
-        ticket.statusName.toLowerCase() === statusFilter
-      );
+      filtered = filtered.filter(ticket => ticket.statusName === statusFilter);
     }
 
+    // Apply priority filter
+    const priorityFilter = this.priorityFilter.value;
     if (priorityFilter) {
-      filtered = filtered.filter(ticket =>
-        ticket.priorityName.toLowerCase() === priorityFilter
-      );
+      filtered = filtered.filter(ticket => ticket.priorityName === priorityFilter);
     }
 
     this.filteredTickets = filtered;
@@ -223,13 +265,12 @@ export class TicketListComponent implements OnInit {
       width: '800px',
       height: '80vh',
       data: {
-        ticket: { ...ticket } // Pass a copy of the ticket
+        ticket: { ...ticket }
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Update the ticket in the list with the returned result
         const index = this.tickets.findIndex(t => t.id === result.id);
         if (index !== -1) {
           this.tickets[index] = result;
@@ -239,21 +280,27 @@ export class TicketListComponent implements OnInit {
     });
   }
 
-  openTicketcreation(ticket: Ticket): void {
+  openTicketcreation(ticket: Ticket | null): void {
     const dialogRef = this.dialog.open(TicketGenerationFormComponent, {
       width: '800px',
       height: '80vh',
       data: {
-        ticket: { ...ticket } // Pass a copy of the ticket
+        ticket: ticket ? { ...ticket } : null
       }
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Update the ticket in the list with the returned result
-        const index = this.tickets.findIndex(t => t.id === result.id);
-        if (index !== -1) {
-          this.tickets[index] = result;
+        if (ticket) {
+          // Update existing ticket
+          const index = this.tickets.findIndex(t => t.id === result.id);
+          if (index !== -1) {
+            this.tickets[index] = result;
+            this.applyFilters();
+          }
+        } else {
+          // Add new ticket
+          this.tickets.push(result);
           this.applyFilters();
         }
       }
@@ -262,7 +309,6 @@ export class TicketListComponent implements OnInit {
 
   deleteTicket(ticket: Ticket): void {
     if (confirm(`Are you sure you want to delete ticket #${ticket.id}?`)) {
-      // TODO: Implement ticket deletion
       const index = this.tickets.findIndex(t => t.id === ticket.id);
       if (index !== -1) {
         this.tickets.splice(index, 1);
