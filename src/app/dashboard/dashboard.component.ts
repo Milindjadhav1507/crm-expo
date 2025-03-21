@@ -159,7 +159,13 @@ getLeads() {
     }
   }
 fetchChartData() {
-  this.barChartOptions = {
+  // Dummy data for weekly leads
+  const dummyData = {
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    data: [45, 52, 38, 64, 58, 50, 45]
+  };
+
+  this.lineChart1 = {
     color: ['#50a5f1'],
     tooltip: {
       trigger: 'axis',
@@ -176,7 +182,7 @@ fetchChartData() {
     xAxis: [
       {
         type: 'category',
-        data: [],
+        data: dummyData.labels,
         axisTick: {
           show: false
         },
@@ -204,24 +210,12 @@ fetchChartData() {
       name: 'Leads',
       type: 'bar',
       barWidth: '30%',
-      data: []
+      data: dummyData.data,
+      itemStyle: {
+        color: '#50a5f1'
+      }
     }]
   };
-  this.api.get('api/previous_leads/', null).subscribe(
-    (res: any) => {
-      console.log(res); // Log the response to inspect the format
-      const rawData = res.data; // Assuming the response matches the format you've shared
-      const labels = Object.keys(rawData[0]);
-      const data = Object.values(rawData[0]);
-      let v = 0;
-      this.barChartOptions.xAxis[0].data = labels
-      this.barChartOptions.series[0].data = data
-      console.log(this.barChartOptions);
-      this.lineChart1 = this.barChartOptions
-
-    });
-
-
 }
 
 fetchDashboardData() {

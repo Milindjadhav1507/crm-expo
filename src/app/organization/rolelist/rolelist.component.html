@@ -1,7 +1,6 @@
-
-  <mat-tab-group>
-    <mat-tab label="Create Role"> 
-        <app-rolemanagement ></app-rolemanagement>
+<mat-tab-group>
+    <mat-tab label="Create Role">
+        <app-rolemanagement></app-rolemanagement>
     </mat-tab>
     <mat-tab label="Role List">
         <div>
@@ -15,7 +14,7 @@
                 <mat-icon matSuffix>search</mat-icon>
               </mat-form-field> -->
             <mat-card-content>
-               
+
               <!-- <input matInput placeholder="Search" (keyup)="applyFilter($event)"/> -->
               <div class="col-md-4">
                 <mat-form-field>
@@ -25,10 +24,10 @@
                     <button mat-button matSuffix mat-icon-button *ngIf="filterText" (click)="clearFilter()">
                         <mat-icon>clear</mat-icon>
                     </button>
-    
+
                 </mat-form-field>
                 <!-- src="../../../assets/images/enter.png" -->
-                <img alt="" *ngIf="filterText" (click)="sea(filterText)" style="width: 24px;
+                <img alt="" *ngIf="filterText" (click)="filter(filterText)" style="width: 24px;
                 height: 24px;
                 background: #e8e8e8;
                 border-radius: 16px;
@@ -37,38 +36,43 @@
               <table mat-table [dataSource]="roleData" class="mat-elevation-z8">
                 <ng-container matColumnDef="srNo">
                     <th mat-header-cell *matHeaderCellDef> Sr. No. </th>
-                    <td mat-cell *matCellDef="let role let i = index"> {{ i + 1 }} </td>
-                  </ng-container>
+                    <td mat-cell *matCellDef="let role; let i = index"> {{ i + 1 }} </td>
+                </ng-container>
 
                 <ng-container matColumnDef="name">
-                  <th mat-header-cell *matHeaderCellDef> Role  </th>
+                  <th mat-header-cell *matHeaderCellDef> Role Name </th>
                   <td mat-cell *matCellDef="let role"> {{role.name}} </td>
                 </ng-container>
-           
 
-               
+                <ng-container matColumnDef="description">
+                  <th mat-header-cell *matHeaderCellDef> Description </th>
+                  <td mat-cell *matCellDef="let role"> {{role.description || 'N/A'}} </td>
+                </ng-container>
+
+                <ng-container matColumnDef="level">
+                  <th mat-header-cell *matHeaderCellDef> Level </th>
+                  <td mat-cell *matCellDef="let role"> {{role.level || 'N/A'}} </td>
+                </ng-container>
 
                 <ng-container matColumnDef="actions">
                   <th mat-header-cell *matHeaderCellDef> Actions </th>
                   <td mat-cell *matCellDef="let role">
-                    <button mat-icon-button color="primary" (click)="editDesignation(role.id)">
+                    <button mat-icon-button color="primary" (click)="editRole(role.id)">
                         <mat-icon>edit</mat-icon>
-                      </button>
-                    
-                      <button mat-icon-button color="warn" (click)="deletedesignation(role.id)">
+                    </button>
+                    <button mat-icon-button color="warn" (click)="deleteRole(role.id)">
                         <mat-icon>delete</mat-icon>
-                      </button>
-                     
+                    </button>
                   </td>
                 </ng-container>
 
                 <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
                 <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
               </table>
-              <mat-paginator [pageSizeOptions]=[10,20,50,100] (page)="onPageChange($event)" [length]="totalData"  showFirstLastButtons></mat-paginator>
+              <mat-paginator [pageSizeOptions]=[10,20,50,100] (page)="onPageChange($event)" [length]="totalData" showFirstLastButtons></mat-paginator>
             </mat-card-content>
           </mat-card>
         </div>
     </mat-tab>
-    
+
 </mat-tab-group>
