@@ -1,0 +1,95 @@
+<div class="communication-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Add Comment</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="commentForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Your Message</mat-label>
+          <textarea 
+            matInput 
+            formControlName="message" 
+            rows="4" 
+            placeholder="Type your message here...">
+          </textarea>
+          <mat-error *ngIf="commentForm.get('message')?.hasError('required')">
+            Message is required
+          </mat-error>
+          <mat-error *ngIf="commentForm.get('message')?.hasError('minlength')">
+            Message must be at least 3 characters long
+          </mat-error>
+        </mat-form-field>
+
+        <!-- File upload section for future implementation -->
+        <div class="file-upload">
+          <input 
+            type="file" 
+            #fileInput 
+            hidden 
+            multiple 
+            (change)="onFileSelected($event)"
+            accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png">
+          
+          <button 
+            type="button"
+            mat-stroked-button 
+            color="primary"
+            (click)="fileInput.click()">
+            <mat-icon>attach_file</mat-icon>
+            Add Attachments
+          </button>
+
+          <div class="attachments-list" *ngIf="commentForm.get('attachments')?.value?.length">
+            <div *ngFor="let file of commentForm.get('attachments')?.value; let i = index" 
+                 class="attachment-item">
+              <span>{{file.name}}</span>
+              <button 
+                type="button"
+                mat-icon-button 
+                color="warn" 
+                (click)="removeAttachment(i)">
+                <mat-icon>close</mat-icon>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <button 
+            type="button"
+            mat-stroked-button 
+            (click)="onCancel()">
+            Cancel
+          </button>
+          <button 
+            type="submit"
+            mat-raised-button 
+            color="primary"
+            [disabled]="!commentForm.valid">
+            Submit Comment
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Communication History -->
+  <div class="history-section" *ngIf="history.length">
+    <h3>Previous Communications</h3>
+    <div class="communication-list">
+      <div *ngFor="let comm of history" 
+           class="communication-item"
+           [ngClass]="comm.type">
+        <div class="message-header">
+          <span class="author">{{comm.author}}</span>
+          <span class="timestamp">{{comm.timestamp | date:'medium'}}</span>
+        </div>
+        <div class="message-content">
+          {{comm.message}}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

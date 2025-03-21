@@ -1,0 +1,85 @@
+<div
+  style="
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+  "
+>
+  <div
+    style="
+      background: #ffffff;
+      padding: 3rem 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      width: 100%;
+      max-width: 400px;
+    "
+  >
+    <div style="text-align: center; margin-bottom: 2rem;">
+      <!-- Adjusted Image Size -->
+      <!-- <img
+        src="assets/logo1.png"
+        alt="CRM Logo"
+        style="max-width: 50%; height: auto; margin-bottom: 1rem;"  
+      /> -->
+      <h2 style="margin: 0; font-weight: 600; color: #343a40;">
+        Welcome Back!
+      </h2>
+      <p style="margin: 0; font-size: 0.9rem; color: #6c757d;">
+        Login to your CRM account
+      </p>
+    </div>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <!-- Username -->
+      <mat-form-field class="full-width" appearance="fill" style="margin-bottom: 1.5rem;width: 100%;">
+        <mat-label>Username</mat-label>
+        <input matInput placeholder="Enter your email" formControlName="email" />
+        <mat-icon matSuffix>email</mat-icon>
+        <mat-error *ngIf="loginForm.get('workEmail')?.invalid">
+          Please enter a valid email address
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Password -->
+      <mat-form-field class="full-width" appearance="fill" style="margin-bottom: 1.5rem;width: 100%;">
+        <mat-label>Password</mat-label>
+        <input matInput type="password" placeholder="Enter your password" formControlName="password" />
+        <mat-icon matSuffix>lock</mat-icon>
+        <mat-error *ngIf="loginForm.get('password')?.invalid">
+          Password is required
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Forgot Password Link -->
+      <div style="text-align: right; margin-bottom: 1.5rem;">
+        <a routerLink="/forgot-password" style="text-decoration: none; color: #007bff;">
+          Forgot Password?
+        </a>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        mat-raised-button
+        color="primary"
+        style="width: 100%; height: 50px; font-size: 1rem; font-weight: bold;"
+        type="submit"
+        [disabled]="!loginForm.valid"
+      >
+        Login
+      </button>
+    </form>
+
+    <!-- Register Link -->
+    <div style="text-align: center; margin-top: 2rem;">
+      <p style="margin: 0; font-size: 0.9rem; color: #6c757d;">
+        Don't have an account? 
+        <a routerLink="/register" style="color: #007bff; text-decoration: none;">
+          Register here
+        </a>
+      </p>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,103 @@
+<div [ngClass]="{ 'designation-management-container mat-elevation-z8': data == null }">
+  <mat-card>
+    <mat-card-header class=" text-center" *ngIf="data!=null">
+      <h2 class="mb-2 title">Edit Designation</h2>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="designationForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <!-- Designation Name -->
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Designation Name</mat-label>
+              <input
+                matInput
+                formControlName="designation_name"
+                placeholder="Enter designation name"
+              />
+              <mat-error *ngIf="designationForm.get('designation_name')?.touched && designationForm.get('designation_name')?.invalid">
+                <small *ngIf="designationForm.get('designation_name')?.errors?.['required']">
+                  Designation name is required.
+                </small>
+                <small *ngIf="designationForm.get('designation_name')?.errors?.['minlength']">
+                  Designation name must be at least 3 characters long.
+                </small>
+                <small *ngIf="designationForm.get('designation_name')?.errors?.['maxlength']">
+                  Designation name cannot exceed 50 characters.
+                </small>
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Department -->
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Department</mat-label>
+              <mat-select formControlName="department">
+                <!-- <mat-option value="">Select Department</mat-option> -->
+                <mat-option *ngFor="let s of departmentData" [value]="s.id">{{s.name}}</mat-option>
+              </mat-select>
+              <mat-error *ngIf="designationForm.get('department')?.touched && designationForm.get('department')?.invalid">
+                <small *ngIf="designationForm.get('department')?.errors?.['required']">
+                  Select Department.
+                </small>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+     
+<!-- Level -->
+        <div class="row">
+          
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Level</mat-label>
+      
+              <mat-select formControlName="level">
+                <mat-option *ngFor="let s of level_Data;let i=index" [value]="s.id">{{s.name}}</mat-option>
+               
+              </mat-select>
+              <mat-error *ngIf="designationForm.get('level')?.touched && designationForm.get('level')?.invalid">
+                <small *ngIf="designationForm.get('level')?.errors?.['required']">Level is required.</small>
+                <!-- <small *ngIf="branchForm.get('state')?.errors?.['minlength']">State must be at least 2 characters long.</small>
+                <small *ngIf="branchForm.get('state')?.errors?.['maxlength']">State cannot exceed 50 characters.</small> -->
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <!-- Description -->
+          <div class="col-md-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Description</mat-label>
+              <textarea
+                matInput
+                formControlName="description"
+                rows="3"
+                placeholder="Enter designation description"
+              ></textarea>
+              <mat-error *ngIf="designationForm.get('description')?.touched && designationForm.get('description')?.invalid">
+                <small *ngIf="designationForm.get('description')?.errors?.['required']">
+                  Description is required.
+                </small>
+                <small *ngIf="designationForm.get('description')?.errors?.['maxlength']">
+                  Description cannot exceed 200 characters.
+                </small>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <!-- Submit Button -->
+        <div class="text-right">
+          <button mat-raised-button color="primary" type="submit" [disabled]="designationForm.invalid">
+            <i class="fas fa-save mr-2"></i> Submit
+          </button>
+        <button *ngIf="data!=null" mat-raised-button color="warn" style="margin-left: 40px;" (click)="onClose()">
+          close
+        </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

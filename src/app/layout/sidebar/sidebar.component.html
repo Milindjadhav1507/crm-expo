@@ -1,0 +1,38 @@
+<div class="container">
+    <div class="d-flex main-wrapper" id="wrapper">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar-wrapper" [class.toggled]="isSidebarToggled" role="navigation" aria-label="Sidebar Navigation">
+            <div class="sidebar-brand">
+                <mat-icon class="brand-icon">business</mat-icon>
+                <h1 class="sidebar-heading">Settings</h1>
+            </div>
+            <div class="sidebar-content">
+                <nav class="list-group list-group-flush" aria-label="Sidebar Menu">
+                    <a *ngFor="let a of listData;let i=index"
+                        class="list-group-item list-group-item-action sidebar-item"
+                        [class.active]="a.id === selected" 
+                        (click)="select(a.id)" [attr.aria-label]="a.name" [attr.aria-current]="a.id === selected ? 'page' : undefined" 
+                        tabindex="0">
+                        <div class="item-content">
+                            <mat-icon [class]="getIconClass(a.name)" aria-hidden="true"></mat-icon>
+                            <span class="item-text">{{a.name}}</span>
+                        </div>
+                        <mat-icon class="arrow-icon" aria-hidden="true">chevron_right</mat-icon>
+                    </a>
+                </nav>
+            </div>
+        </aside>
+
+        <!-- Page Content -->
+        <main id="page-content-wrapper">
+            <div class="content-area">
+                <app-branchlist *ngIf="selected==='1'"></app-branchlist>
+                <app-departmentlist *ngIf="selected==='2'"></app-departmentlist>
+                <app-designationlist *ngIf="selected==='3'"></app-designationlist>
+                <app-rolelist *ngIf="selected==='4'"></app-rolelist>
+                <app-user-list *ngIf="selected==='5'"></app-user-list>
+          
+            </div>
+        </main>
+    </div>
+</div>

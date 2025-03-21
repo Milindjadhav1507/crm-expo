@@ -1,0 +1,114 @@
+<div class="container">
+    <!-- <mat-card> -->
+    <!-- <mat-card-title>Follow-Ups</mat-card-title> -->
+    <!-- <mat-card-content> -->
+      <div class="filters mb-3">
+        <div class="row">
+          <!-- Date Filter -->
+          <div class="col-md-2">
+            <label for="startDate">Start Date:</label>
+            <input id="startDate" type="date" class="form-control" [(ngModel)]="filters.startDate"
+              (change)="applyFilters()" />
+          </div>
+          <div class="col-md-2">
+            <label for="endDate">End Date:</label>
+            <input id="endDate" type="date" class="form-control" [(ngModel)]="filters.endDate" (change)="applyFilters()" />
+          </div>
+          <!-- Status Filter -->
+          <div class="col-md-2">
+            <label for="statusFilter">Status:</label>
+            <select id="statusFilter" class="form-control" [(ngModel)]="filters.status" (change)="applyFilters()">
+              <option value="">All</option>
+              <option value="open">Open</option>
+              <option value="closed">Close</option>
+              <option value="demo given">demo given</option>
+            </select>
+          </div>
+          <div class="col-md-2">
+            <!-- <mat-form-field appearance="outline" class="w-100"> -->
+              <label  for="statusFilter">Select Lead:</label>
+              <select id="statusFilter" class="form-control" [(ngModel)]="selectedLead" (change)="getAllFollowUps()">
+                <option value="">All</option>
+                <option *ngFor="let lead of leadOptions" [ngValue]="lead.id">
+                  {{ lead.leadName }}
+                </option>
+              </select>
+            <!-- </mat-form-field> -->
+          </div>
+          <div class="col-md-4 mt-4" style="align-self: end;text-align: end;">
+            <button mat-raised-button color="primary" (click)="openCreateFollowUpModal()">Create Follow-Up</button>
+          </div>
+        </div>
+    <div class="row">
+   
+    
+    </div>.
+    <div class="row">
+      <table mat-table [dataSource]="dataSource" matSort>
+        <!-- ID Column -->
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef> ID </th>
+          <td mat-cell *matCellDef="let element"> {{ element.id }} </td>
+        </ng-container>
+        <!-- ID Column -->
+        <ng-container matColumnDef="created">
+          <th mat-header-cell *matHeaderCellDef> Created At</th>
+          <td mat-cell *matCellDef="let element"> {{ element.created_at | date:'dd-MM-yyyy'}} </td>
+        </ng-container>
+        <!-- Lead Name Column -->
+        <ng-container matColumnDef="leadName">
+          <th mat-header-cell *matHeaderCellDef> Lead Name </th>
+          <td mat-cell *matCellDef="let element"> {{ element.leadName }} </td>
+        </ng-container>
+  
+        <!-- Status Column -->
+        <ng-container matColumnDef="statusName">
+          <th mat-header-cell *matHeaderCellDef> Status </th>
+          <td mat-cell *matCellDef="let element">
+            <span [ngClass]="{
+                  'failure-status': element.statusName === 'open',
+                  'warning-status': element.statusName === 'demo given',               
+                  'success-status': element.statusName === 'closed'
+                }">
+              {{ element.statusName }}
+            </span>
+        </ng-container>
+  
+        <!-- Comments Column -->
+        <ng-container matColumnDef="comments">
+          <th mat-header-cell *matHeaderCellDef> Comments </th>
+          <td mat-cell *matCellDef="let element"> {{ element.comments }} </td>
+        </ng-container>
+  
+        <!-- Next Follow-Up Date Column -->
+        <ng-container matColumnDef="next_followup_date">
+          <th mat-header-cell *matHeaderCellDef> Next Follow-Up </th>
+          <td mat-cell *matCellDef="let element">
+            {{ element.next_followup_date | date: 'dd-MM-yyyy' }}
+          </td>
+        </ng-container>
+  
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef> Actions </th>
+          <td mat-cell *matCellDef="let element">
+            <button mat-icon-button color="primary" (click)="editFollowUp(element)">
+              <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" (click)="deleteFollowUp(element.id)">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </td>
+        </ng-container>
+  
+        <!-- Table Header and Row Definitions -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+      </table>
+    </div>
+    <!-- Pagination -->
+    <mat-paginator [length]="dataSource.data.length" [pageSize]="5" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons>
+    </mat-paginator>
+    <!-- </mat-card-content> -->
+    <!-- </mat-card> -->
+  </div>

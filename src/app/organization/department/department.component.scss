@@ -1,0 +1,48 @@
+/* Reduce spacing between navbar and content */
+.form-container {
+    margin-top: 20px;
+    max-width: 600px;
+    padding: 20px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  /* Form styling */
+  .form-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px; /* Space between form fields */
+  }
+  
+  .mat-form-field {
+    width: 100%;
+  }
+  
+  .text-primary {
+    color: #1976d2;
+  }
+  
+  /* Button alignment */
+  .text-right {
+    display: flex;
+    justify-content: flex-end;
+  }
+  .department-management-container {
+    padding: 24px;
+    margin: 0 auto;
+  
+    mat-card {
+      margin-bottom: 24px;
+      
+      mat-card-header {
+        margin-bottom: 20px;
+        
+        mat-card-title {
+          font-size: 24px;
+          font-weight: 500;
+          color: #333;
+        }
+      }
+    }
+  }
+  

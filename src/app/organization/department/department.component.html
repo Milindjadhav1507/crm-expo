@@ -1,0 +1,88 @@
+<div [ngClass]="{ 'department-management-container mat-elevation-z8': data == null }">
+  <mat-card>
+    <mat-card-header class="text-center" *ngIf="data!=null">
+      <h2 class="mb-2 title">Edit Department</h2>
+    </mat-card-header>
+    <mat-card-content>
+      <form [formGroup]="departmentForm" (ngSubmit)="onSubmit()">
+        <div class="row">
+          <!-- Department Name -->
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Department Name</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="name"
+                placeholder="Enter department name"
+              />
+              <mat-error *ngIf="departmentForm.get('name')?.touched && departmentForm.get('name')?.invalid">
+                <small *ngIf="departmentForm.get('name')?.errors?.['required']">
+                  Department name is required.
+                </small>
+                <small *ngIf="departmentForm.get('name')?.errors?.['minlength']">
+                  Department name must be at least 3 characters long.
+                </small>
+                <small *ngIf="departmentForm.get('name')?.errors?.['maxlength']">
+                  Department name cannot exceed 50 characters.
+                </small>
+              </mat-error>
+            </mat-form-field>
+          </div>
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Branch</mat-label>
+      
+              <mat-select formControlName="branch">
+                <mat-option *ngFor="let s of branchData;let i=index" [value]="s.id">{{s.branchName}}</mat-option>
+               
+              </mat-select>
+              <mat-error *ngIf="departmentForm.get('branch')?.touched && departmentForm.get('branch')?.invalid">
+                <small *ngIf="departmentForm.get('branch')?.errors?.['required']">State is required.</small>
+                <!-- <small *ngIf="branchForm.get('state')?.errors?.['minlength']">State must be at least 2 characters long.</small>
+                <small *ngIf="branchForm.get('state')?.errors?.['maxlength']">State cannot exceed 50 characters.</small> -->
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <!-- Description -->
+          <div class="col-md-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Description</mat-label>
+              <textarea
+                matInput
+                rows="3"
+                formControlName="description"
+                placeholder="Enter department description"
+              ></textarea>
+              <mat-error *ngIf="departmentForm.get('description')?.touched && departmentForm.get('description')?.invalid">
+                <small *ngIf="departmentForm.get('description')?.errors?.['required']">
+                  Description is required.
+                </small>
+                <small *ngIf="departmentForm.get('description')?.errors?.['maxlength']">
+                  Description cannot exceed 200 characters.
+                </small>
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+        <div class="row">
+          <!-- Submit Button -->
+          <div class="col-md-12 text-right mt-3">
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="departmentForm.invalid"
+            >
+              Submit
+            </button> <button *ngIf="data!=null" mat-raised-button color="warn" style="margin-left: 40px;" (click)="onClose()">
+              close
+            </button>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

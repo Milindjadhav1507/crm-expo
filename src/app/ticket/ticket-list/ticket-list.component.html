@@ -1,0 +1,102 @@
+<div class="ticket-list-container">
+  <div class="filters">
+    <mat-form-field appearance="outline" class="search-field">
+      <mat-label>Search Tickets</mat-label>
+      <input matInput [formControl]="searchControl" placeholder="Search by title or description">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select [formControl]="statusFilter">
+        <mat-option value="">All</mat-option>
+        <mat-option value="Open">Open</mat-option>
+        <mat-option value="In Progress">In Progress</mat-option>
+        <mat-option value="Resolved">Resolved</mat-option>
+        <mat-option value="Closed">Closed</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Priority</mat-label>
+      <mat-select [formControl]="priorityFilter">
+        <mat-option value="">All</mat-option>
+        <mat-option value="High">High</mat-option>
+        <mat-option value="Medium">Medium</mat-option>
+        <mat-option value="Low">Low</mat-option>
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="actions">
+    <button mat-raised-button color="primary" [routerLink]="['/ticket/list']">
+      <mat-icon>add</mat-icon>
+      Create Ticket
+    </button>
+  </div>
+
+  <div class="tickets-grid">
+    <mat-card *ngFor="let ticket of filteredTickets" class="ticket-card">
+      <mat-card-header>
+        <mat-card-title>
+          <div class="title-row">
+            <span class="ticket-id">#{{ticket.id}}</span>
+            {{ticket.title}}
+          </div>
+        </mat-card-title>
+        <mat-card-subtitle>
+          <div class="status-row">
+            <mat-chip-set>
+              <mat-chip [color]="getStatusColor(ticket.statusName)" selected>{{ticket.statusName}}</mat-chip>
+              <mat-chip [color]="getPriorityColor(ticket.priorityName)" selected>{{ticket.priorityName}}</mat-chip>
+              <mat-chip>{{ticket.categoryName}}</mat-chip>
+            </mat-chip-set>
+          </div>
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <p class="description">{{ticket.description}}</p>
+        <div class="meta-info">
+          <span class="created-at">
+            <mat-icon>schedule</mat-icon>
+            {{formatDate(ticket.created_at)}}
+          </span>
+          <span class="contact-info">
+            <mat-icon>email</mat-icon>
+            {{ticket.contact_email}}
+          </span>
+          <span class="contact-info">
+            <mat-icon>phone</mat-icon>
+            {{ticket.contact_phone}}
+          </span>
+          <span class="assigned-to" *ngIf="ticket.assignedToName">
+            <mat-icon>person</mat-icon>
+            {{ticket.assignedToName}}
+          </span>
+        </div>
+      </mat-card-content>
+
+      <div class="actions">
+        <button mat-button color="primary" (click)="openTicketDetails(ticket)">
+          <mat-icon>visibility</mat-icon>
+          View
+        </button>
+        <!-- [routerLink]="['/ticket', ticket.id, 'edit']" -->
+        <button mat-button color="accent" (click)="openTicketcreation(ticket)">
+          <mat-icon>edit</mat-icon>
+          Edit
+        </button>
+        <button mat-button color="warn" (click)="deleteTicket(ticket)" *ngIf="ticket.statusName !== 'Closed'">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      </div>
+    </mat-card>
+  </div>
+
+  <div *ngIf="filteredTickets.length === 0" class="no-tickets">
+    <mat-icon>search_off</mat-icon>
+    <p>No tickets found matching your criteria</p>
+  </div>
+</div>

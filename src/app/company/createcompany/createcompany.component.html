@@ -1,0 +1,73 @@
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9;">
+    <div style="width: 100%; max-width: 600px; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); background-color: #ffffff;">
+      <h2 style="text-align: center; margin-bottom: 20px; font-size: 1.5rem;">Add Company</h2>
+  
+      <form [formGroup]="companyForm" (ngSubmit)="onSubmit()">
+        <!-- Company Name -->
+        <div style="margin-bottom: 15px;">
+          <label for="companyName" style="font-size: 1rem; font-weight: 500; display: block; margin-bottom: 5px;">Company Name</label>
+          <input
+            type="text"
+            id="companyName"
+            style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ced4da; font-size: 1rem;"
+            placeholder="Enter company name"
+            formControlName="companyName"
+          />
+          <div *ngIf="companyForm.get('companyName')?.invalid && companyForm.get('companyName')?.touched" style="color: #dc3545; font-size: 0.875rem; margin-top: 5px;">
+            Company Name is required.
+          </div>
+        </div>
+  
+        <!-- Company Email -->
+        <div style="margin-bottom: 15px;">
+          <label for="companyEmail" style="font-size: 1rem; font-weight: 500; display: block; margin-bottom: 5px;">Company Email</label>
+          <input
+            type="email"
+            id="companyEmail"
+            style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ced4da; font-size: 1rem;"
+            placeholder="Enter company email"
+            formControlName="companyEmail"
+          />
+          <div *ngIf="companyForm.get('companyEmail')?.invalid && companyForm.get('companyEmail')?.touched" style="color: #dc3545; font-size: 0.875rem; margin-top: 5px;">
+            Please enter a valid email.
+          </div>
+        </div>
+  
+        <!-- Company Phone -->
+        <div style="margin-bottom: 15px;">
+          <label for="companyPhone" style="font-size: 1rem; font-weight: 500; display: block; margin-bottom: 5px;">Company Phone</label>
+          <input
+            type="text"
+            id="companyPhone"
+            style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ced4da; font-size: 1rem;"
+            placeholder="Enter company phone"
+            formControlName="companyPhone"
+          />
+          <div *ngIf="companyForm.get('companyPhone')?.invalid && companyForm.get('companyPhone')?.touched" style="color: #dc3545; font-size: 0.875rem; margin-top: 5px;">
+            Company Phone is required.
+          </div>
+        </div>
+  
+        <!-- Company Address -->
+        <div style="margin-bottom: 15px;">
+          <label for="companyAddress" style="font-size: 1rem; font-weight: 500; display: block; margin-bottom: 5px;">Company Address</label>
+          <textarea
+            id="companyAddress"
+            style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ced4da; font-size: 1rem; resize: vertical;"
+            rows="3"
+            placeholder="Enter company address"
+            formControlName="companyAddress"
+          ></textarea>
+          <div *ngIf="companyForm.get('companyAddress')?.invalid && companyForm.get('companyAddress')?.touched" style="color: #dc3545; font-size: 0.875rem; margin-top: 5px;">
+            Company Address is required.
+          </div>
+        </div>
+  
+        <!-- Submit Button -->
+        <button type="submit" style="width: 100%; padding: 10px; border-radius: 4px; background-color: #007bff; color: white; font-size: 1rem; border: none; cursor: pointer;" [disabled]="companyForm.invalid">
+          Save Company
+        </button>
+      </form>
+    </div>
+  </div>
+  

@@ -1,0 +1,118 @@
+<div class="role-management-container mat-elevation-z8">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Create Role and Assign Permissions</mat-card-title>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <form [formGroup]="roleForm" (ngSubmit)="onSubmit()">
+        <!-- Role Name Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Role Name</mat-label>
+          <input matInput formControlName="name" placeholder="Enter role name" required>
+          <mat-error *ngIf="roleForm.get('name')?.hasError('required')">
+            Role name is required
+          </mat-error>
+          <!-- <mat-error *ngIf="roleForm.get('name')?.hasError('minlength')">
+            Role name must be at least 3 characters
+          </mat-error> -->
+        </mat-form-field>
+        <!-- Add description and level also -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Role Description</mat-label>
+          <input matInput formControlName="description" placeholder="Enter role description" required>
+          <mat-error *ngIf="roleForm.get('description')?.hasError('required')">
+            Role description is required
+          </mat-error>
+          <!-- <mat-error *ngIf="roleForm.get('description')?.hasError('minlength')">
+            Role description must be at least 3 characters
+          </mat-error> -->
+        </mat-form-field>
+        <!-- add level field -->
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Role Level</mat-label>
+            
+            <mat-select formControlName="level">
+            <mat-option *ngFor="let s of level_Data;let i=index" [value]="s.id">{{s.name}}</mat-option>
+             
+          </mat-select>
+            <mat-error *ngIf="roleForm.get('level')?.hasError('required')">
+              Role level is required
+            </mat-error>
+            <!-- <mat-error *ngIf="roleForm.get('level')?.hasError('minlength')">
+              Role level must be at least 3 characters
+            </mat-error> -->
+          </mat-form-field>
+          
+        
+        <div class="select-all-container">
+          <mat-checkbox [checked]="allSelected" (change)="toggleSelectAll()" color="primary">
+            Select All Permission
+          </mat-checkbox>
+        </div>
+
+        <!-- Permission Table -->
+        <table mat-table [dataSource]="pages" class="Permission-table mat-elevation-z2">
+          <!-- Page Name Column -->
+          <ng-container matColumnDef="pageName">
+            <th mat-header-cell *matHeaderCellDef>Page Name</th>
+            <td mat-cell *matCellDef="let page">{{page.pageName}}</td>
+          </ng-container>
+
+          <!-- Create Permission Column -->
+          <ng-container matColumnDef="create">
+            <th mat-header-cell *matHeaderCellDef>Create</th>
+            <td mat-cell *matCellDef="let page; let i = index">
+              <mat-checkbox [formControl]="getPermissionControl(i, 'create')!"
+                          color="primary">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <!-- Edit Permission Column -->
+          <ng-container matColumnDef="edit">
+            <th mat-header-cell *matHeaderCellDef>Edit</th>
+            <td mat-cell *matCellDef="let page; let i = index">
+              <mat-checkbox [formControl]="getPermissionControl(i, 'edit')!"
+                          color="primary">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <!-- View Permission Column -->
+          <ng-container matColumnDef="view">
+            <th mat-header-cell *matHeaderCellDef>View</th>
+            <td mat-cell *matCellDef="let page; let i = index">
+              <mat-checkbox [formControl]="getPermissionControl(i, 'view')!"
+                          color="primary">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <!-- Delete Permission Column -->
+          <ng-container matColumnDef="delete">
+            <th mat-header-cell *matHeaderCellDef>Delete</th>
+            <td mat-cell *matCellDef="let page; let i = index">
+              <mat-checkbox [formControl]="getPermissionControl(i, 'delete')!"
+                          color="primary">
+              </mat-checkbox>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <div class="button-container">
+          <button mat-raised-button color="primary" type="submit" 
+                [disabled]="roleForm.invalid"  >
+            Save Role
+          </button>
+          <button mat-button type="button" (click)="resetForm()">
+            Reset
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

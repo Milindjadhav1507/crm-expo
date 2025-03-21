@@ -1,0 +1,151 @@
+<div [ngClass]="{ 'branch-management-container mat-elevation-z8': data == null }">
+  
+  
+  <mat-card>
+    <mat-card-header *ngIf="data!=null">
+     
+          <h2 class="mb-2 title">Edit Branch</h2>
+
+       
+      
+    </mat-card-header>
+    <mat-card-content>
+      
+      <form [formGroup]="branchForm" >
+        <div class="row">
+          <!-- Branch Name -->
+          <div class="col-md-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Branch Name</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="branchName"
+                placeholder="Enter branch name"
+              />
+              <mat-error *ngIf="branchForm.get('branchName')?.touched && branchForm.get('branchName')?.invalid">
+                <small *ngIf="branchForm.get('branchName')?.errors?.['required']">Branch name is required.</small>
+                <!-- <small *ngIf="branchForm.get('branchName')?.errors?.['minlength']">
+                  Branch name must be at least 3 characters long.
+                </small>
+                <small *ngIf="branchForm.get('branchName')?.errors?.['maxlength']">
+                  Branch name cannot exceed 50 characters.
+                </small> -->
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Address -->
+          <div class="col-md-12">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Address</mat-label>
+              <textarea
+                matInput
+                formControlName="address"
+                rows="3"
+                placeholder="Enter branch address"
+              ></textarea>
+              <mat-error *ngIf="branchForm.get('address')?.touched && branchForm.get('address')?.invalid">
+                <small *ngIf="branchForm.get('address')?.errors?.['required']">Address is required.</small>
+                <!-- <small *ngIf="branchForm.get('address')?.errors?.['maxlength']">
+                  Address cannot exceed 200 characters.
+                </small> -->
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- City -->
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>City</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="city"
+                placeholder="Enter city"
+              />
+              <mat-error *ngIf="branchForm.get('city')?.touched && branchForm.get('city')?.invalid">
+                <small *ngIf="branchForm.get('city')?.errors?.['required']">City is required.</small>
+                <!-- <small *ngIf="branchForm.get('city')?.errors?.['minlength']">City must be at least 2 characters long.</small> -->
+                <!-- <small *ngIf="branchForm.get('city')?.errors?.['maxlength']">City cannot exceed 50 characters.</small> -->
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- State -->
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>State</mat-label>
+      
+              <mat-select formControlName="state">
+                <mat-option *ngFor="let s of statesData;let i=index" [value]="s.id">{{s.state}}</mat-option>
+               
+              </mat-select>
+              <mat-error *ngIf="branchForm.get('state')?.touched && branchForm.get('state')?.invalid">
+                <small *ngIf="branchForm.get('state')?.errors?.['required']">State is required.</small>
+                <!-- <small *ngIf="branchForm.get('state')?.errors?.['minlength']">State must be at least 2 characters long.</small>
+                <small *ngIf="branchForm.get('state')?.errors?.['maxlength']">State cannot exceed 50 characters.</small> -->
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Pincode -->
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Pincode</mat-label>
+              <input
+                matInput
+                type="text"
+                formControlName="pincode"
+                placeholder="Enter pincode"
+              />
+              <mat-error *ngIf="branchForm.get('pincode')?.touched && branchForm.get('pincode')?.invalid">
+                <small *ngIf="branchForm.get('pincode')?.errors?.['required']">Pincode is required.</small>
+                <small *ngIf="branchForm.get('pincode')?.errors?.['pattern']">Pincode must be a valid 6-digit number.</small>
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <!-- Manager -->
+          <div class="col-md-6">
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-label>Manager</mat-label>
+              <mat-select formControlName="managerId">
+                <mat-option value="">Select Manager</mat-option>
+                <mat-option value="active">Active</mat-option>
+                <mat-option value="inactive">Inactive</mat-option>
+              </mat-select>
+              <!-- <mat-error *ngIf="branchForm.get('managerId')?.touched && branchForm.get('managerId')?.invalid">
+                <small *ngIf="branchForm.get('managerId')?.errors?.['required']">Select Manager.</small>
+              </mat-error> -->
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="row">
+          <!-- Submit Button -->
+          <div class="col-md-12 text-right mt-3">
+            <button
+              mat-raised-button
+              color="primary"
+              type="submit"
+              [disabled]="branchForm.invalid"
+              (click)="onSubmit()"
+            >
+              Submit
+            </button><button *ngIf="data!=null" mat-raised-button color="warn" style="margin-left: 40px;" (click)="onClose()">
+              close
+            </button>
+          </div>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+</div>

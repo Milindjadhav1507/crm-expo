@@ -1,0 +1,28 @@
+.navbar-toolbar {
+  background-color: #3f51b5; /* Primary color */
+}
+
+.navbar-title {
+  font-size: 24px;
+  color: white;
+}
+
+.nav-links a {
+  color: white; /* Button text color */
+  margin: 0 10px; /* Spacing between buttons */
+}
+
+.nav-links a:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Hover effect */
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.spacer {
+  flex: 1; /* Pushes the nav links to the right */
+}
+
+
