@@ -1,13 +1,20 @@
 import { CommonModule } from '@angular/common';
-import { Component, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, TemplateRef, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatListModule } from '@angular/material/list';
+import { MatSelectModule } from '@angular/material/select';
 
 @Component({
   selector: 'app-create-followup-list',
   standalone: true,
-  imports: [CommonModule,FormsModule,MatCardModule,MatButtonModule],
+  imports: [CommonModule,FormsModule,MatCardModule,MatButtonModule,MatDialogModule,MatFormFieldModule,MatInputModule,MatSelectModule,ReactiveFormsModule,
+    MatListModule,
+  ],
   templateUrl: './create-followup-list.component.html',
   styleUrl: './create-followup-list.component.scss'
 })
@@ -17,12 +24,69 @@ export class CreateFollowupListComponent {
   filteredLeads: any[] = []; // Array to store filtered leads
   searchQuery: string = ''; // Search query for filtering
   statusFilter: string = 'All'; // Status filter (default: 'All')
+  @ViewChild('editModal') editModal!: TemplateRef<any>; // Reference to the modal template
+  editForm!: FormGroup;
 
-  
-  constructor() {
+  @ViewChild('followUpModal') followUpModal!: TemplateRef<any>; // Reference to the follow-up modal template
+  followUpData: any = {
+    leadName: '',
+    status: '',
+    nextFollowUpDate: '',
+    comments: '',
+    isMeetingScheduled: false,
+    meetingPlatform: '',
+    meetingLink: '',
+  };
+  constructor(private dialog: MatDialog, private fb: FormBuilder) {
     this.loadHardcodedLeads(); 
     this.filterLeads(); // Apply initial filter// Load hardcoded data
     this.selectedLead = this.filteredLeads[0]; // Set the first lead as selected by default
+    this.editForm = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', Validators.required],
+      company: ['', Validators.required],
+      status: ['', Validators.required],
+    });
+  }
+
+  
+
+   // Open the edit modal
+   openEditModal(lead: any): void {
+    this.selectedLead = lead;
+    this.editForm.patchValue({
+      name: lead.name,
+      email: lead.email,
+      phone: lead.phone,
+      company: lead.company,
+      status: lead.status,
+    });
+
+    const dialogRef = this.dialog.open(this.editModal, {
+      width: '500px',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.updateLead(result);
+      }
+    });
+  }
+
+   // Cancel the edit
+   onCancelEdit(): void {
+    this.dialog.closeAll();
+  }
+
+  // Update the lead in the list
+  updateLead(updatedData: any): void {
+    const index = this.leads.findIndex((l) => l.id === this.selectedLead.id);
+    if (index !== -1) {
+      this.leads[index] = { ...this.leads[index], ...updatedData };
+      this.filterLeads(); // Refresh the filtered list
+      this.selectedLead = this.leads[index]; // Update the selected lead
+    }
   }
 
 
@@ -44,6 +108,40 @@ export class CreateFollowupListComponent {
         createdDate: '2024-02-01',
         notes: 'Interested in product demo',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Aarav Patel',
+        statusHistory: [
+          {
+            date: '2024-02-01',
+            from: 'New',
+            to: 'Contacted',
+            assignedTo: 'John Doe',
+          },
+          {
+            date: '2024-02-02',
+            from: 'Contacted',
+            to: 'Qualified',
+            assignedTo: 'Jane Smith',
+          },
+        ],
+        documents: [
+          {
+            date: '2024-02-03',
+            fileName: 'Proposal.pdf',
+            uploadedBy: 'John Doe',
+            fileUrl: 'https://example.com/proposal.pdf',
+          },
+        ],
+        comments: [
+          {
+            date: '2024-02-04',
+            by: 'Jane Smith',
+            text: 'Lead seems very interested. Follow up in 2 days.',
+          },
+          {
+            date: '2024-02-05',
+            by: 'John Doe',
+            text: 'Sent proposal document.',
+          },
+        ],
       },
       {
         id: 'L002',
@@ -209,7 +307,35 @@ export class CreateFollowupListComponent {
   }
 
   openFollowUpModal(lead: any): void {
-    console.log('Follow Up clicked for:', lead.name);
-    // Add your logic to open a follow-up modal or perform an action
+    this.followUpData.leadName = lead.name; // Auto-populate lead name
+    const dialogRef = this.dialog.open(this.followUpModal, {
+      width: '500px',
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.saveFollowUp();
+      }
+    });
+  }
+
+    // Save the follow-up data
+    saveFollowUp(): void {
+      console.log('Follow-Up Data:', this.followUpData);
+      // Add your logic to save the follow-up data
+    }
+  
+    // Cancel the follow-up
+    onCancelFollowUp(): void {
+      this.dialog.closeAll();
+    }
+  
+
+  // Save the edited lead
+  onSaveEdit(): void {
+    if (this.editForm.valid) {
+      this.dialog.closeAll();
+      this.updateLead(this.editForm.value);
+    }
   }
 }
