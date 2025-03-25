@@ -67,8 +67,70 @@
             <mat-divider></mat-divider>
 
             <div class="description-section">
-              <h3>Description</h3>
-              <p>{{ticket.description}}</p>
+              <div class="tab-content">
+                <!-- Recent Comments -->
+                <div class="recent-comments" *ngIf="recentComments.length > 0">
+                  <div *ngFor="let comment of recentComments" class="comment-item">
+                    <div class="comment-header">
+                      <span class="user-name">{{comment.userName}}</span>
+                      <span class="timestamp">{{comment.timestamp | date:'medium'}}</span>
+                    </div>
+                    <div class="comment-content">
+                      <p>{{comment.message}}</p>
+                      <div class="comment-attachments" *ngIf="comment.attachments.length > 0">
+                        <div *ngFor="let attachment of comment.attachments" class="attachment-item">
+                          <mat-icon>attach_file</mat-icon>
+                          <span>{{attachment}}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Comment Form -->
+                <div class="comment-form">
+                  <form [formGroup]="commentForm" (ngSubmit)="onSubmitComment()">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Add a comment</mat-label>
+                      <textarea matInput formControlName="message" rows="3"></textarea>
+                    </mat-form-field>
+
+                    <!-- Attachment Button -->
+                    <div class="attachment-section">
+                      <input type="file"
+                             #fileInput
+                             (change)="onFileSelected($event)"
+                             style="display: none">
+                      <button type="button"
+                              mat-stroked-button
+                              (click)="fileInput.click()">
+                        <mat-icon>attach_file</mat-icon>
+                        Add Attachment
+                      </button>
+                    </div>
+
+                    <!-- Recent Attachments -->
+                    <div class="recent-attachments" *ngIf="recentAttachments.length > 0">
+                      <h4>Recent Attachments</h4>
+                      <div class="attachment-list">
+                        <div *ngFor="let attachment of recentAttachments" class="attachment-item">
+                          <mat-icon>attach_file</mat-icon>
+                          <span>{{attachment}}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="form-actions">
+                      <button mat-raised-button
+                              color="primary"
+                              type="submit"
+                              [disabled]="!commentForm.valid">
+                        Post Comment
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
             </div>
 
             <mat-divider></mat-divider>
@@ -76,9 +138,9 @@
             <div class="attachments-section" *ngIf="ticket.attachments">
               <h3>Attachments</h3>
               <!-- <div class="attachment-list">
-                <a *ngFor="let attachment of ticket.attachments" 
-                   [href]="attachment.url || attachment" 
-                   class="attachment-item" 
+                <a *ngFor="let attachment of ticket.attachments"
+                   [href]="attachment.url || attachment"
+                   class="attachment-item"
               <div class="attachment-list">
                 <a *ngFor="let attachment of ticket.attachments"
                    [href]="attachment"
@@ -97,32 +159,65 @@
           <div class="tab-content">
             <div class="communication-header">
               <h3>Communication History</h3>
-              <button mat-raised-button color="primary" (click)="onAddComment()">
-                <mat-icon>add_comment</mat-icon>
-                Add Comment
-              </button>
             </div>
 
-            <!-- <div class="communication-list">
-              <div *ngFor="let comm of ticket.communicationHistory" 
-                   class="communication-item"
-                   [ngClass]="comm.type">
-                <div class="message-header">
-                  <span class="sender">{{comm.author}}</span>
-                  <span class="timestamp">{{formatDate(comm.timestamp)}}</span>
+            <div class="comment-form">
+              <form [formGroup]="commentForm" (ngSubmit)="onSubmitComment()">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Add a comment</mat-label>
+                  <textarea matInput formControlName="message" rows="3"></textarea>
+                </mat-form-field>
+
+                <div class="attachment-section">
+                  <input type="file"
+                         #fileInput
+                         (change)="onFileSelected($event)"
+                         style="display: none">
+                  <button type="button"
+                          mat-stroked-button
+                          (click)="fileInput.click()">
+                    <mat-icon>attach_file</mat-icon>
+                    Add Attachment
+                  </button>
                 </div>
-                <div class="message-content">
-                  {{comm.message}}
+
+                <div class="recent-attachments" *ngIf="recentAttachments.length > 0">
+                  <h4>Recent Attachments</h4>
+                  <div class="attachment-list">
+                    <div *ngFor="let attachment of recentAttachments" class="attachment-item">
+                      <mat-icon>attach_file</mat-icon>
+                      <span>{{attachment}}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button
+                          color="primary"
+                          type="submit"
+                          [disabled]="!commentForm.valid">
+                    Post Comment
+                  </button>
+                </div>
+              </form>
+            </div>
+            <div class="comments-list">
+              <div *ngFor="let comment of comments$ | async" class="comment-item">
+                <div class="comment-header">
+                  <span class="user-name">{{comment.userName}}</span>
+                  <span class="timestamp">{{comment.timestamp | date:'medium'}}</span>
+                </div>
+                <div class="comment-content">
+                  <p>{{comment.message}}</p>
+                  <div class="comment-attachments" *ngIf="comment.attachments.length > 0">
+                    <div *ngFor="let attachment of comment.attachments" class="attachment-item">
+                      <mat-icon>attach_file</mat-icon>
+                      <span>{{attachment}}</span>
+                    </div>
+                  </div>
                 </div>
               </div>
-              
-               <div *ngIf="!ticket.communicationHistory.length" class="no-communications">
-                <p>No communications yet.</p>
-            <div class="communication-list">
-              <div class="no-communications">
-                <p>No communications available.</p>
-              </div>
-            </div> -->
+            </div>
           </div>
         </mat-tab>
       </mat-tab-group>
