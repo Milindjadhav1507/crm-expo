@@ -1,9 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { Form, FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { Modal } from 'bootstrap';
-
+import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+declare var bootstrap: any;
 
 interface Card {
   title: string;
@@ -14,15 +18,23 @@ interface Card {
   column: string;
 }
 
-
 @Component({
   selector: 'app-kanban',
   standalone: true,
-  imports: [FormsModule,CommonModule,RouterLink],
+  imports: [
+    FormsModule,
+    CommonModule,
+    RouterLink,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule
+  ],
   templateUrl: './kanban.component.html',
   styleUrl: './kanban.component.scss'
 })
-export class KanbanComponent {
+export class KanbanComponent implements OnInit {
   todoCards: Card[] = [
     { title: 'Test and debug code for the e-commerce website checkout process', type: 'bug', points: 15, column: 'todo' },
     { title: 'Write a blog post on industry trends and best practices', type: 'issue', points: 10, date: 'Jan 25', column: 'todo' }
@@ -45,10 +57,37 @@ export class KanbanComponent {
   ];
   draggedCard: Card | null = null;
   draggedItem: any;
-  addTaskModal: Modal | undefined;
+  selectedColumn: string = '';
+  newTask: Card = {
+    title: '',
+    type: 'undefined',
+    points: 15,
+    column: ''
+  };
+  editingTask: Card = {
+    title: '',
+    type: 'undefined',
+    points: 15,
+    column: ''
+  };
+  expandedColumns: { [key: string]: boolean } = {
+    todo: true,
+    doing: true,
+    review: true,
+    release: true
+  };
+  editingColumn: string | null = null;
+  columnNames: { [key: string]: string } = {
+    todo: 'To do',
+    doing: 'Doing',
+    review: 'Review',
+    release: 'Release'
+  };
+
+  constructor(private dialog: MatDialog) {}
 
   ngOnInit(): void {
-    this.addTaskModal = new Modal(document.getElementById('addTaskModal')!);
+    // Initialize any required data
   }
 
   // Getters for column counts
@@ -92,17 +131,16 @@ export class KanbanComponent {
         this.removeCardFromArray(this.draggedCard);
 
         // Update the card's column
-        // this.draggedCard.column = column;
         this.draggedCard['column'] = column;
 
         // Add the card to the new column's array
         this.addCardToColumn(this.draggedCard, column);
 
         columnElement.classList.remove('drag-over');
-
       }
     }
   }
+
   removeCardFromArray(card: Card): void {
     switch (card.column) {
       case 'todo':
@@ -139,28 +177,193 @@ export class KanbanComponent {
 
   // Modal functions
   showAddTaskModal(column: string): void {
-    // Store the target column in a data attribute of the form
-    const taskForm = document.querySelector('#taskForm') as HTMLFormElement;
-    taskForm.dataset['column'] = column;
-    this.addTaskModal?.show();
+    this.selectedColumn = column;
+    const modal = document.getElementById('addTaskModal');
+    if (modal) {
+      const modalInstance = new bootstrap.Modal(modal);
+      modalInstance.show();
+    }
   }
 
-  addTask(form: NgForm): void {
+  onSubmit(form: NgForm) {
     if (form.valid) {
-      const column = (document.querySelector('#taskForm') as HTMLFormElement).dataset['column']!;
-      const newTask: Card = {
-        title: form.value.title,
-        type: form.value.type,
-        points: form.value.points,
-        date: form.value.date,
-        image: form.value.image,
-        column: column
+      // Create a new card with all required properties
+      const newCard: Card = {
+        title: this.newTask.title,
+        type: this.newTask.type,
+        points: this.newTask.points,
+        date: this.newTask.date,
+        image: this.newTask.image,
+        column: this.selectedColumn
       };
-        this.addCardToColumn(newTask, column);
 
-      // Reset the form and close the modal
-      form.reset();
-        this.addTaskModal?.hide();
+      // Add the new card to the selected column
+      this.addCardToColumn(newCard, this.selectedColumn);
+
+      // Reset the form
+      this.newTask = {
+        title: '',
+        type: 'undefined',
+        points: 15,
+        column: ''
+      };
+
+      // Close the modal
+      const modal = document.getElementById('addTaskModal');
+      if (modal) {
+        const modalInstance = bootstrap.Modal.getInstance(modal);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
+      }
+    }
+  }
+
+  editTask(card: Card): void {
+    this.editingTask = { ...card };
+    const modal = document.getElementById('editTaskModal');
+    if (modal) {
+      const modalInstance = new bootstrap.Modal(modal);
+      modalInstance.show();
+    }
+  }
+
+  onEditSubmit(form: NgForm): void {
+    if (form.valid) {
+      // Remove the old card from its current column
+      this.removeCardFromArray(this.editingTask);
+
+      // Add the updated card to the same column
+      this.addCardToColumn(this.editingTask, this.editingTask.column);
+
+      // Reset the editing task
+      this.editingTask = {
+        title: '',
+        type: 'undefined',
+        points: 15,
+        column: ''
+      };
+
+      // Close the modal
+      const modal = document.getElementById('editTaskModal');
+      if (modal) {
+        const modalInstance = bootstrap.Modal.getInstance(modal);
+        if (modalInstance) {
+          modalInstance.hide();
+        }
+      }
+    }
+  }
+
+  deleteTask(card: Card): void {
+    if (confirm('Are you sure you want to delete this task?')) {
+      this.removeCardFromArray(card);
+    }
+  }
+
+  toggleColumn(column: string): void {
+    this.expandedColumns[column] = !this.expandedColumns[column];
+  }
+
+  startEditing(column: string): void {
+    this.editingColumn = column;
+  }
+
+  saveColumnName(column: string, event: any): void {
+    const newName = event.target.value.trim();
+    if (newName) {
+      this.columnNames[column] = newName;
+    }
+    this.editingColumn = null;
+  }
+
+  cancelEditing(): void {
+    this.editingColumn = null;
+  }
+}
+
+// Add Task Dialog Component
+@Component({
+  selector: 'app-add-task-dialog',
+  template: `
+    <h2 mat-dialog-title>Add New Task</h2>
+    <form #taskForm="ngForm" (ngSubmit)="onSubmit()">
+      <mat-dialog-content>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Task Title</mat-label>
+          <input matInput name="title" [(ngModel)]="task.title" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Task Type</mat-label>
+          <matSelect name="type" [(ngModel)]="task.type">
+            <mat-option value="bug">Bug</mat-option>
+            <mat-option value="feature">Feature</mat-option>
+            <mat-option value="issue">Issue</mat-option>
+            <mat-option value="undefined">Undefined</mat-option>
+          </matSelect>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Points</mat-label>
+          <input matInput type="number" name="points" [(ngModel)]="task.points" required min="1">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Date (Optional)</mat-label>
+          <input matInput name="date" [(ngModel)]="task.date" placeholder="e.g., Jan 25 or 5/34">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Image URL (Optional)</mat-label>
+          <input matInput name="image" [(ngModel)]="task.image" placeholder="e.g., https://via.placeholder.com/400/200">
+        </mat-form-field>
+      </mat-dialog-content>
+
+      <mat-dialog-actions align="end">
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="!taskForm.valid">Add Task</button>
+      </mat-dialog-actions>
+    </form>
+  `,
+  styles: [`
+    .full-width {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+    mat-dialog-content {
+      max-height: 80vh;
+    }
+  `],
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule
+  ]
+})
+export class AddTaskDialogComponent {
+  task: Card = {
+    title: '',
+    type: 'undefined',
+    points: 15,
+    column: ''
+  };
+
+  constructor(
+    public dialogRef: MatDialogRef<AddTaskDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { column: string }
+  ) {
+    this.task.column = data.column;
+  }
+
+  onSubmit() {
+    if (this.task.title && this.task.type && this.task.points) {
+      this.dialogRef.close(this.task);
     }
   }
 }

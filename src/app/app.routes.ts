@@ -6,6 +6,7 @@ import { SidebarComponent } from './layout/sidebar/sidebar.component';
 import { AuthguardService } from './auth/authguard.service';
 import { KanbanComponent } from './layout/kanban/kanban.component';
 import { CalenderComponent } from './layout/calender/calender.component';
+import { DaypilotKanbanComponent } from './daypilot-kanban/daypilot-kanban.component';
 
 export const routes: Routes = [
   {
@@ -62,5 +63,9 @@ export const routes: Routes = [
   {
     path: 'cal',
     component: CalenderComponent
+  },
+  {
+    path: 'kan',
+    component: DaypilotKanbanComponent
   }
 ];

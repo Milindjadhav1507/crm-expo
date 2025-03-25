@@ -26,13 +26,27 @@
   </div>
 
   <div class="actions">
+    <div class="view-toggle">
+      <mat-button-toggle-group [(value)]="isGridView">
+        <mat-button-toggle [value]="false">
+          <!-- <mat-icon>view_list</mat-icon> -->
+          <span class="material-icons">list</span>
+        </mat-button-toggle>
+        <mat-button-toggle [value]="true">
+          <!-- <mat-icon>grid_view</mat-icon> -->
+          <span class="material-icons">window
+            </span>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
     <button mat-raised-button color="primary" (click)="openTicketcreation(null)">
       <mat-icon>add</mat-icon>
       Create Ticket
     </button>
   </div>
 
-  <div class="tickets-grid">
+  <!-- Grid View -->
+  <div class="tickets-grid" *ngIf="isGridView">
     <mat-card *ngFor="let ticket of filteredTickets" class="ticket-card">
       <mat-card-header>
         <mat-card-title>
@@ -91,8 +105,74 @@
     </mat-card>
   </div>
 
+  <!-- List View -->
+  <div class="tickets-list" *ngIf="!isGridView">
+    <mat-card *ngFor="let ticket of filteredTickets" class="ticket-list-item">
+      <div class="list-item-content">
+        <div class="list-item-header">
+          <div class="title-row">
+            <span class="ticket-id">#{{ticket.id}}</span>
+            <h3>{{ticket.title}}</h3>
+          </div>
+          <div class="status-row">
+            <mat-chip-set>
+              <mat-chip [color]="getStatusColor(ticket.statusName)" selected>{{ticket.statusName}}</mat-chip>
+              <mat-chip [color]="getPriorityColor(ticket.priorityName)" selected>{{ticket.priorityName}}</mat-chip>
+              <mat-chip>{{ticket.categoryName}}</mat-chip>
+            </mat-chip-set>
+          </div>
+        </div>
+
+        <div class="list-item-body">
+          <p class="description">{{ticket.description}}</p>
+          <div class="meta-info">
+            <span class="created-at">
+              <mat-icon>schedule</mat-icon>
+              {{formatDate(ticket.created_at)}}
+            </span>
+            <span class="contact-info">
+              <mat-icon>email</mat-icon>
+              {{ticket.contact_email}}
+            </span>
+            <span class="contact-info">
+              <mat-icon>phone</mat-icon>
+              {{ticket.contact_phone}}
+            </span>
+            <span class="assigned-to" *ngIf="ticket.assignedToName">
+              <mat-icon>person</mat-icon>
+              {{ticket.assignedToName}}
+            </span>
+          </div>
+        </div>
+
+        <div class="list-item-actions">
+          <button mat-button color="primary" (click)="openTicketDetails(ticket)">
+            <mat-icon>visibility</mat-icon>
+            View
+          </button>
+          <button mat-button color="accent" (click)="openTicketcreation(ticket)">
+            <mat-icon>edit</mat-icon>
+            Edit
+          </button>
+          <button mat-button color="warn" (click)="deleteTicket(ticket)" *ngIf="ticket.statusName !== 'Closed'">
+            <mat-icon>delete</mat-icon>
+            Delete
+          </button>
+        </div>
+      </div>
+    </mat-card>
+  </div>
+
   <div *ngIf="filteredTickets.length === 0" class="no-tickets">
     <mat-icon>search_off</mat-icon>
     <p>No tickets found matching your criteria</p>
   </div>
+</div>
+
+<div class="ticket-details-overlay" [class.visible]="showDetails" (click)="closeDetails()"></div>
+<div class="ticket-details-container" [class.visible]="showDetails" [class.slide-in]="showDetails">
+  <button mat-icon-button class="close-button" (click)="closeDetails()">
+    <mat-icon>close</mat-icon>
+  </button>
+  <app-ticket-detail *ngIf="selectedTicket" [ticket]="selectedTicket"></app-ticket-detail>
 </div>

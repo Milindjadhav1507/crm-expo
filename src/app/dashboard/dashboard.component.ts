@@ -238,7 +238,7 @@ fetchDashboardData() {
           orient: 'vertical',
           left: 'left',
           data: ['Total Leads', 'Today\'s Lead', 'Total Open Leads', 'Total Closed Leads']
-        },
+        }, 
         series: [
           {
             name: 'Leads Data',

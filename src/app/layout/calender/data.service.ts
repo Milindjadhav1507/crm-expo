@@ -18,7 +18,7 @@ export class DataService {
     {
       id: 1,
       text: "Event 1",
-      start: DayPilot.Date.today().firstDayOfWeek().addHours(10),
+      start: DayPilot.Date.today().firstDayOfWeek().addHours(10) ,
       end: DayPilot.Date.today().firstDayOfWeek().addHours(13),
       participants: 2,
     },

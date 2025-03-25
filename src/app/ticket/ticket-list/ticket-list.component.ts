@@ -14,6 +14,8 @@ import { RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { TicketDetailComponent } from '../ticket-detail/ticket-detail.component';
 import { TicketGenerationFormComponent } from '../ticket-generation-form/ticket-generation-form.component';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 
 export interface Communication {
   id: number;
@@ -65,7 +67,10 @@ export interface Ticket {
     MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    MatMenuModule,
+    MatButtonToggleModule,
+    TicketDetailComponent
   ],
   templateUrl: './ticket-list.component.html',
   styleUrls: ['./ticket-list.component.scss']
@@ -77,6 +82,9 @@ export class TicketListComponent implements OnInit {
   statusFilter = new FormControl('');
   priorityFilter = new FormControl('');
   private searchSubject = new Subject<string>();
+  isGridView: boolean = true;
+  showDetails = false;
+  selectedTicket: Ticket | null = null;
 
   statusColors: { [key: string]: string } = {
     'Open': 'accent',
@@ -261,23 +269,13 @@ export class TicketListComponent implements OnInit {
   }
 
   openTicketDetails(ticket: Ticket): void {
-    const dialogRef = this.dialog.open(TicketDetailComponent, {
-      width: '800px',
-      height: '80vh',
-      data: {
-        ticket: { ...ticket }
-      }
-    });
+    this.selectedTicket = ticket;
+    this.showDetails = true;
+  }
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const index = this.tickets.findIndex(t => t.id === result.id);
-        if (index !== -1) {
-          this.tickets[index] = result;
-          this.applyFilters();
-        }
-      }
-    });
+  closeDetails(): void {
+    this.showDetails = false;
+    this.selectedTicket = null;
   }
 
   openTicketcreation(ticket: Ticket | null): void {
@@ -318,5 +316,9 @@ export class TicketListComponent implements OnInit {
         });
       }
     }
+  }
+
+  toggleView(view: 'grid' | 'list'): void {
+    this.isGridView = view === 'grid';
   }
 }
