@@ -1,19 +1,7 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white py-2">
+<nav class="navbar navbar-expand-lg navbar-light bg-white">
   <div class="container-fluid">
       <div class="d-flex align-items-center">
-          <!-- <a class="navbar-brand me-4 d-flex align-items-center" href="#">
-              Phoenix <i class="bi bi-chevron-down ms-1"></i>
-          </a> -->
-          <div class="avatar-group ms-2">
-              <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User 1">
-              <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="User 2">
-              <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="User 3">
-              <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="User 4">
-              <img src="https://randomuser.me/api/portraits/men/3.jpg" alt="User 5">
-          </div>
-          <button class="btn btn-primary ms-3" [routerLink]="['/project', 'home', 'team']">
-              <i class="bi bi-plus"></i> Invite
-          </button>
+          <h5 class="mb-0">Kanban Board</h5>
       </div>
       <div class="d-flex align-items-center ms-auto">
           <button class="btn btn-light me-2">
@@ -22,14 +10,7 @@
           <button class="btn btn-light me-2" [routerLink]="['/project', 'home', 'team']">
               <i class="bi bi-funnel"></i> Team
           </button>
-          <!-- <button class="btn btn-light me-2">
-              <i class="bi bi-arrow-left-right"></i> Export/Import
-          </button> -->
-          <!-- <button class="btn btn-light me-2">
-              <i class="bi bi-pencil-square"></i> Modify
-          </button> -->
           <button class="btn btn-light me-2" [routerLink]="['/project', 'home', 'code']">
-              <!-- <i class="bi bi-bar-chart"></i> -->
                Code
           </button>
           <button class="btn btn-light me-2" [routerLink]="['/project', 'home', 'gantt-chart']">
@@ -41,9 +22,6 @@
           <button class="btn btn-light me-2" [routerLink]="['/project', 'home', 'todo-list']">
               <i class="bi bi-archive"></i> Todo List
           </button>
-          <!-- <button class="btn btn-light">
-              <i class="bi bi-list"></i>
-          </button> -->
       </div>
   </div>
 </nav>
@@ -52,170 +30,274 @@
 <div class="container-fluid">
   <div class="kanban-container d-flex">
       <!-- Unassigned sidebar -->
-      <div class="unassigned-column">
+      <!-- <div class="unassigned-column">
           <div class="unassigned-text">Unassigned</div>
-      </div>
+      </div> -->
 
       <!-- Board columns -->
       <div class="board-columns d-flex flex-grow-1 pt-3 px-3">
           <!-- To do column -->
-          <div class="board-column" data-column="todo" (dragover)="allowDrop($event)" (drop)="drop($event)">
+          <div class="board-column" data-column="todo" (dragover)="allowDrop($event)" (drop)="drop($event)" [class.collapsed]="!expandedColumns['todo']" (click)="!expandedColumns['todo'] && toggleColumn('todo')">
               <div class="column-header">
-                  To do <span class="column-count">{{ todoCount }}</span>
-                  <button class="btn btn-sm p-0 ms-auto">
-                      <i class="bi bi-arrow-right"></i>
+                  <div class="header-content" (dblclick)="startEditing('todo')">
+                      <ng-container *ngIf="editingColumn !== 'todo'; else todoEdit">
+                          {{ columnNames['todo'] }}
+                          <span class="column-count">{{ todoCount }}</span>
+                      </ng-container>
+                      <ng-template #todoEdit>
+                          <input type="text"
+                                 [value]="columnNames['todo']"
+                                 (blur)="saveColumnName('todo', $event)"
+                                 (keyup.enter)="saveColumnName('todo', $event)"
+                                 (keyup.escape)="cancelEditing()"
+                                 class="column-name-input"
+                                 autofocus>
+                      </ng-template>
+                  </div>
+                  <button class="btn btn-sm p-0 ms-auto" (click)="$event.stopPropagation(); toggleColumn('todo')">
+                      <i class="bi" [ngClass]="{'bi-arrow-right': !expandedColumns['todo'], 'bi-arrow-left': expandedColumns['todo']}"></i>
                   </button>
               </div>
               <div class="column-divider to-do-divider"></div>
-
-              <div class="card" *ngFor="let card of todoCards" draggable="true" (dragstart)="drag($event, card)"
-                  (dragend)="dragEnd($event)">
-                  <div class="card-body">
-                      <span class="badge" [ngClass]="{'badge-bug': card.type === 'bug', 'badge-feature': card.type === 'feature',
-                                                    'badge-issue': card.type === 'issue', 'badge-undefined': card.type === 'undefined'}">
-                          <i class="bi" [ngClass]="{'bi-bug': card.type === 'bug', 'bi-lightning': card.type === 'feature',
-                                                     'bi-exclamation-triangle': card.type === 'issue', 'bi-question-circle': card.type === 'undefined'}"></i>
-                          {{ card.type }}
-                      </span>
-                      <div class="card-title">{{ card.title }}</div>
-                  </div>
-                  <div class="card-footer">
-                      <div class="card-meta">
-                          <div class="points-badge">
-                              <i class="bi bi-clock"></i> {{ card.points }}
+              <div class="column-content">
+                  <div class="card" *ngFor="let card of todoCards" draggable="true" (dragstart)="drag($event, card)" (dragend)="dragEnd($event)">
+                      <div class="card-body">
+                          <div class="task-header d-flex justify-content-between align-items-start">
+                              <div class="task-content">
+                                  <span class="badge" [ngClass]="{'badge-bug': card.type === 'bug', 'badge-feature': card.type === 'feature',
+                                                      'badge-issue': card.type === 'issue', 'badge-undefined': card.type === 'undefined'}">
+                                      <i class="bi" [ngClass]="{'bi-bug': card.type === 'bug', 'bi-lightning': card.type === 'feature',
+                                                       'bi-exclamation-triangle': card.type === 'issue', 'bi-question-circle': card.type === 'undefined'}"></i>
+                                      {{ card.type }}
+                                  </span>
+                                  <div class="card-title">{{ card.title }}</div>
+                              </div>
+                              <div class="card-actions">
+                                  <button class="btn btn-sm btn-light" (click)="editTask(card)">
+                                      <i class="bi bi-pencil"></i>
+                                  </button>
+                                  <button class="btn btn-sm btn-light text-danger" (click)="deleteTask(card)">
+                                      <i class="bi bi-trash"></i>
+                                  </button>
+                              </div>
                           </div>
-                          <div class="avatar-group">
-                              <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User 1">
-                              <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="User 2">
-                              <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="User 3">
+                      </div>
+                      <div class="card-footer">
+                          <div class="card-meta">
+                              <div class="points-badge">
+                                  <i class="bi bi-clock"></i> {{ card.points }}
+                              </div>
+                              <div class="avatar-group">
+                                  <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User 1">
+                                  <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="User 2">
+                                  <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="User 3">
+                              </div>
                           </div>
                       </div>
                   </div>
-              </div>
 
-              <button class="add-task-btn" (click)="showAddTaskModal('todo')">
-                  <i class="bi bi-plus"></i> Add new task
-              </button>
+                  <button class="add-task-btn" (click)="showAddTaskModal('todo')">
+                      <i class="bi bi-plus"></i> Add new task
+                  </button>
+              </div>
           </div>
 
           <!-- Doing column -->
-          <div class="board-column" data-column="doing" (dragover)="allowDrop($event)" (drop)="drop($event)">
+          <div class="board-column" data-column="doing" (dragover)="allowDrop($event)" (drop)="drop($event)" [class.collapsed]="!expandedColumns['doing']" (click)="!expandedColumns['doing'] && toggleColumn('doing')">
               <div class="column-header">
-                  Doing <span class="column-count">{{ doingCount }}</span>
-                  <button class="btn btn-sm p-0 ms-auto">
-                      <i class="bi bi-arrow-right"></i>
+                  <div class="header-content" (dblclick)="startEditing('doing')">
+                      <ng-container *ngIf="editingColumn !== 'doing'; else doingEdit">
+                          {{ columnNames['doing'] }}
+                          <span class="column-count">{{ doingCount }}</span>
+                      </ng-container>
+                      <ng-template #doingEdit>
+                          <input type="text"
+                                 [value]="columnNames['doing']"
+                                 (blur)="saveColumnName('doing', $event)"
+                                 (keyup.enter)="saveColumnName('doing', $event)"
+                                 (keyup.escape)="cancelEditing()"
+                                 class="column-name-input"
+                                 autofocus>
+                      </ng-template>
+                  </div>
+                  <button class="btn btn-sm p-0 ms-auto" (click)="$event.stopPropagation(); toggleColumn('doing')">
+                      <i class="bi" [ngClass]="{'bi-arrow-right': !expandedColumns['doing'], 'bi-arrow-left': expandedColumns['doing']}"></i>
                   </button>
               </div>
               <div class="column-divider doing-divider"></div>
-
-              <div class="card" *ngFor="let card of doingCards" draggable="true" (dragstart)="drag($event, card)"
-                  (dragend)="dragEnd($event)">
-                  <div class="card-body">
-                      <span class="badge" [ngClass]="{'badge-bug': card.type === 'bug', 'badge-feature': card.type === 'feature',
-                                                    'badge-issue': card.type === 'issue', 'badge-undefined': card.type === 'undefined'}">
-                          <i class="bi" [ngClass]="{'bi-bug': card.type === 'bug', 'bi-lightning': card.type === 'feature',
-                                                     'bi-exclamation-triangle': card.type === 'issue', 'bi-question-circle': card.type === 'undefined'}"></i>
-                          {{ card.type }}
-                      </span>
-                      <div class="card-title">{{ card.title }}</div>
-                  </div>
-                  <div class="card-footer">
-                      <div class="card-meta">
-                          <div class="points-badge">
-                              <i class="bi bi-clock"></i> {{ card.points }}
+              <div class="column-content">
+                  <div class="card" *ngFor="let card of doingCards" draggable="true" (dragstart)="drag($event, card)" (dragend)="dragEnd($event)">
+                      <div class="card-body">
+                          <div class="task-header d-flex justify-content-between align-items-start">
+                              <div class="task-content">
+                                  <span class="badge" [ngClass]="{'badge-bug': card.type === 'bug', 'badge-feature': card.type === 'feature',
+                                                      'badge-issue': card.type === 'issue', 'badge-undefined': card.type === 'undefined'}">
+                                      <i class="bi" [ngClass]="{'bi-bug': card.type === 'bug', 'bi-lightning': card.type === 'feature',
+                                                       'bi-exclamation-triangle': card.type === 'issue', 'bi-question-circle': card.type === 'undefined'}"></i>
+                                      {{ card.type }}
+                                  </span>
+                                  <div class="card-title">{{ card.title }}</div>
+                              </div>
+                              <div class="card-actions">
+                                  <button class="btn btn-sm btn-light" (click)="editTask(card)">
+                                      <i class="bi bi-pencil"></i>
+                                  </button>
+                                  <button class="btn btn-sm btn-light text-danger" (click)="deleteTask(card)">
+                                      <i class="bi bi-trash"></i>
+                                  </button>
+                              </div>
                           </div>
-                          <div class="avatar-group">
-                              <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="User 1">
-                              <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="User 2">
-                              <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="User 3">
+                      </div>
+                      <div class="card-footer">
+                          <div class="card-meta">
+                              <div class="points-badge">
+                                  <i class="bi bi-clock"></i> {{ card.points }}
+                              </div>
+                              <div class="avatar-group">
+                                  <img src="https://randomuser.me/api/portraits/women/1.jpg" alt="User 1">
+                                  <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="User 2">
+                                  <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="User 3">
+                              </div>
                           </div>
                       </div>
                   </div>
-              </div>
 
-              <button class="add-task-btn" (click)="showAddTaskModal('doing')">
-                  <i class="bi bi-plus"></i> Add new task
-              </button>
+                  <button class="add-task-btn" (click)="showAddTaskModal('doing')">
+                      <i class="bi bi-plus"></i> Add new task
+                  </button>
+              </div>
           </div>
 
           <!-- Review column -->
-          <div class="board-column" data-column="review" (dragover)="allowDrop($event)" (drop)="drop($event)">
+          <div class="board-column" data-column="review" (dragover)="allowDrop($event)" (drop)="drop($event)" [class.collapsed]="!expandedColumns['review']" (click)="!expandedColumns['review'] && toggleColumn('review')">
               <div class="column-header">
-                  Review <span class="column-count">{{ reviewCount }}</span>
-                  <button class="btn btn-sm p-0 ms-auto">
-                      <i class="bi bi-arrow-right"></i>
+                  <div class="header-content" (dblclick)="startEditing('review')">
+                      <ng-container *ngIf="editingColumn !== 'review'; else reviewEdit">
+                          {{ columnNames['review'] }}
+                          <span class="column-count">{{ reviewCount }}</span>
+                      </ng-container>
+                      <ng-template #reviewEdit>
+                          <input type="text"
+                                 [value]="columnNames['review']"
+                                 (blur)="saveColumnName('review', $event)"
+                                 (keyup.enter)="saveColumnName('review', $event)"
+                                 (keyup.escape)="cancelEditing()"
+                                 class="column-name-input"
+                                 autofocus>
+                      </ng-template>
+                  </div>
+                  <button class="btn btn-sm p-0 ms-auto" (click)="$event.stopPropagation(); toggleColumn('review')">
+                      <i class="bi" [ngClass]="{'bi-arrow-right': !expandedColumns['review'], 'bi-arrow-left': expandedColumns['review']}"></i>
                   </button>
               </div>
               <div class="column-divider review-divider"></div>
-
-              <div class="card" *ngFor="let card of reviewCards" draggable="true" (dragstart)="drag($event, card)"
-                  (dragend)="dragEnd($event)">
-                  <div class="card-body">
-                      <span class="badge" [ngClass]="{'badge-bug': card.type === 'bug', 'badge-feature': card.type === 'feature',
-                                                    'badge-issue': card.type === 'issue', 'badge-undefined': card.type === 'undefined'}">
-                          <i class="bi" [ngClass]="{'bi-bug': card.type === 'bug', 'bi-lightning': card.type === 'feature',
-                                                     'bi-exclamation-triangle': card.type === 'issue', 'bi-question-circle': card.type === 'undefined'}"></i>
-                          {{ card.type }}
-                      </span>
-                      <div class="card-title">{{ card.title }}</div>
-                  </div>
-                  <div class="card-footer">
-                      <div class="card-meta">
-                          <div class="points-badge">
-                              <i class="bi bi-clock"></i> {{ card.points }}
+              <div class="column-content">
+                  <div class="card" *ngFor="let card of reviewCards" draggable="true" (dragstart)="drag($event, card)" (dragend)="dragEnd($event)">
+                      <div class="card-body">
+                          <div class="task-header d-flex justify-content-between align-items-start">
+                              <div class="task-content">
+                                  <span class="badge" [ngClass]="{'badge-bug': card.type === 'bug', 'badge-feature': card.type === 'feature',
+                                                      'badge-issue': card.type === 'issue', 'badge-undefined': card.type === 'undefined'}">
+                                      <i class="bi" [ngClass]="{'bi-bug': card.type === 'bug', 'bi-lightning': card.type === 'feature',
+                                                       'bi-exclamation-triangle': card.type === 'issue', 'bi-question-circle': card.type === 'undefined'}"></i>
+                                      {{ card.type }}
+                                  </span>
+                                  <div class="card-title">{{ card.title }}</div>
+                              </div>
+                              <div class="card-actions">
+                                  <button class="btn btn-sm btn-light" (click)="editTask(card)">
+                                      <i class="bi bi-pencil"></i>
+                                  </button>
+                                  <button class="btn btn-sm btn-light text-danger" (click)="deleteTask(card)">
+                                      <i class="bi bi-trash"></i>
+                                  </button>
+                              </div>
                           </div>
-                          <div class="avatar-group">
-                              <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="User 1">
-                              <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="User 2">
-                              <img src="https://randomuser.me/api/portraits/men/3.jpg" alt="User 3">
+                      </div>
+                      <div class="card-footer">
+                          <div class="card-meta">
+                              <div class="points-badge">
+                                  <i class="bi bi-clock"></i> {{ card.points }}
+                              </div>
+                              <div class="avatar-group">
+                                  <img src="https://randomuser.me/api/portraits/men/2.jpg" alt="User 1">
+                                  <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="User 2">
+                                  <img src="https://randomuser.me/api/portraits/men/3.jpg" alt="User 3">
+                              </div>
                           </div>
                       </div>
                   </div>
-              </div>
 
-              <button class="add-task-btn" (click)="showAddTaskModal('review')">
-                  <i class="bi bi-plus"></i> Add new task
-              </button>
+                  <button class="add-task-btn" (click)="showAddTaskModal('review')">
+                      <i class="bi bi-plus"></i> Add new task
+                  </button>
+              </div>
           </div>
 
           <!-- Release column -->
-          <div class="board-column" data-column="release" (dragover)="allowDrop($event)" (drop)="drop($event)">
+          <div class="board-column" data-column="release" (dragover)="allowDrop($event)" (drop)="drop($event)" [class.collapsed]="!expandedColumns['release']" (click)="!expandedColumns['release'] && toggleColumn('release')">
               <div class="column-header">
-                  Release <span class="column-count">{{ releaseCount }}</span>
-                  <button class="btn btn-sm p-0 ms-auto">
-                      <i class="bi bi-arrow-right"></i>
+                  <div class="header-content" (dblclick)="startEditing('release')">
+                      <ng-container *ngIf="editingColumn !== 'release'; else releaseEdit">
+                          {{ columnNames['release'] }}
+                          <span class="column-count">{{ releaseCount }}</span>
+                      </ng-container>
+                      <ng-template #releaseEdit>
+                          <input type="text"
+                                 [value]="columnNames['release']"
+                                 (blur)="saveColumnName('release', $event)"
+                                 (keyup.enter)="saveColumnName('release', $event)"
+                                 (keyup.escape)="cancelEditing()"
+                                 class="column-name-input"
+                                 autofocus>
+                      </ng-template>
+                  </div>
+                  <button class="btn btn-sm p-0 ms-auto" (click)="$event.stopPropagation(); toggleColumn('release')">
+                      <i class="bi" [ngClass]="{'bi-arrow-right': !expandedColumns['release'], 'bi-arrow-left': expandedColumns['release']}"></i>
                   </button>
               </div>
               <div class="column-divider release-divider"></div>
-
-              <div class="card" *ngFor="let card of releaseCards" draggable="true" (dragstart)="drag($event, card)"
-                  (dragend)="dragEnd($event)">
-                  <div class="card-body">
-                      <span class="badge" [ngClass]="{'badge-bug': card.type === 'bug', 'badge-feature': card.type === 'feature',
-                                                    'badge-issue': card.type === 'issue', 'badge-undefined': card.type === 'undefined'}">
-                          <i class="bi" [ngClass]="{'bi-bug': card.type === 'bug', 'bi-lightning': card.type === 'feature',
-                                                     'bi-exclamation-triangle': card.type === 'issue', 'bi-question-circle': card.type === 'undefined'}"></i>
-                          {{ card.type }}
-                      </span>
-                      <div class="card-title">{{ card.title }}</div>
-                  </div>
-                  <div class="card-footer">
-                      <div class="card-meta">
-                          <div class="points-badge">
-                              <i class="bi bi-clock"></i> {{ card.points }}
+              <div class="column-content">
+                  <div class="card" *ngFor="let card of releaseCards" draggable="true" (dragstart)="drag($event, card)" (dragend)="dragEnd($event)">
+                      <div class="card-body">
+                          <div class="task-header d-flex justify-content-between align-items-start">
+                              <div class="task-content">
+                                  <span class="badge" [ngClass]="{'badge-bug': card.type === 'bug', 'badge-feature': card.type === 'feature',
+                                                      'badge-issue': card.type === 'issue', 'badge-undefined': card.type === 'undefined'}">
+                                      <i class="bi" [ngClass]="{'bi-bug': card.type === 'bug', 'bi-lightning': card.type === 'feature',
+                                                       'bi-exclamation-triangle': card.type === 'issue', 'bi-question-circle': card.type === 'undefined'}"></i>
+                                      {{ card.type }}
+                                  </span>
+                                  <div class="card-title">{{ card.title }}</div>
+                              </div>
+                              <div class="card-actions">
+                                  <button class="btn btn-sm btn-light" (click)="editTask(card)">
+                                      <i class="bi bi-pencil"></i>
+                                  </button>
+                                  <button class="btn btn-sm btn-light text-danger" (click)="deleteTask(card)">
+                                      <i class="bi bi-trash"></i>
+                                  </button>
+                              </div>
                           </div>
-                          <div class="avatar-group">
-                              <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="User 1">
-                              <img src="https://randomuser.me/api/portraits/men/3.jpg" alt="User 2">
-                              <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User 3">
+                      </div>
+                      <div class="card-footer">
+                          <div class="card-meta">
+                              <div class="points-badge">
+                                  <i class="bi bi-clock"></i> {{ card.points }}
+                              </div>
+                              <div class="avatar-group">
+                                  <img src="https://randomuser.me/api/portraits/women/2.jpg" alt="User 1">
+                                  <img src="https://randomuser.me/api/portraits/men/3.jpg" alt="User 2">
+                                  <img src="https://randomuser.me/api/portraits/men/1.jpg" alt="User 3">
+                              </div>
                           </div>
                       </div>
                   </div>
-              </div>
 
-              <button class="add-task-btn" (click)="showAddTaskModal('release')">
-                  <i class="bi bi-plus"></i> Add new task
-              </button>
+                  <button class="add-task-btn" (click)="showAddTaskModal('release')">
+                      <i class="bi bi-plus"></i> Add new task
+                  </button>
+              </div>
           </div>
       </div>
   </div>
@@ -226,18 +308,18 @@
   <div class="modal-dialog">
       <div class="modal-content">
           <div class="modal-header">
-              <h5 class="modal-title" id="addTaskModalLabel">Add New Task</h5>
+              <h4 class="modal-title" id="addTaskModalLabel">Add New Task</h4>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-              <form #taskForm="ngForm" (ngSubmit)="addTask(taskForm)">
+              <form #taskForm="ngForm" (ngSubmit)="onSubmit(taskForm)">
                   <div class="mb-3">
                       <label for="taskTitle" class="form-label">Task Title</label>
-                      <input type="text" class="form-control" id="taskTitle" name="title" ngModel required>
+                      <input type="text" class="form-control" id="taskTitle" name="title" [(ngModel)]="newTask.title" required>
                   </div>
                   <div class="mb-3">
                       <label for="taskType" class="form-label">Task Type</label>
-                      <select class="form-select" id="taskType" name="type" ngModel>
+                      <select class="form-select" id="taskType" name="type" [(ngModel)]="newTask.type">
                           <option value="bug">Bug</option>
                           <option value="feature">Feature</option>
                           <option value="issue">Issue</option>
@@ -246,23 +328,67 @@
                   </div>
                   <div class="mb-3">
                       <label for="taskPoints" class="form-label">Points</label>
-                      <input type="number" class="form-control" id="taskPoints" name="points" ngModel value="15" min="1">
+                      <input type="number" class="form-control" id="taskPoints" name="points" [(ngModel)]="newTask.points" value="15" min="1">
                   </div>
                   <div class="mb-3">
                       <label for="taskDate" class="form-label">Date (Optional)</label>
-                      <input type="text" class="form-control" id="taskDate" name="date" ngModel placeholder="e.g., Jan 25 or 5/34">
+                      <input type="text" class="form-control" id="taskDate" name="date" [(ngModel)]="newTask.date" placeholder="e.g., Jan 25 or 5/34">
                   </div>
                   <div class="mb-3">
                       <label for="taskImage" class="form-label">Image URL (Optional)</label>
-                      <input type="text" class="form-control" id="taskImage" name="image" ngModel placeholder="e.g., https://via.placeholder.com/400/200">
+                      <input type="text" class="form-control" id="taskImage" name="image" [(ngModel)]="newTask.image" placeholder="e.g., https://via.placeholder.com/400/200">
                   </div>
                   <div class="modal-footer">
                       <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                      <button type="submit" class="btn btn-primary" >Add Task</button>
+                      <button type="submit" class="btn btn-primary" [disabled]="!taskForm.valid">Add Task</button>
                   </div>
               </form>
           </div>
-
       </div>
   </div>
+</div>
+
+<!-- Edit Task Modal -->
+<div class="modal fade" id="editTaskModal" tabindex="-1" aria-labelledby="editTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="editTaskModalLabel">Edit Task</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form #editTaskForm="ngForm" (ngSubmit)="onEditSubmit(editTaskForm)">
+                    <div class="mb-3">
+                        <label for="editTaskTitle" class="form-label">Task Title</label>
+                        <input type="text" class="form-control" id="editTaskTitle" name="title" [(ngModel)]="editingTask.title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTaskType" class="form-label">Task Type</label>
+                        <select class="form-select" id="editTaskType" name="type" [(ngModel)]="editingTask.type">
+                            <option value="bug">Bug</option>
+                            <option value="feature">Feature</option>
+                            <option value="issue">Issue</option>
+                            <option value="undefined">Undefined</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTaskPoints" class="form-label">Points</label>
+                        <input type="number" class="form-control" id="editTaskPoints" name="points" [(ngModel)]="editingTask.points" min="1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTaskDate" class="form-label">Date (Optional)</label>
+                        <input type="text" class="form-control" id="editTaskDate" name="date" [(ngModel)]="editingTask.date" placeholder="e.g., Jan 25 or 5/34">
+                    </div>
+                    <div class="mb-3">
+                        <label for="editTaskImage" class="form-label">Image URL (Optional)</label>
+                        <input type="text" class="form-control" id="editTaskImage" name="image" [(ngModel)]="editingTask.image" placeholder="e.g., https://via.placeholder.com/400/200">
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary" [disabled]="!editTaskForm.valid">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
