@@ -2,6 +2,7 @@ import { CommonModule, NgFor, NgIf } from '@angular/common';
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+// import { MatNativeDateModule } from '@angular/material/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -24,11 +25,13 @@ import { CrmApiService } from '../../crm-api.service';
     MatSelectModule,
     MatButtonModule,
     MatDatepickerModule,
-    MatNativeDateModule,
+    MatNativeDateModule, // ✅ Ensure this is included
+    // MatNativeDateModule,
     MatIconModule,NgFor,NgIf
   ],
   templateUrl: './ticket-generation-form.component.html',
-  styleUrls: ['./ticket-generation-form.component.scss']
+  styleUrls: ['./ticket-generation-form.component.scss'],
+
 })
 export class TicketGenerationFormComponent implements OnInit {
   @Input() ticket: Ticket | null = null;
@@ -64,6 +67,8 @@ categories:any
     // Any initialization logic
     this.ticketType()
     this.priority()
+    console.log("milind ngOnIt ticket genreation component");
+
   }
 
   ticketType(){
