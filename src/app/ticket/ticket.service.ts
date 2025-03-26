@@ -64,4 +64,17 @@ export class TicketService {
     this.comments = this.comments.filter(c => c.ticketId !== ticketId);
     this.saveComments();
   }
+
+  updateComment(comment: Comment): void {
+    const index = this.comments.findIndex(c => c.id === comment.id);
+    if (index !== -1) {
+      this.comments[index] = comment;
+      this.saveComments();
+    }
+  }
+
+  deleteComment(commentId: number): void {
+    this.comments = this.comments.filter(c => c.id !== commentId);
+    this.saveComments();
+  }
 }

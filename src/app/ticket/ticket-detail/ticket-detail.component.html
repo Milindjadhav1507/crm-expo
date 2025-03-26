@@ -1,13 +1,12 @@
 <div class="ticket-detail-container">
   <div class="actions-header">
-    <button mat-stroked-button (click)="onBack()">
+    <!-- <button mat-stroked-button (click)="onBack()">
       <mat-icon>arrow_back</mat-icon>
       Back to Tickets
-    </button>
+    </button> -->
     <div class="right-actions" *ngIf="ticket">
       <button mat-stroked-button color="primary" (click)="onEdit()">
-        <mat-icon>edit</mat-icon>
-        Edit
+        <mat-icon>edit</mat-icon>Edit
       </button>
       <!-- <button mat-stroked-button color="warn" (click)="onClose()" [disabled]="ticket.status === 'closed'">
       <button mat-stroked-button color="warn" (click)="onClose()" [disabled]="ticket.statusName === 'Closed'">
@@ -161,7 +160,7 @@
               <h3>Communication History</h3>
             </div>
 
-            <div class="comment-form">
+            <!-- <div class="comment-form">
               <form [formGroup]="commentForm" (ngSubmit)="onSubmitComment()">
                 <mat-form-field appearance="outline" class="full-width">
                   <mat-label>Add a comment</mat-label>
@@ -200,12 +199,22 @@
                   </button>
                 </div>
               </form>
-            </div>
+            </div> -->
             <div class="comments-list">
               <div *ngFor="let comment of comments$ | async" class="comment-item">
                 <div class="comment-header">
-                  <span class="user-name">{{comment.userName}}</span>
-                  <span class="timestamp">{{comment.timestamp | date:'medium'}}</span>
+                  <div class="comment-info">
+                    <span class="user-name">{{comment.userName}}</span>
+                    <span class="timestamp">{{comment.timestamp | date:'medium'}}</span>
+                  </div>
+                  <div class="comment-actions">
+                    <button mat-icon-button color="primary" (click)="editComment(comment)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button color="warn" (click)="deleteComment(comment)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
                 </div>
                 <div class="comment-content">
                   <p>{{comment.message}}</p>
@@ -217,6 +226,55 @@
                   </div>
                 </div>
               </div>
+            </div>
+
+            <!-- Edit Comment Form -->
+            <div class="comment-form" *ngIf="editingComment">
+              <form [formGroup]="commentForm" (ngSubmit)="updateComment()">
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>Edit comment</mat-label>
+                  <textarea matInput formControlName="message" rows="3"></textarea>
+                </mat-form-field>
+
+                <!-- Attachment Button -->
+                <div class="attachment-section">
+                  <input type="file"
+                         #fileInput
+                         (change)="onFileSelected($event)"
+                         style="display: none">
+                  <button type="button"
+                          mat-stroked-button
+                          (click)="fileInput.click()">
+                    <mat-icon>attach_file</mat-icon>
+                    Add Attachment
+                  </button>
+                </div>
+
+                <!-- Recent Attachments -->
+                <div class="recent-attachments" *ngIf="recentAttachments.length > 0">
+                  <h4>Attachments</h4>
+                  <div class="attachment-list">
+                    <div *ngFor="let attachment of recentAttachments" class="attachment-item">
+                      <mat-icon>attach_file</mat-icon>
+                      <span>{{attachment}}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-actions">
+                  <button mat-raised-button
+                          color="primary"
+                          type="submit"
+                          [disabled]="!commentForm.valid">
+                    Update Comment
+                  </button>
+                  <button mat-stroked-button
+                          type="button"
+                          (click)="cancelEdit()">
+                    Cancel
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </mat-tab>
