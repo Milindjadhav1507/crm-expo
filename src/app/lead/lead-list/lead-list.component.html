@@ -6,360 +6,329 @@
   </ol>
 </nav>
 
-<div class="container-fluid mt-3 compact-form card p-3">
-  <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 16px;">
-    <!-- Search Input -->
-    <div style="flex: 1; min-width: 250px;">
-      <mat-form-field appearance="outline" style="width: 100%;">
-        <mat-label>Search visitors...</mat-label>
-        <input matInput [(ngModel)]="searchQuery" (input)="filterLeads()">
-      </mat-form-field>
-    </div>
+<!-- Toolbar -->
+<mat-toolbar color="primary" class="mb-4">
+  <span>Lead List</span>
+  <span class="spacer"></span>
+  <button mat-raised-button color="accent" (click)="openCreateLeadDialog()">
+    <mat-icon>add</mat-icon> Create Lead
+  </button>
+</mat-toolbar>
 
-    <!-- Time Filter Dropdown -->
-    <div style="flex: 1; min-width: 200px;">
-      <mat-form-field appearance="outline" style="width: 100%;">
-        <mat-label>Time Filter</mat-label>
-        <mat-select>
-          <mat-option value="all">All Time Entries</mat-option>
-          <mat-option value="today">Today's Entries</mat-option>
-          <mat-option value="last7days">Last 7 Days</mat-option>
-          <mat-option value="last1month">Last 1 Month</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
-    <!-- View Toggle Buttons -->
-    <div class="col-md-3 col-sm-6 text-md-end text-center">
-      <button mat-raised-button color="primary" class="btn btn-success btn-sm me-2" data-bs-toggle="modal"
-        data-bs-target="#createLeadModal">
-        <i class="fa fa-plus"></i> Create Lead
-      </button>
+<div class="container-fluid">
+  <!-- Search and Filter Section -->
+  <mat-card class="mb-4">
+    <mat-card-content>
+      <div class="search-filter-container">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search leads...</mat-label>
+          <input matInput [(ngModel)]="searchQuery" (input)="filterLeads()">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
 
-      <button class="btn btn-outline-primary btn-sm me-2" [class.active]="displayMode === 'list'"
-        (click)="toggleView('list')">
-        <i class="fa fa-list"></i>
-      </button>
-      <button class="btn btn-outline-primary btn-sm" [class.active]="displayMode === 'grid'"
-        (click)="toggleView('grid')">
-        <i class="fa fa-th"></i>
-      </button>
-    </div>
-  </div>
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>Time Filter</mat-label>
+          <mat-select [(ngModel)]="selectedFilter" (selectionChange)="filterLeads()">
+            <mat-option value="all">All Time Entries</mat-option>
+            <mat-option value="today">Today's Entries</mat-option>
+            <mat-option value="last7days">Last 7 Days</mat-option>
+            <mat-option value="last1month">Last 1 Month</mat-option>
+          </mat-select>
+        </mat-form-field>
 
-  <!-- List View -->
-  <div *ngIf="displayMode === 'list'" class="mt-3">
-    <div *ngFor="let lead of paginatedLeads; let i = index"
-      class="visitor-card d-flex justify-content-between align-items-center p-2" (click)="viewDetails(lead)">
-      <div class="d-flex align-items-center">
-        <img [src]="lead.imageUrl" alt="Visitor Image" class="visitor-image">
-        <div class="visitor-card-details ms-2">
-          <span class="compact-text"><strong>Name:</strong> {{ lead.name }}</span><br>
-          <span class="compact-text"><strong>ID:</strong> {{ lead.email }}</span><br>
-          <span class="compact-text"><strong>Purpose:</strong> {{ lead.phone }}</span><br>
-          <span class="compact-text"><strong>Mobile:</strong> {{ lead.leadSource }}</span>
+        <div class="view-toggle">
+          <button mat-icon-button [color]="displayMode === 'list' ? 'primary' : ''" (click)="toggleView('list')">
+            <mat-icon>view_list</mat-icon>
+          </button>
+          <button mat-icon-button [color]="displayMode === 'grid' ? 'primary' : ''" (click)="toggleView('grid')">
+            <mat-icon>grid_view</mat-icon>
+          </button>
         </div>
       </div>
-      <div>
-        <button mat-raised-button color="primary" (click)="openFollowUpModal(lead, $event)">Follow Up</button>
-        <button mat-raised-button color="warn" (click)="deleteLead(lead.id, $event)">Delete</button>
-      </div>
-    </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- List View -->
+  <div *ngIf="displayMode === 'list'" class="list-view">
+    <mat-card *ngFor="let lead of paginatedLeads" class="lead-item">
+      <mat-card-content>
+        <div class="lead-content">
+          <div class="lead-info">
+            <img [src]="lead.imageUrl" alt="Lead Image" class="lead-avatar">
+            <div class="lead-details">
+              <h3>{{ lead.name }}</h3>
+              <div class="detail-item">
+                <mat-icon>email</mat-icon>
+                <span>{{ lead.email }}</span>
+              </div>
+              <div class="detail-item">
+                <mat-icon>phone</mat-icon>
+                <span>{{ lead.phone }}</span>
+              </div>
+              <div class="detail-item">
+                <mat-icon>source</mat-icon>
+                <span>{{ lead.leadSource }}</span>
+              </div>
+              <div class="detail-item">
+                <mat-icon>category</mat-icon>
+                <span>{{ lead.leadType }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="lead-actions">
+            <button mat-raised-button color="primary" (click)="viewDetails(lead)">
+              <mat-icon>visibility</mat-icon> View
+            </button>
+            <button mat-raised-button color="accent" (click)="openFollowUpDialog(lead)">
+              <mat-icon>event</mat-icon> Follow Up
+            </button>
+            <button mat-raised-button color="warn" (click)="deleteLead(lead.id)">
+              <mat-icon>delete</mat-icon> Delete
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
   </div>
 
   <!-- Grid View -->
-  <div *ngIf="displayMode === 'grid'" class="row mt-3 g-3">
-    <div *ngFor="let lead of paginatedLeads" class="col-lg-3 col-md-6 col-sm-12">
-      <mat-card class="lead-card">
-        <div class="card-content">
-          <!-- Image Section -->
-          <div class="image-section">
-            <img [src]="lead.imageUrl" alt="Visitor Image" class="avatar">
-            <h6 class="lead-name">{{ lead.name }}</h6>
-          </div>
-
-          <!-- Details Section -->
-          <div class="details-section">
-            <p class="lead-detail"><strong>Email:</strong> {{ lead.email }}</p>
-            <p class="lead-detail"><strong>Phone:</strong> {{ lead.phone }}</p>
-            <p class="lead-detail"><strong>Lead Source:</strong> {{ lead.leadSource }}</p>
-            <p class="lead-detail"><strong>Lead Type:</strong> {{ lead.leadType }}</p>
-          </div>
+  <div *ngIf="displayMode === 'grid'" class="grid-view">
+    <div class="grid-container">
+      <mat-card *ngFor="let lead of paginatedLeads" class="lead-card">
+        <div class="lead-avatar-container">
+          <img [src]="lead.imageUrl" alt="Lead Image" class="lead-avatar">
+          <h3 class="lead-name">{{ lead.name }}</h3>
         </div>
-
-        <!-- Buttons Section -->
-        <div class="button-container">
-          <button mat-raised-button color="primary " (click)="openFollowUpModal(lead, $event)">Follow Up</button>
-          <button mat-stroked-button color="primary" (click)="viewDetails(lead)">
-            <mat-icon>visibility</mat-icon> View
+        <mat-card-content>
+          <div class="lead-info-grid">
+            <div class="info-item">
+              <mat-icon>email</mat-icon>
+              <span>{{ lead.email }}</span>
+            </div>
+            <div class="info-item">
+              <mat-icon>phone</mat-icon>
+              <span>{{ lead.phone }}</span>
+            </div>
+            <div class="info-item">
+              <mat-icon>source</mat-icon>
+              <span>{{ lead.leadSource }}</span>
+            </div>
+            <div class="info-item">
+              <mat-icon>category</mat-icon>
+              <span>{{ lead.leadType }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-divider></mat-divider>
+        <mat-card-actions>
+          <button mat-button color="accent" (click)="openFollowUpDialog(lead)">
+            Follow Up
           </button>
-          <button mat-raised-button color="warn" (click)="deleteLead(lead.id, $event)">Delete</button>
-        </div>
+          <button mat-button color="primary" (click)="viewDetails(lead)">
+            View
+          </button>
+          <button mat-button color="warn" (click)="deleteLead(lead.id)">
+            Delete
+          </button>
+        </mat-card-actions>
       </mat-card>
     </div>
   </div>
 
-  <!-- Pagination & Page Size Selector -->
-  <div class="row align-items-center mt-3">
-    <div class="col-md-6">
-      <ul class="pagination mb-0">
-        <li class="page-item" [class.disabled]="currentPage === 1">
-          <a class="page-link" (click)="changePage(currentPage - 1)">Previous</a>
-        </li>
-        <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index"
-          [class.active]="i + 1 === currentPage">
-          <a class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</a>
-        </li>
-        <li class="page-item" [class.disabled]="currentPage === totalPages">
-          <a class="page-link" (click)="changePage(currentPage + 1)">Next</a>
-        </li>
-      </ul>
-    </div>
-    <div class="col-md-6 text-md-end text-center">
-      <select class="form-select w-auto" (change)="onPageSizeChange($event)">
-        <option value="10">10</option>
-        <option value="20">20</option>
-        <option value="50">50</option>
-        <option value="0">All</option>
-      </select>
-    </div>
-  </div>
+  <!-- Pagination -->
+  <mat-paginator
+    [length]="filteredLeads.length"
+    [pageSize]="pageSize"
+    [pageSizeOptions]="[10, 20, 50, 100]"
+    (page)="onPageChange($event)"
+    aria-label="Select page">
+  </mat-paginator>
 </div>
 
-<!-- lead Details Modal -->
-<div class="modal fade" id="leadModal" tabindex="-1" aria-labelledby="leadModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered modal-sm">
-    <div class="modal-content"
-      style="box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); border: none; border-radius: 8px;">
-      <div class="modal-header" style="background-color: #1976d2; color: white; padding: 12px;">
-        <h6 class="modal-title" id="leadModalLabel" style="margin: 0;">Lead Details</h6>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
-          style="color: white; background-color: transparent; border: none; font-size: 1.5rem;"></button>
-      </div>
-      <div class="modal-body" style="padding: 16px;">
-        <div *ngIf="selectedLead" style="font-size: 0.875rem; line-height: 1.5;">
-          <p class="mb-1" style="margin-bottom: 8px;"><strong>Name:</strong> {{ selectedLead.name }}</p>
-          <p class="mb-1" style="margin-bottom: 8px;"><strong>Email:</strong> {{ selectedLead.email }}</p>
-          <p class="mb-1" style="margin-bottom: 8px;"><strong>Phone:</strong> {{ selectedLead.phone }}</p>
-          <p class="mb-1" style="margin-bottom: 8px;"><strong>Lead Source:</strong> {{ selectedLead.leadSource }}</p>
-          <p class="mb-1" style="margin-bottom: 8px;"><strong>Lead Type:</strong> {{ selectedLead.leadType }}</p>
-          <p class="mb-1" style="margin-bottom: 8px;"><strong>Company:</strong> {{ selectedLead.company }}</p>
-          <p class="mb-1" style="margin-bottom: 8px;"><strong>Status:</strong> {{ selectedLead.status }}</p>
-          <p class="mb-1" style="margin-bottom: 8px;"><strong>Created Date:</strong> {{ selectedLead.createdDate }}</p>
-          <p class="mb-1" style="margin-bottom: 8px;"><strong>Notes:</strong> {{ selectedLead.notes }}</p>
-        </div>
-      </div>
-      <div class="modal-footer" style="padding: 12px; display: flex; justify-content: flex-end;">
-        <button type="button" class="btn btn-sm" data-bs-dismiss="modal"
-          style="border: 1px solid #1976d2; color: #1976d2; background-color: transparent; padding: 6px 12px; border-radius: 4px; font-size: 0.875rem;">Close</button>
-      </div>
+<!-- Lead Details Dialog -->
+<ng-template #leadDetailsDialog>
+  <h2 mat-dialog-title>Lead Details</h2>
+  <mat-dialog-content>
+    <div *ngIf="selectedLead" class="lead-details">
+      <p><strong>Name:</strong> {{ selectedLead.name }}</p>
+      <p><strong>Email:</strong> {{ selectedLead.email }}</p>
+      <p><strong>Phone:</strong> {{ selectedLead.phone }}</p>
+      <p><strong>Lead Source:</strong> {{ selectedLead.leadSource }}</p>
+      <p><strong>Lead Type:</strong> {{ selectedLead.leadType }}</p>
+      <p><strong>Company:</strong> {{ selectedLead.company }}</p>
+      <p><strong>Status:</strong> {{ selectedLead.status }}</p>
+      <p><strong>Created Date:</strong> {{ selectedLead.createdDate }}</p>
+      <p><strong>Notes:</strong> {{ selectedLead.notes }}</p>
     </div>
-  </div>
-</div>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Close</button>
+  </mat-dialog-actions>
+</ng-template>
 
-<!-- Create Lead Modal -->
-<div class="modal fade" id="createLeadModal" tabindex="-1" aria-labelledby="createLeadModalLabel" aria-hidden="true"
-  style="z-index: 1060;">
-  <!-- Increased z-index -->
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="createLeadModalLabel" style="font-size: 25px;">Create Lead</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+<!-- Create Lead Dialog -->
+<ng-template #createLeadDialog>
+  <h2 mat-dialog-title>Create Lead</h2>
+  <mat-dialog-content>
+    <form [formGroup]="leadForm">
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Name</mat-label>
+          <input matInput formControlName="name" required>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Number</mat-label>
+          <input matInput formControlName="number" required>
+        </mat-form-field>
       </div>
-      <div class="modal-body">
-        <form (submit)="createLead()">
-          <div class="row g-2">
-            <!-- Name -->
-            <div class="col-md-6">
-              <label class="form-label">Name <span class="text-danger">*</span></label>
-              <input type="text" class="form-control form-control-sm" [(ngModel)]="newLead.name"
-                [ngModelOptions]="{standalone: true}" required>
-            </div>
-            <!-- Number -->
-            <div class="col-md-6">
-              <label class="form-label">Number <span class="text-danger">*</span></label>
-              <input type="tel" class="form-control form-control-sm" [(ngModel)]="newLead.number"
-                [ngModelOptions]="{standalone: true}" required>
-            </div>
 
-            <!-- Email -->
-            <div class="col-md-6">
-              <label class="form-label">Email <span class="text-danger">*</span></label>
-              <input type="email" class="form-control form-control-sm" [(ngModel)]="newLead.email"
-                [ngModelOptions]="{standalone: true}" required>
-            </div>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput formControlName="email" required>
+        </mat-form-field>
 
-            <!-- Assign To -->
-            <div class="col-md-6">
-              <label class="form-label">Assign To</label>
-              <select class="form-select form-select-sm" [(ngModel)]="newLead.assignedTo"
-                [ngModelOptions]="{standalone: true}">
-                <option *ngFor="let user of users" [value]="user">
-                  {{ user }}
-                </option>
-              </select>
-            </div>
-
-            <!-- Lead Type -->
-            <div class="col-md-6">
-              <label class="form-label">Lead Type</label>
-              <select class="form-select form-select-sm" [(ngModel)]="newLead.leadType"
-                [ngModelOptions]="{standalone: true}">
-                <option *ngFor="let type of leadTypes" [value]="type">
-                  {{ type }}
-                </option>
-              </select>
-            </div>
-
-            <!-- Lead Source -->
-            <div class="col-md-6">
-              <label class="form-label">Lead Source</label>
-              <select class="form-select form-select-sm" [(ngModel)]="newLead.leadSource"
-                [ngModelOptions]="{standalone: true}">
-                <option value="Reference">Reference</option>
-                <option value="India Mart">India Mart</option>
-                <option value="LinkedIn">LinkedIn</option>
-              </select>
-            </div>
-
-            <!-- Company -->
-            <div class="col-md-6">
-              <label class="form-label">Company</label>
-              <input type="text" class="form-control form-control-sm" [(ngModel)]="newLead.company"
-                [ngModelOptions]="{standalone: true}">
-            </div>
-
-            <!-- Document Upload -->
-            <div class="col-md-6">
-              <label class="form-label">Attach Documents</label>
-              <input type="file" class="form-control form-control-sm" (change)="onFileSelect($event)">
-            </div>
-
-            <!-- Notes -->
-            <div class="col-md-6">
-              <label class="form-label">Notes</label>
-              <textarea class="form-control form-control-sm" rows="1" [(ngModel)]="newLead.notes"
-                [ngModelOptions]="{standalone: true}"></textarea>
-            </div>
-          </div>
-
-          <div class="text-end mt-3">
-            <button type="submit" class="btn btn-success btn-sm mx-2">Save Lead</button>
-            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
-          </div>
-        </form>
+        <mat-form-field appearance="outline">
+          <mat-label>Assign To</mat-label>
+          <mat-select formControlName="assignedTo">
+            <mat-option *ngFor="let user of users" [value]="user">
+              {{ user }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
       </div>
-    </div>
-  </div>
-</div>
 
-<!-- Follow-Up Modal -->
-<div class="modal fade" id="followUpModal" tabindex="-1" aria-labelledby="followUpModalLabel" aria-hidden="true"
-    style="z-index: 1060;">
-    <!-- Increased z-index -->
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="followUpModalLabel" style="font-size: 25px;">Follow Up</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Lead Type</mat-label>
+          <mat-select formControlName="leadType">
+            <mat-option *ngFor="let type of leadTypes" [value]="type">
+              {{ type }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Lead Source</mat-label>
+          <mat-select formControlName="leadSource">
+            <mat-option value="Reference">Reference</mat-option>
+            <mat-option value="India Mart">India Mart</mat-option>
+            <mat-option value="LinkedIn">LinkedIn</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Company</mat-label>
+          <input matInput formControlName="company">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Notes</mat-label>
+          <textarea matInput formControlName="notes" rows="3"></textarea>
+        </mat-form-field>
+      </div>
+
+      <div class="file-upload">
+        <button mat-raised-button type="button" (click)="fileInput.click()">
+          <mat-icon>attach_file</mat-icon> Attach Documents
+        </button>
+        <input #fileInput type="file" (change)="onFileSelect($event)" style="display: none">
+      </div>
+    </form>
+  </mat-dialog-content>
+  <mat-dialog-actions align="end">
+    <button mat-button mat-dialog-close>Cancel</button>
+    <button mat-raised-button color="primary" (click)="createLead()">Save Lead</button>
+  </mat-dialog-actions>
+</ng-template>
+
+<!-- Follow-up Dialog -->
+<ng-template #followUpDialog>
+    <h2 mat-dialog-title>Schedule Follow-up</h2>
+    <mat-dialog-content>
+        <div class="lead-details">
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Lead Name</mat-label>
+                    <input matInput [(ngModel)]="followUpData.leadName" readonly>
+                </mat-form-field>
             </div>
-            <div class="modal-body">
-                <form (submit)="saveFollowUp()">
-                    <!-- Lead Name (Auto-populated) -->
-                    <div class="mb-2">
-                        <label class="form-label">Lead Name</label>
-                        <input type="text" class="form-control" [(ngModel)]="followUpData.leadName"
-                            [ngModelOptions]="{standalone: true}" readonly>
-                    </div>
 
-                    <!-- Assign To -->
-                    <div class="mb-2">
-                        <label class="form-label">Assign To</label>
-                         <select class="form-select form-select-sm" [(ngModel)]="followUpData.assignedTo"
-                            [ngModelOptions]="{standalone: true}">
-                            <option *ngFor="let user of users" [value]="user">
-                                {{ user }}
-                            </option>
-                        </select>
-                    </div>
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Status</mat-label>
+                    <mat-select [(ngModel)]="followUpData.status">
+                        <mat-option value="Call">Call</mat-option>
+                        <mat-option value="Email">Email</mat-option>
+                        <mat-option value="Meeting">Meeting</mat-option>
+                        <mat-option value="Other">Other</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
 
-                    <!-- Lead Type -->
-                    <div class="mb-2">
-                        <label class="form-label">Lead Type</label>
-                         <select class="form-select form-select-sm" [(ngModel)]="followUpData.leadType"
-                            [ngModelOptions]="{standalone: true}">
-                            <option *ngFor="let type of leadTypes" [value]="type">
-                                {{ type }}
-                            </option>
-                        </select>
-                    </div>
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Next Follow-up Date</mat-label>
+                    <input matInput type="date" [(ngModel)]="followUpData.nextFollowUpDate">
+                </mat-form-field>
+            </div>
 
-                    <!-- Follow Up Status -->
-                    <div class="mb-2">
-                        <label class="form-label">Follow Up Status <span class="text-danger">*</span></label>
-                        <select class="form-select" [(ngModel)]="followUpData.status" [ngModelOptions]="{standalone: true}"
-                            (change)="onStatusChange()">
-                            <option value="Closed">Closed</option>
-                            <option value="Contacted">Contacted</option>
-                            <option value="Converted">Converted</option>
-                            <option value="Lost">Lost</option>
-                            <option value="Open">Open</option>
-                            <option value="Qualified">Qualified</option>
-                        </select>
-                    </div>
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Comments</mat-label>
+                    <textarea matInput rows="3" [(ngModel)]="followUpData.comments"></textarea>
+                </mat-form-field>
+            </div>
 
-                    <!-- Next Follow-Up Date (Date Picker) -->
-                    <div class="mb-2">
-                        <label class="form-label">Next Follow-Up Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control" [(ngModel)]="followUpData.nextFollowUpDate"
-                            [ngModelOptions]="{standalone: true}">
-                    </div>
+            <div class="form-row">
+                <mat-checkbox [(ngModel)]="followUpData.isMeetingScheduled" (change)="onStatusChange()">
+                    Meeting Scheduled
+                </mat-checkbox>
+            </div>
 
-                    <!-- Comments -->
-                    <div class="mb-2">
-                        <label class="form-label">Comments</label>
-                        <textarea class="form-control" rows="3" [(ngModel)]="followUpData.comments"
-                            [ngModelOptions]="{standalone: true}"></textarea>
-                    </div>
+            <div class="form-row" *ngIf="followUpData.isMeetingScheduled">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Meeting Platform</mat-label>
+                    <mat-select [(ngModel)]="followUpData.meetingPlatform">
+                        <mat-option value="Google Meet">Google Meet</mat-option>
+                        <mat-option value="Zoom">Zoom</mat-option>
+                        <mat-option value="Microsoft Teams">Microsoft Teams</mat-option>
+                        <mat-option value="Other">Other</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
 
-                    <!-- Toggle Button for Meeting Fields -->
-                    <div class="mb-2">
-                        <label class="form-label">Schedule Meeting?</label>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" [(ngModel)]="followUpData.isMeetingScheduled"
-                                [ngModelOptions]="{standalone: true}" id="meetingToggle">
-                            <label class="form-check-label" for="meetingToggle">Toggle to schedule a meeting</label>
-                        </div>
-                    </div>
+            <div class="form-row" *ngIf="followUpData.isMeetingScheduled">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Meeting Link</mat-label>
+                    <input matInput [(ngModel)]="followUpData.meetingLink">
+                </mat-form-field>
+            </div>
 
-                    <!-- Meeting Platform (Conditional) -->
-                    <div class="mb-2" *ngIf="followUpData.isMeetingScheduled">
-                        <label class="form-label">Meeting Platform</label>
-                        <select class="form-select" [(ngModel)]="followUpData.meetingPlatform"
-                            [ngModelOptions]="{standalone: true}">
-                            <option value="Google Meet">Google Meet</option>
-                            <option value="Zoom">Zoom</option>
-                            <option value="Microsoft Teams">Microsoft Teams</option>
-                        </select>
-                    </div>
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Assigned To</mat-label>
+                    <mat-select [(ngModel)]="followUpData.assignedTo">
+                        <mat-option *ngFor="let user of users" [value]="user">{{user}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
+            </div>
 
-                    <!-- Meeting Link (Conditional) -->
-                    <div class="mb-2" *ngIf="followUpData.isMeetingScheduled">
-                        <label class="form-label">Meeting Link</label>
-                        <input type="url" class="form-control" [(ngModel)]="followUpData.meetingLink"
-                            [ngModelOptions]="{standalone: true}">
-                    </div>
-
-                    <div class="text-end mt-3">
-                        <button mat-raised-button color="primary" type="submit" style="margin: 20px;">
-                            Create Follow Up
-                        </button>
-                        <button mat-stroked-button color="warn" type="button" data-bs-dismiss="modal">
-                            Cancel
-                        </button>
-                    </div>
-                </form>
+            <div class="form-row">
+                <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Lead Type</mat-label>
+                    <mat-select [(ngModel)]="followUpData.leadType">
+                        <mat-option *ngFor="let type of leadTypes" [value]="type">{{type}}</mat-option>
+                    </mat-select>
+                </mat-form-field>
             </div>
         </div>
-    </div>
-</div>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+        <button mat-button mat-dialog-close>Cancel</button>
+        <button mat-raised-button color="primary" (click)="saveFollowUp()">Save Follow-up</button>
+    </mat-dialog-actions>
+</ng-template>

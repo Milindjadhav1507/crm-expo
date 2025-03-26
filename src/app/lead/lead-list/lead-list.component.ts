@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
@@ -8,8 +8,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatSelectModule } from '@angular/material/select';
+import { MatDialogModule, MatDialog } from '@angular/material/dialog';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatChipsModule } from '@angular/material/chips';
 import { RouterLink } from '@angular/router';
-import * as bootstrap from 'bootstrap';
 
 @Component({
     selector: 'app-lead-list',
@@ -17,6 +21,7 @@ import * as bootstrap from 'bootstrap';
     imports: [
         CommonModule,
         FormsModule,
+        ReactiveFormsModule,
         RouterLink,
         MatListModule,
         MatButtonModule,
@@ -26,11 +31,20 @@ import * as bootstrap from 'bootstrap';
         MatSelectModule,
         MatLabel,
         MatInputModule,
+        MatDialogModule,
+        MatPaginatorModule,
+        MatToolbarModule,
+        MatMenuModule,
+        MatChipsModule
     ],
     templateUrl: './lead-list.component.html',
-    styleUrls: ['./lead-list.component.scss'], // Use styleUrls
+    styleUrls: ['./lead-list.component.scss'],
 })
 export class LeadListComponent implements OnInit {
+    @ViewChild('leadDetailsDialog') leadDetailsDialog!: TemplateRef<any>;
+    @ViewChild('createLeadDialog') createLeadDialog!: TemplateRef<any>;
+    @ViewChild('followUpDialog') followUpDialog!: TemplateRef<any>;
+
     leads: any[] = [];
     filteredLeads: any[] = [];
     paginatedLeads: any[] = [];
@@ -38,17 +52,22 @@ export class LeadListComponent implements OnInit {
     searchQuery: string = '';
     loading: boolean = true;
     selectedFilter: string = 'all';
+    leadForm: FormGroup;
+    selectedLead: any = null;
+    pageSize: number = 10;
+    currentPage: number = 1;
+    totalPages: number = 1;
 
-    newLead: any = {
-        name: '',
-        number: '',
-        email: '',
-        leadType: '',
-        leadSource: '',
-        notes: '',
-        document: null,
-        company: '',
-        assignedTo: '',  // Store the username directly
+    followUpData = {
+        leadName: '',
+        status: '',
+        nextFollowUpDate: '',
+        comments: '',
+        isMeetingScheduled: false,
+        meetingPlatform: '',
+        meetingLink: '',
+        assignedTo: '',
+        leadType: ''
     };
 
     users = [
@@ -59,26 +78,23 @@ export class LeadListComponent implements OnInit {
         'Michael Wilson'
     ];
 
-    leadTypes = ['Hot', 'Warm', 'Cold']; // Available lead types
+    leadTypes = ['Hot', 'Warm', 'Cold'];
 
-    followUpData = {
-        leadName: '',
-        status: '',
-        nextFollowUpDate: '',
-        comments: '',
-        isMeetingScheduled: false,
-        meetingPlatform: '',
-        meetingLink: '',
-        assignedTo: '',  // Store the username directly
-        leadType: '' // Added Lead Type for Follow Up
-    };
-
-    pageSize: number = 10;
-    currentPage: number = 1;
-    totalPages: number = 1;
-    selectedLead: any = null;
-
-    constructor() { }
+    constructor(
+        private dialog: MatDialog,
+        private fb: FormBuilder
+    ) {
+        this.leadForm = this.fb.group({
+            name: ['', Validators.required],
+            number: ['', Validators.required],
+            email: ['', [Validators.required, Validators.email]],
+            assignedTo: [''],
+            leadType: [''],
+            leadSource: [''],
+            company: [''],
+            notes: ['']
+        });
+    }
 
     ngOnInit(): void {
         this.loadHardcodedLeads();
@@ -99,7 +115,7 @@ export class LeadListComponent implements OnInit {
                 createdDate: '2024-02-01',
                 notes: 'Interested in product demo',
                 imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Aarav Patel',
-                assignedTo: 'John Doe'  // Example
+                assignedTo: 'John Doe'
             },
             {
                 id: 'L002',
@@ -216,11 +232,13 @@ export class LeadListComponent implements OnInit {
 
     viewDetails(lead: any): void {
         this.selectedLead = lead;
-        const modalElement = document.getElementById('leadModal');
-        if (modalElement) {
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        }
+        const dialogRef = this.dialog.open(this.leadDetailsDialog, {
+            width: '400px'
+        });
+
+        dialogRef.afterClosed().subscribe(() => {
+            this.selectedLead = null;
+        });
     }
 
     applyPagination(): void {
@@ -244,46 +262,27 @@ export class LeadListComponent implements OnInit {
         this.applyPagination();
     }
 
-    onFileSelect(event: any) {
+    onFileSelect(event: any): void {
         if (event.target.files.length > 0) {
-            this.newLead.document = event.target.files[0];
+            const file = event.target.files[0];
+            // Handle file upload logic here
+            console.log('File selected:', file);
         }
     }
 
-    createLead() {
-        if (!this.newLead.name || !this.newLead.number || !this.newLead.email) {
-            alert('Name, Number, and Email are required.');
-            return;
-        }
+    openCreateLeadDialog(): void {
+        const dialogRef = this.dialog.open(this.createLeadDialog, {
+            width: '600px'
+        });
 
-        console.log('Lead Created:', this.newLead);
-
-        const modalElement = document.getElementById('createLeadModal');
-        if (modalElement) {
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) {
-                modal.hide();
-            } else {
-                const newModal = new bootstrap.Modal(modalElement);
-                newModal.hide();
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                this.createLead();
             }
-        }
-
-        this.newLead = {
-            name: '',
-            number: '',
-            email: '',
-            leadType: '',
-            leadSource: '',
-            notes: '',
-            document: null,
-            company: '',
-            assignedTo: '',  // Reset assignedTo (username)
-        };
+        });
     }
 
-    openFollowUpModal(lead: any, event: Event) {
-        event.stopPropagation(); // Prevents triggering viewDetails
+    openFollowUpDialog(lead: any): void {
         this.followUpData = {
             leadName: lead.name,
             status: '',
@@ -292,20 +291,53 @@ export class LeadListComponent implements OnInit {
             isMeetingScheduled: false,
             meetingPlatform: '',
             meetingLink: '',
-            assignedTo: lead.assignedTo,  // Get initial assignedTo (username)
-            leadType: lead.leadType // Initialize leadType from lead
+            assignedTo: lead.assignedTo,
+            leadType: lead.leadType
         };
 
-        const modalElement = document.getElementById('followUpModal');
-        if (modalElement) {
-            const modal = new bootstrap.Modal(modalElement);
-            modal.show();
-        } else {
-            console.error('Follow-Up Modal not found in the DOM.');
+        const dialogRef = this.dialog.open(this.followUpDialog, {
+            width: '500px',
+            disableClose: false
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                this.saveFollowUp();
+            }
+        });
+    }
+
+    onPageChange(event: PageEvent): void {
+        this.pageSize = event.pageSize;
+        this.currentPage = event.pageIndex + 1;
+        this.applyPagination();
+    }
+
+    createLead(): void {
+        if (this.leadForm.valid) {
+            const newLead = {
+                ...this.leadForm.value,
+                id: `L${String(this.leads.length + 1).padStart(3, '0')}`,
+                status: 'New',
+                createdDate: new Date().toISOString().split('T')[0],
+                imageUrl: `https://api.dicebear.com/7.x/initials/svg?seed=${this.leadForm.value.name}`
+            };
+
+            this.leads.push(newLead);
+            this.filterLeads();
+            this.dialog.closeAll();
+            this.leadForm.reset();
         }
     }
 
-    onStatusChange() {
+    deleteLead(leadId: string): void {
+        if (confirm('Are you sure you want to delete this lead?')) {
+            this.leads = this.leads.filter(lead => lead.id !== leadId);
+            this.filterLeads();
+        }
+    }
+
+    onStatusChange(): void {
         if (this.followUpData.status !== 'Meeting') {
             this.followUpData.isMeetingScheduled = false;
             this.followUpData.meetingPlatform = '';
@@ -313,15 +345,9 @@ export class LeadListComponent implements OnInit {
         }
     }
 
-    saveFollowUp() {
-        console.log('Follow-up saved:', this.followUpData);
-        // Add logic to save follow-up data
-    }
-
-        //Delete lead logic
-    deleteLead(leadId: string, event: Event) {
-        event.stopPropagation();
-        this.leads = this.leads.filter(lead => lead.id !== leadId);
-        this.filterLeads();
+    saveFollowUp(): void {
+        // Implement your follow-up saving logic here
+        console.log('Saving follow-up:', this.followUpData);
+        this.dialog.closeAll();
     }
 }
