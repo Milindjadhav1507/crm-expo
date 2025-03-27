@@ -1,8 +1,7 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-// import { MatNativeDateModule } from '@angular/material/core';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -13,6 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { Ticket, TicketStatus } from '../ticket.interface';
 import { CrmApiService } from '../../crm-api.service';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-ticket-generation-form',
@@ -25,13 +25,14 @@ import { CrmApiService } from '../../crm-api.service';
     MatSelectModule,
     MatButtonModule,
     MatDatepickerModule,
-    MatNativeDateModule, // ✅ Ensure this is included
-    // MatNativeDateModule,
-    MatIconModule,NgFor,NgIf
+    MatNativeDateModule,
+    MatIconModule,
+    NgFor,
+    NgIf
   ],
+
   templateUrl: './ticket-generation-form.component.html',
   styleUrls: ['./ticket-generation-form.component.scss'],
-
 })
 export class TicketGenerationFormComponent implements OnInit {
   @Input() ticket: Ticket | null = null;
@@ -39,6 +40,7 @@ export class TicketGenerationFormComponent implements OnInit {
   ticketForm!: FormGroup;
   isSubmitting = false;
   maxDate = new Date();
+  isEditMode = false;
 
   // priorities = [
   //   { value: 'high', label: 'High' },
@@ -58,7 +60,9 @@ categories:any
     private fb: FormBuilder,
     private router: Router,
     private snackBar: MatSnackBar,
-    private api:CrmApiService
+    private api:CrmApiService,
+    @Inject(MAT_DIALOG_DATA) public data: { ticket: Ticket | null },
+    private dialogRef: MatDialogRef<TicketGenerationFormComponent>
   ) {
     this.initForm();
   }
@@ -69,6 +73,24 @@ categories:any
     this.priority()
     console.log("milind ngOnIt ticket genreation component");
 
+    if (this.data.ticket) {
+      this.isEditMode = true;
+      this.patchFormData(this.data.ticket);
+    }
+  }
+
+  private patchFormData(ticket: Ticket) {
+    console.log('Patching form with ticket data:', ticket);
+    this.ticketForm.patchValue({
+      title: ticket.title || '',
+      category: ticket.category || '',
+      priority: ticket.priority || '',
+      description: ticket.description || '',
+      contact_email: ticket.contact_email || '',
+      contact_phone: ticket.contact_phone || '',
+      expected_resolution_date: ticket.expected_resolution_date || '',
+      additional_notes: ticket.additional_notes || ''
+    });
   }
 
   ticketType(){
@@ -144,42 +166,43 @@ categories:any
     if (this.ticketForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       try {
-        const formData = this.ticketForm.value;
+        // Get the current form values
+        const formData = this.ticketForm.getRawValue();
+        console.log('Form data before submission:', formData);
+        let response;
 
-        const newTicket: Partial<Ticket> = {
-          title: formData.title,
-          category: formData.category,
-          priority: formData.priority,
-          description: formData.description,
-          attachments: formData.attachments || '',
-          contact_email: formData.contact_email || '',
-          contact_phone: formData.contact_phone || '',
-          expected_resolution_date: formData.expected_resolution_date || null,
-          additional_notes: formData.additional_notes || '',
-          // status: TicketStatus.OPEN,
-          // createdAt: new Date(),
-          // communicationHistory: []
-        };
-
-        // API call using async/await
-        const response = await this.api.post('ticket/create_ticket/', newTicket).toPromise();
-
-        if (response.status === 200) {
-          console.log('Ticket created successfully:', response);
+        if (this.isEditMode && this.data.ticket) {
+          // Update existing ticket
+          const updatePayload = {
+            ...formData,
+            id: this.data.ticket.id
+          };
+          console.log('Update payload:', updatePayload);
+          response = await this.api.post(`ticket/update_ticket/`, updatePayload).toPromise();
+          this.snackBar.open('Ticket updated successfully!', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top'
+          });
+        } else {
+          // Create new ticket
+          response = await this.api.post('ticket/create_ticket/', formData).toPromise();
           this.snackBar.open('Ticket created successfully!', 'Close', {
             duration: 3000,
             horizontalPosition: 'end',
             verticalPosition: 'top'
           });
+        }
 
-          this.ticketCreated.emit(response.data); // Emit the created ticket
-          this.router.navigate(['/tickets']);
+        if (response.status === 200) {
+          this.ticketCreated.emit(response.data);
+          this.dialogRef.close(response.data);
         } else {
           throw new Error('Unexpected response from server');
         }
       } catch (error) {
-        console.error('Error creating ticket:', error);
-        this.snackBar.open('Error creating ticket. Please try again.', 'Close', {
+        console.error('Error saving ticket:', error);
+        this.snackBar.open('Error saving ticket. Please try again.', 'Close', {
           duration: 3000,
           horizontalPosition: 'end',
           verticalPosition: 'top'
@@ -192,7 +215,6 @@ categories:any
     }
   }
 
-
   private markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
@@ -203,7 +225,7 @@ categories:any
   }
 
   cancel() {
-    this.router.navigate(['/tickets']);
+    this.dialogRef.close();
   }
   formatDate(date: any) {
     if (date) {

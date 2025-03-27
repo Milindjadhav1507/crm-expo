@@ -7,74 +7,74 @@
     font-style: normal;
     background-color: #f8f9fa;
   }
-  
-  
-  
-  
+
+
+
+
   .navbar {
   padding: 0.5rem 1rem;
   background-color: #fff; /* White background */
   }
-  
+
   .navbar-brand {
     display: flex;
     align-items: center;
   }
-  
+
   .navbar-brand img {
     height: 30px; /* Adjust based on actual logo size */
     margin-right: 10px;
   }
-  
+
   .navbar-brand span {
     font-weight: bold;
   }
-  
+
   .navbar-nav {
     margin-left: auto; /* Push to right */
   }
-  
+
   .navbar-nav .nav-link {
     color: #6c757d; /* Light gray color */
     padding: 0.5rem 1rem;
   }
-  
+
   .navbar-nav .nav-link:hover {
     color: #000; /* Black on hover */
   }
-  
+
   .navbar-nav .nav-item.dropdown .dropdown-menu {
     border: none;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   }
-  
+
   .navbar-nav .nav-item.dropdown .dropdown-item {
     color: #6c757d;
   }
-  
+
   .navbar-nav .nav-item.dropdown .dropdown-item:hover {
     background-color: #f8f9fa;
     color: #000;
   }
-  
+
   .header-strip {
     background-color: #f0ad4e; /* Orange color */
     height: 5px; /* Adjust based on image */
   }
-  
-  
+
+
   .nav-item.active .nav-link {
     color: #3d3185 !important;
     font-weight: 800 !important;
   }
-  
-  
+
+
   .nav-link:hover {
   background-color: #9489da26;
   border-radius: 37px;
   }
-  
-  
+
+
   //sticky navbar
   .stick-header{
   position: sticky;
