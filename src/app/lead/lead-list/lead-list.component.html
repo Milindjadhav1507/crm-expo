@@ -1,334 +1,624 @@
-<nav aria-label="breadcrumb" style="margin-top: 80px; z-index: 1;">
+
+<nav aria-label="breadcrumb" style="margin-top: 8px; margin-left: 10px;">
   <!-- Add z-index: 1 -->
-  <ol class="breadcrumb">
+  <ol class="breadcrumb" >
     <li class="breadcrumb-item"><a [routerLink]="['/dashboard']">Dashboard</a></li>
     <li class="breadcrumb-item active" aria-current="page">lead List</li>
   </ol>
 </nav>
 
-<!-- Toolbar -->
-<mat-toolbar color="primary" class="mb-4">
-  <span>Lead List</span>
-  <span class="spacer"></span>
-  <button mat-raised-button color="accent" (click)="openCreateLeadDialog()">
-    <mat-icon>add</mat-icon> Create Lead
-  </button>
-</mat-toolbar>
+<div class="container-fluid mt-4">
+  <div class="lead-list-container">
+    <!-- Header Section -->
+    <div class="lead-list-header">
+      <div class="row g-3 align-items-center">
+    <!-- Search Input -->
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+              <i class="fa fa-search text-muted"></i>
+            </span>
+            <input type="text" class="form-control border-start-0 search-input" 
+                   placeholder="Search leads..." 
+                   [(ngModel)]="searchQuery" 
+                   (input)="filterLeads()">
+          </div>
+    </div>
 
-<div class="container-fluid">
-  <!-- Search and Filter Section -->
-  <mat-card class="mb-4">
-    <mat-card-content>
-      <div class="search-filter-container">
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Search leads...</mat-label>
-          <input matInput [(ngModel)]="searchQuery" (input)="filterLeads()">
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
+    <!-- Time Filter Dropdown -->
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text bg-white border-end-0">
+              <i class="fa fa-calendar text-muted"></i>
+            </span>
+            <select class="form-select border-start-0 filter-select" [(ngModel)]="selectedFilter">
+              <option value="all">All Time Entries</option>
+              <option value="today">Today's Entries</option>
+              <option value="last7days">Last 7 Days</option>
+              <option value="last1month">Last 1 Month</option>
+            </select>
+          </div>
+    </div>
 
-        <mat-form-field appearance="outline" class="filter-field">
-          <mat-label>Time Filter</mat-label>
-          <mat-select [(ngModel)]="selectedFilter" (selectionChange)="filterLeads()">
-            <mat-option value="all">All Time Entries</mat-option>
-            <mat-option value="today">Today's Entries</mat-option>
-            <mat-option value="last7days">Last 7 Days</mat-option>
-            <mat-option value="last1month">Last 1 Month</mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <div class="view-toggle">
-          <button mat-icon-button [color]="displayMode === 'list' ? 'primary' : ''" (click)="toggleView('list')">
-            <mat-icon>view_list</mat-icon>
-          </button>
-          <button mat-icon-button [color]="displayMode === 'grid' ? 'primary' : ''" (click)="toggleView('grid')">
-            <mat-icon>grid_view</mat-icon>
-          </button>
+        <!-- Action Buttons -->
+        <div class="col-md-4 text-md-end text-center">
+          <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#createLeadModal">
+            <i class="fa fa-plus me-1"></i> Create Lead
+      </button>
+          <div class="btn-group">
+            <button class="btn btn-outline-primary view-toggle-btn" 
+                    [class.active]="displayMode === 'list'" 
+        (click)="toggleView('list')">
+              <i class="fa fa-list me-1"></i> List
+      </button>
+            <button class="btn btn-outline-primary view-toggle-btn" 
+                    [class.active]="displayMode === 'grid'" 
+        (click)="toggleView('grid')">
+              <i class="fa fa-th me-1"></i> Grid
+      </button>
+    </div>
         </div>
       </div>
-    </mat-card-content>
-  </mat-card>
+    </div>
 
-  <!-- List View -->
-  <div *ngIf="displayMode === 'list'" class="list-view">
-    <mat-card *ngFor="let lead of paginatedLeads" class="lead-item">
-      <mat-card-content>
-        <div class="lead-content">
-          <div class="lead-info">
-            <img [src]="lead.imageUrl" alt="Lead Image" class="lead-avatar">
-            <div class="lead-details">
-              <h3>{{ lead.name }}</h3>
-              <div class="detail-item">
-                <mat-icon>email</mat-icon>
-                <span>{{ lead.email }}</span>
+    <!-- List View -->
+    <div *ngIf="displayMode === 'list'" class="table-responsive">
+      <table class="table table-hover align-middle">
+        <thead>
+          <tr>
+            <th>Lead</th>
+            <th>Contact</th>
+            <th>Source</th>
+            <th>Type</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let lead of paginatedLeads">
+            <td>
+              <div class="d-flex align-items-center" style="cursor: pointer;" (click)="viewDetails(lead)">
+                <img [src]="lead.imageUrl" alt="Lead Image" class="lead-avatar me-3">
+      <div>
+                  <h5 class="mb-1 text-primary" style="font-size: 1.1rem; font-weight: 600;">{{ lead.name }}</h5>
+                  <small class="text-muted">{{ lead.company }}</small>
+                </div>
               </div>
-              <div class="detail-item">
-                <mat-icon>phone</mat-icon>
-                <span>{{ lead.phone }}</span>
-              </div>
-              <div class="detail-item">
-                <mat-icon>source</mat-icon>
-                <span>{{ lead.leadSource }}</span>
-              </div>
-              <div class="detail-item">
-                <mat-icon>category</mat-icon>
-                <span>{{ lead.leadType }}</span>
-              </div>
-            </div>
-          </div>
-          <div class="lead-actions">
-            <button mat-raised-button color="primary" (click)="viewDetails(lead)">
-              <mat-icon>visibility</mat-icon> View
-            </button>
-            <button mat-raised-button color="accent" (click)="openFollowUpDialog(lead)">
-              <mat-icon>event</mat-icon> Follow Up
-            </button>
-            <button mat-raised-button color="warn" (click)="deleteLead(lead.id)">
-              <mat-icon>delete</mat-icon> Delete
-            </button>
-          </div>
-        </div>
-      </mat-card-content>
-    </mat-card>
+            </td>
+            <td>
+              <div class="d-flex flex-column">
+                <small class="text-muted mb-1">
+                  <i class="fa fa-envelope me-1"></i>{{ lead.email }}
+                </small>
+                <small class="text-muted">
+                  <i class="fa fa-phone me-1"></i>{{ lead.phone }}
+                </small>
+      </div>
+            </td>
+            <td>
+              <span class="badge bg-light text-dark">
+                <i class="fa fa-user me-1"></i>{{ lead.leadSource }}
+              </span>
+            </td>
+            <td>
+              <span class="badge bg-light text-dark">
+                <i class="fa fa-tag me-1"></i>{{ lead.leadType }}
+              </span>
+            </td>
+            <td>
+              <span class="status-badge" [ngClass]="{
+                'bg-success bg-opacity-10 text-success': lead.status === 'Converted',
+                'bg-warning bg-opacity-10 text-warning': lead.status === 'Open',
+                'bg-danger bg-opacity-10 text-danger': lead.status === 'Lost',
+                'bg-info text-white': lead.status === 'Qualified',
+                'bg-secondary bg-opacity-10 text-secondary': lead.status === 'Closed'
+              }">
+                {{ lead.status }}
+              </span>
+            </td>
+            <td>
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteLead(lead.id, $event)">
+                <i class="fa fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
   </div>
 
   <!-- Grid View -->
-  <div *ngIf="displayMode === 'grid'" class="grid-view">
-    <div class="grid-container">
-      <mat-card *ngFor="let lead of paginatedLeads" class="lead-card">
-        <div class="lead-avatar-container">
-          <img [src]="lead.imageUrl" alt="Lead Image" class="lead-avatar">
-          <h3 class="lead-name">{{ lead.name }}</h3>
-        </div>
-        <mat-card-content>
-          <div class="lead-info-grid">
-            <div class="info-item">
-              <mat-icon>email</mat-icon>
-              <span>{{ lead.email }}</span>
-            </div>
-            <div class="info-item">
-              <mat-icon>phone</mat-icon>
-              <span>{{ lead.phone }}</span>
-            </div>
-            <div class="info-item">
-              <mat-icon>source</mat-icon>
-              <span>{{ lead.leadSource }}</span>
-            </div>
-            <div class="info-item">
-              <mat-icon>category</mat-icon>
-              <span>{{ lead.leadType }}</span>
+    <div *ngIf="displayMode === 'grid'" class="row g-4 p-4">
+    <div *ngFor="let lead of paginatedLeads" class="col-lg-3 col-md-6 col-sm-12">
+        <div class="lead-card">
+          <div class="lead-card-header">
+            <div class="d-flex align-items-center">
+              <img [src]="lead.imageUrl" alt="Lead Image" class="lead-avatar me-3">
+              <div>
+                <h5 class="mb-1 text-primary" style="font-size: 1.1rem; font-weight: 600;">{{ lead.name }}</h5>
+                <small class="text-muted">{{ lead.company }}</small>
+              </div>
             </div>
           </div>
-        </mat-card-content>
-        <mat-divider></mat-divider>
-        <mat-card-actions>
-          <button mat-button color="accent" (click)="openFollowUpDialog(lead)">
-            Follow Up
-          </button>
-          <button mat-button color="primary" (click)="viewDetails(lead)">
-            View
-          </button>
-          <button mat-button color="warn" (click)="deleteLead(lead.id)">
-            Delete
-          </button>
-        </mat-card-actions>
-      </mat-card>
+          <div class="lead-card-body">
+            <div class="mb-3">
+              <div class="d-flex align-items-center mb-2">
+                <i class="fa fa-envelope text-primary me-2"></i>
+                <small class="text-truncate">{{ lead.email }}</small>
+              </div>
+              <div class="d-flex align-items-center mb-2">
+                <i class="fa fa-phone text-primary me-2"></i>
+                <small class="text-truncate">{{ lead.phone }}</small>
+              </div>
+              <div class="d-flex align-items-center mb-2">
+                <i class="fa fa-tag text-primary me-2"></i>
+                <small class="text-truncate">{{ lead.leadType }}</small>
+              </div>
+              <div class="d-flex align-items-center">
+                <i class="fa fa-user text-primary me-2"></i>
+                <small class="text-truncate">{{ lead.leadSource }}</small>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="status-badge" [ngClass]="{
+                'bg-success bg-opacity-10 text-success': lead.status === 'Converted',
+                'bg-warning bg-opacity-10 text-warning': lead.status === 'Open',
+                'bg-danger bg-opacity-10 text-danger': lead.status === 'Lost',
+                'bg-info text-white': lead.status === 'Qualified',
+                'bg-secondary bg-opacity-10 text-secondary': lead.status === 'Closed'
+              }">
+                {{ lead.status }}
+              </span>
+              <button class="btn btn-sm btn-outline-danger" (click)="deleteLead(lead.id, $event)">
+                <i class="fa fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
     </div>
   </div>
 
-  <!-- Pagination -->
-  <mat-paginator
-    [length]="filteredLeads.length"
-    [pageSize]="pageSize"
-    [pageSizeOptions]="[10, 20, 50, 100]"
-    (page)="onPageChange($event)"
-    aria-label="Select page">
-  </mat-paginator>
+    <!-- Pagination & Page Size -->
+    <div class="d-flex justify-content-between align-items-center p-3 border-top">
+      <ul class="pagination mb-0">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a class="page-link" (click)="changePage(currentPage - 1)">
+            <i class="fa fa-chevron-left"></i>
+          </a>
+        </li>
+        <li class="page-item" *ngFor="let page of [].constructor(totalPages); let i = index"
+          [class.active]="i + 1 === currentPage">
+          <a class="page-link" (click)="changePage(i + 1)">{{ i + 1 }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a class="page-link" (click)="changePage(currentPage + 1)">
+            <i class="fa fa-chevron-right"></i>
+          </a>
+        </li>
+      </ul>
+      <select class="page-size-select" (change)="onPageSizeChange($event)">
+        <option value="10">10 per page</option>
+        <option value="20">20 per page</option>
+        <option value="50">50 per page</option>
+        <option value="0">All</option>
+      </select>
+    </div>
+  </div>
 </div>
 
-<!-- Lead Details Dialog -->
-<ng-template #leadDetailsDialog>
-  <h2 mat-dialog-title>Lead Details</h2>
-  <mat-dialog-content>
-    <div *ngIf="selectedLead" class="lead-details">
-      <p><strong>Name:</strong> {{ selectedLead.name }}</p>
-      <p><strong>Email:</strong> {{ selectedLead.email }}</p>
-      <p><strong>Phone:</strong> {{ selectedLead.phone }}</p>
-      <p><strong>Lead Source:</strong> {{ selectedLead.leadSource }}</p>
-      <p><strong>Lead Type:</strong> {{ selectedLead.leadType }}</p>
-      <p><strong>Company:</strong> {{ selectedLead.company }}</p>
-      <p><strong>Status:</strong> {{ selectedLead.status }}</p>
-      <p><strong>Created Date:</strong> {{ selectedLead.createdDate }}</p>
-      <p><strong>Notes:</strong> {{ selectedLead.notes }}</p>
+<!-- Off-canvas Lead Details -->
+<div class="offcanvas offcanvas-end" tabindex="-1" id="leadDetailsOffcanvas" [class.show]="selectedLead" style="width: 800px; margin-top: 61px;">
+  <div class="offcanvas-header border-bottom bg-white">
+    <div class="d-flex align-items-center">
+      <div class="position-relative">
+        <img [src]="selectedLead?.imageUrl" alt="Lead Image" class="rounded-circle me-3" style="width: 56px; height: 56px; object-fit: cover; border: 2px solid #fff; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+        <span class="position-absolute bottom-0 end-0 bg-success rounded-circle" style="width: 16px; height: 16px; border: 2px solid #fff;"></span>
+      </div>
+      <div>
+        <h5 class="offcanvas-title mb-1">{{ selectedLead?.name }}</h5>
+        <div class="d-flex align-items-center">
+          <small class="text-muted me-2">{{ selectedLead?.company }}</small>
+          <span class="badge bg-light text-dark">
+            <i class="fa fa-user me-1"></i>{{ selectedLead?.assignedTo }}
+          </span>
+        </div>
+      </div>
     </div>
-  </mat-dialog-content>
-  <mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close>Close</button>
-  </mat-dialog-actions>
-</ng-template>
-
-<!-- Create Lead Dialog -->
-<ng-template #createLeadDialog>
-  <h2 mat-dialog-title>Create Lead</h2>
-  <mat-dialog-content>
-    <form [formGroup]="leadForm">
-      <div class="form-row">
-        <mat-form-field appearance="outline">
-          <mat-label>Name</mat-label>
-          <input matInput formControlName="name" required>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Number</mat-label>
-          <input matInput formControlName="number" required>
-        </mat-form-field>
+    <button type="button" class="btn-close" (click)="closeDetails()"></button>
+  </div>
+  <div class="offcanvas-body p-0">
+    <div *ngIf="selectedLead" class="lead-details">
+      <!-- Status Bar -->
+      <div class="bg-light p-3 border-bottom">
+        <div class="d-flex justify-content-between align-items-center">
+          <div class="d-flex align-items-center">
+            <span class="badge px-3 py-2 me-2" [ngClass]="{
+              'bg-success bg-opacity-10 text-success': selectedLead.status === 'Converted',
+              'bg-warning bg-opacity-10 text-warning': selectedLead.status === 'Open',
+              'bg-danger bg-opacity-10 text-danger': selectedLead.status === 'Lost',
+              'bg-info text-white': selectedLead.status === 'Qualified',
+              'bg-secondary bg-opacity-10 text-secondary': selectedLead.status === 'Closed'
+            }">
+              {{ selectedLead.status }}
+            </span>
+            <small class="text-muted">
+              <i class="fa fa-calendar me-1"></i>Created {{ selectedLead.createdDate }}
+            </small>
+          </div>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary">
+              <i class="fa fa-edit me-1"></i> Edit
+            </button>
+            <button class="btn btn-sm btn-outline-danger">
+              <i class="fa fa-trash me-1"></i> Delete
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div class="form-row">
-        <mat-form-field appearance="outline">
-          <mat-label>Email</mat-label>
-          <input matInput formControlName="email" required>
-        </mat-form-field>
+      <!-- Tabs Navigation -->
+      <ul class="nav nav-tabs nav-fill border-bottom bg-white" id="leadTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button class="nav-link active" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab">
+            <i class="fa fa-user me-1"></i> Details
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="activity-tab" data-bs-toggle="tab" data-bs-target="#activity" type="button" role="tab">
+            <i class="fa fa-history me-1"></i> Activity
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes" type="button" role="tab">
+            <i class="fa fa-sticky-note me-1"></i> Notes
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button class="nav-link" id="meetings-tab" data-bs-toggle="tab" data-bs-target="#meetings" type="button" role="tab">
+            <i class="fa fa-calendar me-1"></i> Meetings
+          </button>
+        </li>
+      </ul>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Assign To</mat-label>
-          <mat-select formControlName="assignedTo">
-            <mat-option *ngFor="let user of users" [value]="user">
-              {{ user }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
+      <!-- Tab Content -->
+      <div class="tab-content p-4" id="leadTabsContent">
+        <!-- Details Tab -->
+        <div class="tab-pane fade show active" id="details" role="tabpanel">
+          <div class="row g-4">
+            <!-- Contact Information -->
+            <div class="col-md-6">
+              <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                  <h6 class="mb-0"><i class="fa fa-address-card me-2 text-primary"></i>Contact Information</h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="text-muted small">Email</label>
+                    <div class="d-flex align-items-center">
+                      <i class="fa fa-envelope text-primary me-2"></i>
+                      <span>{{ selectedLead.email }}</span>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="text-muted small">Phone</label>
+                    <div class="d-flex align-items-center">
+                      <i class="fa fa-phone text-primary me-2"></i>
+                      <span>{{ selectedLead.phone }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lead Information -->
+            <div class="col-md-6">
+              <div class="card h-100 border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                  <h6 class="mb-0"><i class="fa fa-info-circle me-2 text-primary"></i>Lead Information</h6>
+                </div>
+                <div class="card-body">
+                  <div class="mb-3">
+                    <label class="text-muted small">Lead Type</label>
+                    <div class="d-flex align-items-center">
+                      <i class="fa fa-tag text-primary me-2"></i>
+                      <span>{{ selectedLead.leadType }}</span>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label class="text-muted small">Lead Source</label>
+                    <div class="d-flex align-items-center">
+                      <i class="fa fa-user text-primary me-2"></i>
+                      <span>{{ selectedLead.leadSource }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="col-12">
+              <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-bottom">
+                  <h6 class="mb-0"><i class="fa fa-plus-circle me-2 text-primary"></i>Additional Information</h6>
+                </div>
+                <div class="card-body">
+                  <div class="row g-3">
+                    <div class="col-md-6">
+                      <label class="text-muted small">Created Date</label>
+                      <div class="d-flex align-items-center">
+                        <i class="fa fa-calendar text-primary me-2"></i>
+                        <span>{{ selectedLead.createdDate }}</span>
+                      </div>
+                    </div>
+                    <div class="col-md-6">
+                      <label class="text-muted small">Assigned To</label>
+                      <div class="d-flex align-items-center">
+                        <i class="fa fa-user-circle text-primary me-2"></i>
+                        <span>{{ selectedLead.assignedTo }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Tab -->
+        <div class="tab-pane fade" id="activity" role="tabpanel">
+          <div class="timeline">
+            <ng-container *ngFor="let date of getUniqueDates()">
+              <div class="timeline-item">
+                <div class="timeline-date">{{ date }}</div>
+                <div class="timeline-content">
+                  <ng-container *ngFor="let activity of getTimelineActivitiesByDate(date)">
+                    <div class="timeline-step">
+                      <div class="timeline-icon" [ngClass]="getIconBgClass(activity)">
+                        <i [class]="getIconClass(activity)"></i>
+                      </div>
+                      <div class="timeline-details">
+                        <div class="timeline-card">
+                          <div class="timeline-card-header">
+                            <h6 class="timeline-card-title">{{ activity.title }}</h6>
+                            <span class="timeline-card-time">{{ activity.time }}</span>
+                          </div>
+                          <div class="timeline-card-body">{{ activity.description }}</div>
+                          <div class="timeline-card-footer">
+                            <img [src]="activity.user.avatar" [alt]="activity.user.name">
+                            <span>By {{ activity.user.name }}</span>
+                          </div>
+                          <!-- Additional metadata for specific activity types -->
+                          <div class="timeline-card-meta" *ngIf="activity.metadata">
+                            <div class="d-flex gap-2 mt-2">
+                              <span class="badge bg-light text-dark" *ngIf="activity.metadata.duration">
+                                <i class="fa fa-clock me-1"></i>{{ activity.metadata.duration }}
+                              </span>
+                              <span class="badge bg-light text-dark" *ngIf="activity.metadata.outcome">
+                                <i class="fa fa-check-circle me-1"></i>{{ activity.metadata.outcome }}
+                              </span>
+                              <span class="badge bg-light text-dark" *ngIf="activity.metadata.platform">
+                                <i class="fa fa-video me-1"></i>{{ activity.metadata.platform }}
+                              </span>
+                              <a [href]="activity.metadata.link" target="_blank" class="badge bg-light text-dark" *ngIf="activity.metadata.link">
+                                <i class="fa fa-link me-1"></i>Join Meeting
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </ng-container>
+                </div>
+              </div>
+            </ng-container>
+          </div>
+        </div>
+
+        <!-- Notes Tab -->
+        <div class="tab-pane fade" id="notes" role="tabpanel">
+          <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+              <h6 class="mb-3">Add New Note</h6>
+              <textarea class="form-control mb-2" rows="3" placeholder="Type your note here..."></textarea>
+              <div class="d-flex justify-content-between align-items-center">
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" id="privateNote">
+                  <label class="form-check-label small" for="privateNote">Private Note</label>
+                </div>
+                <button class="btn btn-primary btn-sm">Save Note</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="notes-list">
+            <div class="card border-0 shadow-sm mb-3">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h6 class="mb-0">Initial Meeting Notes</h6>
+                  <small class="text-muted">2 days ago</small>
+                </div>
+                <p class="text-muted mb-2">Discussed project requirements and timeline</p>
+                <div class="d-flex align-items-center">
+                  <img src="https://via.placeholder.com/24" class="rounded-circle me-2" alt="User">
+                  <small class="text-muted">Added by John Doe</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Meetings Tab -->
+        <div class="tab-pane fade" id="meetings" role="tabpanel">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h6 class="mb-0">Upcoming Meetings</h6>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#scheduleMeetingModal">
+              <i class="fa fa-plus me-1"></i> Schedule Meeting
+            </button>
+          </div>
+
+          <div class="meetings-list">
+            <div class="card border-0 shadow-sm mb-3">
+              <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <h6 class="mb-1">Project Discussion</h6>
+                    <p class="text-muted mb-2">
+                      <i class="fa fa-calendar me-2"></i>Tomorrow at 10:00 AM
+                      <br>
+                      <i class="fa fa-video me-2"></i>Google Meet
+                    </p>
+                    <div class="d-flex align-items-center">
+                      <img src="https://via.placeholder.com/24" class="rounded-circle me-2" alt="User">
+                      <small class="text-muted">Organized by John Doe</small>
+                    </div>
+                  </div>
+                  <span class="badge bg-primary">Upcoming</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
+    </div>
+  </div>
+</div>
 
-      <div class="form-row">
-        <mat-form-field appearance="outline">
-          <mat-label>Lead Type</mat-label>
-          <mat-select formControlName="leadType">
-            <mat-option *ngFor="let type of leadTypes" [value]="type">
-              {{ type }}
-            </mat-option>
-          </mat-select>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline">
-          <mat-label>Lead Source</mat-label>
-          <mat-select formControlName="leadSource">
-            <mat-option value="Reference">Reference</mat-option>
-            <mat-option value="India Mart">India Mart</mat-option>
-            <mat-option value="LinkedIn">LinkedIn</mat-option>
-          </mat-select>
-        </mat-form-field>
+<!-- Create Lead Modal -->
+<div class="modal fade" id="createLeadModal" tabindex="-1" aria-labelledby="createLeadModalLabel" aria-hidden="true"
+  style="z-index: 1060;">
+  <!-- Increased z-index -->
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="createLeadModalLabel" style="font-size: 25px;">Create Lead</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
+      <div class="modal-body">
+        <form (submit)="createLead()">
+          <div class="row g-2">
+            <!-- Name -->
+            <div class="col-md-6">
+              <label class="form-label">Name <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="newLead.name"
+                [ngModelOptions]="{standalone: true}" required>
+            </div>
+            <!-- Number -->
+            <div class="col-md-6">
+              <label class="form-label">Number <span class="text-danger">*</span></label>
+              <input type="tel" class="form-control form-control-sm" [(ngModel)]="newLead.number"
+                [ngModelOptions]="{standalone: true}" required>
+            </div>
 
-      <div class="form-row">
-        <mat-form-field appearance="outline">
-          <mat-label>Company</mat-label>
-          <input matInput formControlName="company">
-        </mat-form-field>
+            <!-- Email -->
+            <div class="col-md-6">
+              <label class="form-label">Email <span class="text-danger">*</span></label>
+              <input type="email" class="form-control form-control-sm" [(ngModel)]="newLead.email"
+                [ngModelOptions]="{standalone: true}" required>
+            </div>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Notes</mat-label>
-          <textarea matInput formControlName="notes" rows="3"></textarea>
-        </mat-form-field>
+            <!-- Assign To -->
+            <div class="col-md-6">
+              <label class="form-label">Assign To</label>
+              <select class="form-select form-select-sm" [(ngModel)]="newLead.assignedTo"
+                [ngModelOptions]="{standalone: true}">
+                <option *ngFor="let user of users" [value]="user">
+                  {{ user }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Lead Type -->
+            <div class="col-md-6">
+              <label class="form-label">Lead Type</label>
+              <select class="form-select form-select-sm" [(ngModel)]="newLead.leadType"
+                [ngModelOptions]="{standalone: true}">
+                <option *ngFor="let type of leadTypes" [value]="type">
+                  {{ type }}
+                </option>
+              </select>
+            </div>
+
+            <!-- Lead Source -->
+            <div class="col-md-6">
+              <label class="form-label">Lead Source</label>
+              <select class="form-select form-select-sm" [(ngModel)]="newLead.leadSource"
+                [ngModelOptions]="{standalone: true}">
+                <option value="Reference">Reference</option>
+                <option value="India Mart">India Mart</option>
+                <option value="LinkedIn">LinkedIn</option>
+              </select>
+            </div>
+
+            <!-- Company -->
+            <div class="col-md-6">
+              <label class="form-label">Company</label>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="newLead.company"
+                [ngModelOptions]="{standalone: true}">
+            </div>
+
+            <!-- Document Upload -->
+            <div class="col-md-6">
+              <label class="form-label">Attach Documents</label>
+              <input type="file" class="form-control form-control-sm" (change)="onFileSelect($event)">
+            </div>
+
+            <!-- Notes -->
+            <div class="col-md-6">
+              <label class="form-label">Notes</label>
+              <textarea class="form-control form-control-sm" rows="1" [(ngModel)]="newLead.notes"
+                [ngModelOptions]="{standalone: true}"></textarea>
+            </div>
+          </div>
+
+          <div class="text-end mt-3">
+            <button type="submit" class="btn btn-success btn-sm mx-2">Save Lead</button>
+            <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          </div>
+        </form>
       </div>
+    </div>
+  </div>
+</div>
 
-      <div class="file-upload">
-        <button mat-raised-button type="button" (click)="fileInput.click()">
-          <mat-icon>attach_file</mat-icon> Attach Documents
-        </button>
-        <input #fileInput type="file" (change)="onFileSelect($event)" style="display: none">
-      </div>
-    </form>
-  </mat-dialog-content>
-  <mat-dialog-actions align="end">
-    <button mat-button mat-dialog-close>Cancel</button>
-    <button mat-raised-button color="primary" (click)="createLead()">Save Lead</button>
-  </mat-dialog-actions>
-</ng-template>
-
-<!-- Follow-up Dialog -->
-<ng-template #followUpDialog>
-    <h2 mat-dialog-title>Schedule Follow-up</h2>
-    <mat-dialog-content>
-        <div class="lead-details">
-            <div class="form-row">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Lead Name</mat-label>
-                    <input matInput [(ngModel)]="followUpData.leadName" readonly>
-                </mat-form-field>
+<!-- Schedule Meeting Modal -->
+<div class="modal fade" id="scheduleMeetingModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+        <h5 class="modal-title">Schedule Meeting</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-
-            <div class="form-row">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Status</mat-label>
-                    <mat-select [(ngModel)]="followUpData.status">
-                        <mat-option value="Call">Call</mat-option>
-                        <mat-option value="Email">Email</mat-option>
-                        <mat-option value="Meeting">Meeting</mat-option>
-                        <mat-option value="Other">Other</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-
-            <div class="form-row">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Next Follow-up Date</mat-label>
-                    <input matInput type="date" [(ngModel)]="followUpData.nextFollowUpDate">
-                </mat-form-field>
-            </div>
-
-            <div class="form-row">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Comments</mat-label>
-                    <textarea matInput rows="3" [(ngModel)]="followUpData.comments"></textarea>
-                </mat-form-field>
-            </div>
-
-            <div class="form-row">
-                <mat-checkbox [(ngModel)]="followUpData.isMeetingScheduled" (change)="onStatusChange()">
-                    Meeting Scheduled
-                </mat-checkbox>
-            </div>
-
-            <div class="form-row" *ngIf="followUpData.isMeetingScheduled">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Meeting Platform</mat-label>
-                    <mat-select [(ngModel)]="followUpData.meetingPlatform">
-                        <mat-option value="Google Meet">Google Meet</mat-option>
-                        <mat-option value="Zoom">Zoom</mat-option>
-                        <mat-option value="Microsoft Teams">Microsoft Teams</mat-option>
-                        <mat-option value="Other">Other</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-
-            <div class="form-row" *ngIf="followUpData.isMeetingScheduled">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Meeting Link</mat-label>
-                    <input matInput [(ngModel)]="followUpData.meetingLink">
-                </mat-form-field>
-            </div>
-
-            <div class="form-row">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Assigned To</mat-label>
-                    <mat-select [(ngModel)]="followUpData.assignedTo">
-                        <mat-option *ngFor="let user of users" [value]="user">{{user}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
-            </div>
-
-            <div class="form-row">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Lead Type</mat-label>
-                    <mat-select [(ngModel)]="followUpData.leadType">
-                        <mat-option *ngFor="let type of leadTypes" [value]="type">{{type}}</mat-option>
-                    </mat-select>
-                </mat-form-field>
+            <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Meeting Title</label>
+            <input type="text" class="form-control">
+                    </div>
+          <div class="mb-3">
+            <label class="form-label">Date & Time</label>
+            <input type="datetime-local" class="form-control">
+                    </div>
+          <div class="mb-3">
+            <label class="form-label">Platform</label>
+            <select class="form-select">
+              <option>Google Meet</option>
+              <option>Zoom</option>
+              <option>Microsoft Teams</option>
+                        </select>
+                    </div>
+          <div class="mb-3">
+            <label class="form-label">Meeting Link</label>
+            <input type="url" class="form-control">
+                    </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" rows="3"></textarea>
+                    </div>
+          <div class="text-end">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Schedule Meeting</button>
+                    </div>
+                </form>
             </div>
         </div>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-        <button mat-button mat-dialog-close>Cancel</button>
-        <button mat-raised-button color="primary" (click)="saveFollowUp()">Save Follow-up</button>
-    </mat-dialog-actions>
-</ng-template>
+    </div>
+</div>

@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule, MatLabel } from '@angular/material/form-field';
@@ -8,12 +8,29 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatListModule } from '@angular/material/list';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDialogModule, MatDialog } from '@angular/material/dialog';
-import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatChipsModule } from '@angular/material/chips';
 import { RouterLink } from '@angular/router';
+import * as bootstrap from 'bootstrap';
+
+interface TimelineActivity {
+    id: number;
+    date: string;
+    time: string;
+    title: string;
+    description: string;
+    type: 'created' | 'status' | 'call' | 'email' | 'meeting' | 'note';
+    icon: string;
+    iconColor: string;
+    user: {
+        name: string;
+        avatar: string;
+    };
+    metadata?: {
+        duration?: string;
+        outcome?: string;
+        platform?: string;
+        link?: string;
+    };
+}
 
 @Component({
     selector: 'app-lead-list',
@@ -21,7 +38,6 @@ import { RouterLink } from '@angular/router';
     imports: [
         CommonModule,
         FormsModule,
-        ReactiveFormsModule,
         RouterLink,
         MatListModule,
         MatButtonModule,
@@ -31,20 +47,11 @@ import { RouterLink } from '@angular/router';
         MatSelectModule,
         MatLabel,
         MatInputModule,
-        MatDialogModule,
-        MatPaginatorModule,
-        MatToolbarModule,
-        MatMenuModule,
-        MatChipsModule
     ],
     templateUrl: './lead-list.component.html',
-    styleUrls: ['./lead-list.component.scss'],
+    styleUrls: ['./lead-list.component.scss'], // Use styleUrls
 })
 export class LeadListComponent implements OnInit {
-    @ViewChild('leadDetailsDialog') leadDetailsDialog!: TemplateRef<any>;
-    @ViewChild('createLeadDialog') createLeadDialog!: TemplateRef<any>;
-    @ViewChild('followUpDialog') followUpDialog!: TemplateRef<any>;
-
     leads: any[] = [];
     filteredLeads: any[] = [];
     paginatedLeads: any[] = [];
@@ -52,22 +59,17 @@ export class LeadListComponent implements OnInit {
     searchQuery: string = '';
     loading: boolean = true;
     selectedFilter: string = 'all';
-    leadForm: FormGroup;
-    selectedLead: any = null;
-    pageSize: number = 10;
-    currentPage: number = 1;
-    totalPages: number = 1;
 
-    followUpData = {
-        leadName: '',
-        status: '',
-        nextFollowUpDate: '',
-        comments: '',
-        isMeetingScheduled: false,
-        meetingPlatform: '',
-        meetingLink: '',
-        assignedTo: '',
-        leadType: ''
+    newLead: any = {
+        name: '',
+        number: '',
+        email: '',
+        leadType: '',
+        leadSource: '',
+        notes: '',
+        document: null,
+        company: '',
+        assignedTo: '',  // Store the username directly
     };
 
     users = [
@@ -78,23 +80,121 @@ export class LeadListComponent implements OnInit {
         'Michael Wilson'
     ];
 
-    leadTypes = ['Hot', 'Warm', 'Cold'];
+    leadTypes = ['Hot', 'Warm', 'Cold']; // Available lead types
 
-    constructor(
-        private dialog: MatDialog,
-        private fb: FormBuilder
-    ) {
-        this.leadForm = this.fb.group({
-            name: ['', Validators.required],
-            number: ['', Validators.required],
-            email: ['', [Validators.required, Validators.email]],
-            assignedTo: [''],
-            leadType: [''],
-            leadSource: [''],
-            company: [''],
-            notes: ['']
-        });
-    }
+    followUpData = {
+        leadName: '',
+        status: '',
+        nextFollowUpDate: '',
+        comments: '',
+        isMeetingScheduled: false,
+        meetingPlatform: '',
+        meetingLink: '',
+        assignedTo: '',  // Store the username directly
+        leadType: '' // Added Lead Type for Follow Up
+    };
+
+    pageSize: number = 10;
+    currentPage: number = 1;
+    totalPages: number = 1;
+    selectedLead: any = null;
+
+    timelineData: TimelineActivity[] = [
+        {
+            id: 1,
+            date: 'Today',
+            time: '10:30 AM',
+            title: 'Lead Created',
+            description: 'New lead was added to the system',
+            type: 'created',
+            icon: 'fa-user-plus',
+            iconColor: 'primary',
+            user: {
+                name: 'John Doe',
+                avatar: 'https://via.placeholder.com/20'
+            }
+        },
+        {
+            id: 2,
+            date: 'Yesterday',
+            time: '2:45 PM',
+            title: 'Status Updated',
+            description: 'Lead status changed to Qualified',
+            type: 'status',
+            icon: 'fa-check',
+            iconColor: 'success',
+            user: {
+                name: 'Sarah Smith',
+                avatar: 'https://via.placeholder.com/20'
+            }
+        },
+        {
+            id: 3,
+            date: '2 Days Ago',
+            time: '11:15 AM',
+            title: 'Phone Call',
+            description: 'Initial contact made with the lead',
+            type: 'call',
+            icon: 'fa-phone',
+            iconColor: 'info',
+            user: {
+                name: 'Mike Johnson',
+                avatar: 'https://via.placeholder.com/20'
+            },
+            metadata: {
+                duration: '15 mins',
+                outcome: 'Positive'
+            }
+        },
+        {
+            id: 4,
+            date: '3 Days Ago',
+            time: '3:30 PM',
+            title: 'Email Sent',
+            description: 'Proposal document sent to the lead',
+            type: 'email',
+            icon: 'fa-envelope',
+            iconColor: 'warning',
+            user: {
+                name: 'Emily Brown',
+                avatar: 'https://via.placeholder.com/20'
+            }
+        },
+        {
+            id: 5,
+            date: '4 Days Ago',
+            time: '10:00 AM',
+            title: 'Meeting Scheduled',
+            description: 'Project discussion meeting scheduled',
+            type: 'meeting',
+            icon: 'fa-calendar',
+            iconColor: 'primary',
+            user: {
+                name: 'John Doe',
+                avatar: 'https://via.placeholder.com/20'
+            },
+            metadata: {
+                platform: 'Google Meet',
+                link: 'https://meet.google.com/xxx'
+            }
+        },
+        {
+            id: 6,
+            date: '5 Days Ago',
+            time: '4:20 PM',
+            title: 'Note Added',
+            description: 'Added initial requirements note',
+            type: 'note',
+            icon: 'fa-sticky-note',
+            iconColor: 'info',
+            user: {
+                name: 'Sarah Smith',
+                avatar: 'https://via.placeholder.com/20'
+            }
+        }
+    ];
+
+    constructor() { }
 
     ngOnInit(): void {
         this.loadHardcodedLeads();
@@ -115,7 +215,7 @@ export class LeadListComponent implements OnInit {
                 createdDate: '2024-02-01',
                 notes: 'Interested in product demo',
                 imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Aarav Patel',
-                assignedTo: 'John Doe'
+                assignedTo: 'John Doe'  // Example
             },
             {
                 id: 'L002',
@@ -230,15 +330,12 @@ export class LeadListComponent implements OnInit {
         this.applyPagination();
     }
 
-    viewDetails(lead: any): void {
+    viewDetails(lead: any) {
         this.selectedLead = lead;
-        const dialogRef = this.dialog.open(this.leadDetailsDialog, {
-            width: '400px'
-        });
+    }
 
-        dialogRef.afterClosed().subscribe(() => {
-            this.selectedLead = null;
-        });
+    closeDetails() {
+        this.selectedLead = null;
     }
 
     applyPagination(): void {
@@ -262,27 +359,46 @@ export class LeadListComponent implements OnInit {
         this.applyPagination();
     }
 
-    onFileSelect(event: any): void {
+    onFileSelect(event: any) {
         if (event.target.files.length > 0) {
-            const file = event.target.files[0];
-            // Handle file upload logic here
-            console.log('File selected:', file);
+            this.newLead.document = event.target.files[0];
         }
     }
 
-    openCreateLeadDialog(): void {
-        const dialogRef = this.dialog.open(this.createLeadDialog, {
-            width: '600px'
-        });
+    createLead() {
+        if (!this.newLead.name || !this.newLead.number || !this.newLead.email) {
+            alert('Name, Number, and Email are required.');
+            return;
+        }
 
-        dialogRef.afterClosed().subscribe(result => {
-            if (result) {
-                this.createLead();
+        console.log('Lead Created:', this.newLead);
+
+        const modalElement = document.getElementById('createLeadModal');
+        if (modalElement) {
+            const modal = bootstrap.Modal.getInstance(modalElement);
+            if (modal) {
+                modal.hide();
+            } else {
+                const newModal = new bootstrap.Modal(modalElement);
+                newModal.hide();
             }
-        });
+        }
+
+        this.newLead = {
+            name: '',
+            number: '',
+            email: '',
+            leadType: '',
+            leadSource: '',
+            notes: '',
+            document: null,
+            company: '',
+            assignedTo: '',  // Reset assignedTo (username)
+        };
     }
 
-    openFollowUpDialog(lead: any): void {
+    openFollowUpModal(lead: any, event: Event) {
+        event.stopPropagation(); // Prevents triggering viewDetails
         this.followUpData = {
             leadName: lead.name,
             status: '',
@@ -291,53 +407,20 @@ export class LeadListComponent implements OnInit {
             isMeetingScheduled: false,
             meetingPlatform: '',
             meetingLink: '',
-            assignedTo: lead.assignedTo,
-            leadType: lead.leadType
+            assignedTo: lead.assignedTo,  // Get initial assignedTo (username)
+            leadType: lead.leadType // Initialize leadType from lead
         };
 
-        const dialogRef = this.dialog.open(this.followUpDialog, {
-            width: '500px',
-            disableClose: false
-        });
-
-        dialogRef.afterClosed().subscribe(result => {
-            if (result) {
-                this.saveFollowUp();
-            }
-        });
-    }
-
-    onPageChange(event: PageEvent): void {
-        this.pageSize = event.pageSize;
-        this.currentPage = event.pageIndex + 1;
-        this.applyPagination();
-    }
-
-    createLead(): void {
-        if (this.leadForm.valid) {
-            const newLead = {
-                ...this.leadForm.value,
-                id: `L${String(this.leads.length + 1).padStart(3, '0')}`,
-                status: 'New',
-                createdDate: new Date().toISOString().split('T')[0],
-                imageUrl: `https://api.dicebear.com/7.x/initials/svg?seed=${this.leadForm.value.name}`
-            };
-
-            this.leads.push(newLead);
-            this.filterLeads();
-            this.dialog.closeAll();
-            this.leadForm.reset();
+        const modalElement = document.getElementById('followUpModal');
+        if (modalElement) {
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        } else {
+            console.error('Follow-Up Modal not found in the DOM.');
         }
     }
 
-    deleteLead(leadId: string): void {
-        if (confirm('Are you sure you want to delete this lead?')) {
-            this.leads = this.leads.filter(lead => lead.id !== leadId);
-            this.filterLeads();
-        }
-    }
-
-    onStatusChange(): void {
+    onStatusChange() {
         if (this.followUpData.status !== 'Meeting') {
             this.followUpData.isMeetingScheduled = false;
             this.followUpData.meetingPlatform = '';
@@ -345,9 +428,31 @@ export class LeadListComponent implements OnInit {
         }
     }
 
-    saveFollowUp(): void {
-        // Implement your follow-up saving logic here
-        console.log('Saving follow-up:', this.followUpData);
-        this.dialog.closeAll();
+    saveFollowUp() {
+        console.log('Follow-up saved:', this.followUpData);
+        // Add logic to save follow-up data
+    }
+
+        //Delete lead logic
+    deleteLead(leadId: string, event: Event) {
+        event.stopPropagation();
+        this.leads = this.leads.filter(lead => lead.id !== leadId);
+        this.filterLeads();
+    }
+
+    getTimelineActivitiesByDate(date: string): TimelineActivity[] {
+        return this.timelineData.filter(activity => activity.date === date);
+    }
+
+    getUniqueDates(): string[] {
+        return [...new Set(this.timelineData.map(activity => activity.date))];
+    }
+
+    getIconClass(activity: TimelineActivity): string {
+        return `fa ${activity.icon} text-${activity.iconColor}`;
+    }
+
+    getIconBgClass(activity: TimelineActivity): string {
+        return `bg-${activity.iconColor}`;
     }
 }
