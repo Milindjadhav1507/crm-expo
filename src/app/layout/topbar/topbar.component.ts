@@ -1,58 +1,29 @@
-import { Component, ViewChild } from '@angular/core';
-import { AuthService } from '../../auth/auth.service';
-import { CommonModule, NgIf } from '@angular/common';
-import { RouterLink, RouterLinkActive } from '@angular/router';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatSidenavModule, MatSidenav } from '@angular/material/sidenav';
-import { MatIconModule } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatListModule } from '@angular/material/list';
-import { MatDividerModule } from '@angular/material/divider';
-
-import './topbar.component.css';
+import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 
 @Component({
   selector: 'app-topbar',
   standalone: true,
-  imports: [
-    NgIf,
-    RouterLink,
-    RouterLinkActive,
-    CommonModule,
-    MatToolbarModule,
-    MatButtonModule,
-    MatSidenavModule,
-    MatIconModule,
-    MatMenuModule,
-    MatListModule,
-    MatDividerModule
-  ],
+  imports: [CommonModule,RouterLink,RouterLinkActive],
   templateUrl: './topbar.component.html',
-  styleUrls: ['./topbar.component.scss']
+  styleUrls: ['./topbar.component.scss'],
 })
-export class TopbarComponent {
-  @ViewChild('sidenav') sidenav!: MatSidenav;
-  isLoggedIn: boolean = false;
-  dropdownOpen: boolean = false;
-
-  constructor(private authService: AuthService) {}
-
-  ngOnInit(): void {
-    this.isLoggedIn = this.authService.isAuthenticated();
+export class TopbarComponent  {
+  showComponent = false;
+  currentUrl: string = '';
+  constructor(private router: Router) {
+    this.router.events.subscribe(() => {
+      this.currentUrl = this.router.url;
+      console.log('Current URL:', this.currentUrl);
+      this.showComponent = this.router.url.includes('/login');
+      console.log('kk', this.showComponent);
+    if (this.showComponent) {
+        this.showComponent = false;
+      } else {
+        this.showComponent = true;
+      }
+    });
   }
 
-  logout() {
-    this.authService.logout();
-    this.isLoggedIn = false;
-    this.sidenav.close();
-  }
-
-  toggleSidenav() {
-    this.sidenav.toggle();
-  }
-
-  toggleDropdown() {
-    this.dropdownOpen = !this.dropdownOpen;
-  }
 }
