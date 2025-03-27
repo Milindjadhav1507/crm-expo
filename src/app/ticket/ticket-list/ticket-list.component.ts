@@ -315,18 +315,27 @@ this.ticketlist();
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        if (ticket) {
-          // Update existing ticket
-          const index = this.tickets.findIndex(t => t.id === result.id);
-          if (index !== -1) {
-            this.tickets[index] = result;
-            this.applyFilters();
-          }
-        } else {
-          // Add new ticket
-          this.tickets.push(result);
+        // Refresh the ticket list
+        this.loadTickets();
+      }
+    });
+  }
+
+  loadTickets() {
+    this.api.get('ticket/list_tickets/').subscribe({
+      next: (response: any) => {
+        if (response.status === 200) {
+          this.tickets = response.data;
           this.applyFilters();
         }
+      },
+      error: (error) => {
+        console.error('Error loading tickets:', error);
+        this.snackBar.open('Error loading tickets. Please try again.', 'Close', {
+          duration: 3000,
+          horizontalPosition: 'end',
+          verticalPosition: 'top'
+        });
       }
     });
   }
@@ -385,5 +394,16 @@ this.ticketlist();
       }
     });
 
+  }
+
+  editByTicketId(id: number): void {
+    console.log(id);
+    this.api.get(`ticket/get_ticket/${id}/`,null).subscribe({
+      next: (response: any) => {
+        console.log(response);
+      // this api data i want to patch
+        this.openTicketcreation(response.data);
+      }
+    });
   }
 }

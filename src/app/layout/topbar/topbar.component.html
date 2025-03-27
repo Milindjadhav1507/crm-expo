@@ -1,61 +1,4 @@
-<div class="topbar">
-  <div class="toolbar-left">
-    <div class="brand">
-      <mat-icon class="brand-icon">dashboard</mat-icon>
-      <span class="brand-name">Crm Esarwa</span>
-    </div>
-  </div>
-  <div class="toolbar-center">
-    <nav class="nav-links">
-      <a mat-button routerLink="/dashboard" routerLinkActive="active-link">
-        <mat-icon>home</mat-icon> Dashboard
-      </a>
-      <a mat-button routerLink="/organization/department" routerLinkActive="active-link">
-        <mat-icon>people</mat-icon> Department
-      </a>
-      <a mat-button routerLink="/organization/designation" routerLinkActive="active-link">
-        <mat-icon>work</mat-icon> Designation
-      </a>
-      <a mat-button routerLink="/organization/branch" routerLinkActive="active-link">
-        <mat-icon>store</mat-icon> Branch
-      </a>
-      <a mat-button routerLink="/lead/lead-list" routerLinkActive="active-link">
-        <mat-icon>assignment</mat-icon> Lead List
-      </a>
-      <a mat-button routerLink="/followup/follow-up-list" routerLinkActive="active-link">
-        <mat-icon>check_circle</mat-icon> Follow-Up List
-      </a>
-      <a mat-button routerLink="/ticket/ticket" routerLinkActive="active-link">
-        <mat-icon>confirmation_number</mat-icon> Ticket Generation      </a>
-      <a mat-button routerLink="/ticket/list" routerLinkActive="active-link">
-        <mat-icon>format_list_bulleted</mat-icon> Ticket List
-      </a>
-      <a mat-button routerLink="/ticket/comment-form" routerLinkActive="active-link">
-        <mat-icon>comment</mat-icon> Comment
-      </a>
-      <a mat-button routerLink="/app-sidebar" routerLinkActive="active-link">
-        <mat-icon>settings</mat-icon> Settings
-      </a>
-      <a mat-button routerLink="/kanbanb" routerLinkActive="active-link">
-        <mat-icon>view_kanban</mat-icon> Kanban
-      </a>
-      <a mat-button routerLink="/cal" routerLinkActive="active-link">
-        <mat-icon>event</mat-icon> Calendar
-      </a>
-    </nav>
-  </div>
-  <div class="toolbar-right">
-    <div class="auth-buttons">
-      <!-- <button *ngIf="!isLoggedIn" class="nav_list" mat-stroked-button routerLink="/login">Login</button> heloo -->
-      <div class="dropdown">
-        <button mat-icon-button (click)="toggleDropdown()">
-          <mat-icon>account_circle</mat-icon>
-        </button>
-        <div class="dropdown-content" *ngIf="dropdownOpen" [ngClass]="{'show': dropdownOpen}">
-          <button class="nav_list" mat-raised-button color="warn" (click)="logout()">
-            <mat-icon>logout</mat-icon> Logout
-            <!-- <mat-icon>exit_to_app</mat-icon> -->
-=======
+
 <div class="fixed-top col-12 " *ngIf="showComponent">
   <nav class="navbar navbar-expand-lg navbar-light">
       <div class="container-fluid">
@@ -71,20 +14,15 @@
                       <li class="nav-item" routerLink="/dashboard" routerLinkActive="active">
                           <a class="nav-link">Dashboard</a>
                       </li>
-
                       <li class="nav-item" routerLink="/lead/lead-list" routerLinkActive="active">
                           <a class="nav-link">Lead List</a>
                       </li>
-
-
                       <li class="nav-item" routerLink="/followup/follow-up-list" routerLinkActive="active">
                           <a class="nav-link">Follow-Up List</a>
                       </li>
-
                       <li class="nav-item" routerLink="/ticket/list" routerLinkActive="active">
                           <a class="nav-link">Ticket List</a>
                       </li>
-
                       <li class="nav-item" routerLink="/app-sidebar" routerLinkActive="active">
                           <a class="nav-link">Settings</a>
                       </li>
@@ -94,7 +32,6 @@
                       <li class="nav-item" routerLink="/cal" routerLinkActive="active">
                           <a class="nav-link">Calendar</a>
                       </li>
-
                   <div class="flex-shrink-0 dropdown">
                       <a class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
                         <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">

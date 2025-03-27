@@ -1,7 +1,7 @@
 <div class="ticket-form-container mat-elevation-z4">
   <div class="form-header">
-    <h2>Create New Ticket</h2>
-    <p class="subtitle">Please fill in the details below to create a new support ticket</p>
+    <h2>{{ isEditMode ? 'Edit Ticket' : 'Create New Ticket' }}</h2>
+    <p class="subtitle">{{ isEditMode ? 'Update the ticket details below' : 'Please fill in the details below to create a new support ticket' }}</p>
   </div>
 
   <form [formGroup]="ticketForm" (ngSubmit)="onSubmit()" class="ticket-form">
@@ -166,7 +166,7 @@
         type="submit"
         [disabled]="ticketForm.invalid || isSubmitting">
         <mat-icon>send</mat-icon>
-        {{ isSubmitting ? 'Submitting...' : 'Submit Ticket' }}
+        {{ isSubmitting ? 'Submitting...' : (isEditMode ? 'Update Ticket' : 'Submit Ticket') }}
       </button>
     </div>
   </form>
