@@ -27,6 +27,7 @@
     "chart.js": "^4.4.7",
     "echarts": "^5.6.0",
     "jquery": "^3.7.1",
+    "mat-breadcrumb": "^1.0.1",
     "ng2-charts": "^7.0.0",
     "ngx-echarts": "^19.0.0",
     "popper.js": "^1.16.1",
