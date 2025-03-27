@@ -1,15 +1,21 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit, Optional } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
-import { ActivatedRoute, Router } from '@angular/router';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Ticket } from '../ticket-list/ticket-list.component';
+import { CommunicationComponent } from "../communication/communication.component";
+import { TicketService, Comment } from '../ticket.service';
+import { Observable, of, Subject, BehaviorSubject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-ticket-detail',
@@ -21,14 +27,26 @@ import { Ticket } from '../ticket-list/ticket-list.component';
     MatIconModule,
     MatDividerModule,
     MatChipsModule,
-    MatTabsModule
+    MatTabsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    ReactiveFormsModule,
+    // CommunicationComponent
   ],
   templateUrl: './ticket-detail.component.html',
   styleUrls: ['./ticket-detail.component.scss']
 })
-export class TicketDetailComponent implements OnInit {
-  ticket: Ticket | null = null;
-  isDialog = false;
+export class TicketDetailComponent implements OnInit, OnDestroy {
+  @Input() ticket: Ticket | null = null;
+
+  commentForm: FormGroup;
+  comments$: Observable<Comment[]> = of([]);
+  recentComments: Comment[] = [];
+  recentAttachments: string[] = [];
+  selectedFile: File | null = null;
+  editingComment: Comment | null = null;
+  private destroy$ = new Subject<void>();
 
   statusColors: { [key: string]: string } = {
     'Open': 'accent',
@@ -45,102 +63,67 @@ export class TicketDetailComponent implements OnInit {
   };
 
   constructor(
-    private router: Router,
-    private route: ActivatedRoute,
+    private fb: FormBuilder,
+    private ticketService: TicketService,
     private snackBar: MatSnackBar,
-    @Optional() private dialogRef: MatDialogRef<TicketDetailComponent>,
-    @Optional() @Inject(MAT_DIALOG_DATA) public data: { ticket: Ticket }
+    private dialog: MatDialog
   ) {
-    this.isDialog = !!dialogRef;
+    this.commentForm = this.fb.group({
+      message: ['', [Validators.required]],
+      attachments: [[]]
+    });
   }
 
   ngOnInit(): void {
-    if (this.isDialog && this.data?.ticket) {
-      this.ticket = { ...this.data.ticket };
-    } else {
-      const id = this.route.snapshot.paramMap.get('id');
-      if (id) {
-        // Use hardcoded data instead of API call
-        this.ticket = this.getHardcodedTicket(parseInt(id));
-      }
+    if (this.ticket) {
+      this.comments$ = this.ticketService.getCommentsForTicket(this.ticket.id);
+      this.recentAttachments = this.ticketService.getRecentAttachments(this.ticket.id);
     }
   }
 
-  private getHardcodedTicket(id: number): Ticket | null {
-    // Hardcoded ticket data
-    const tickets: Ticket[] = [
-      {
-        id: 1,
-        title: 'System Login Issue',
-        category_id: 1,
-        priority_id: 1,
-        description: 'Users unable to login to the system',
-        attachments: null,
-        contact_email: 'user1@example.com',
-        contact_phone: '123-456-7890',
-        expected_resolution_date: '2024-03-25',
-        additional_notes: 'Affecting multiple users',
-        status_id: 1,
-        assigned_to_id: 1,
-        created_by_id: 2,
-        created_at: '2024-03-20T10:00:00',
-        updated_at: null,
-        deleted: false,
-        statusName: 'Open',
-        categoryName: 'Technical',
-        priorityName: 'High',
-        assignedToName: 'John Doe',
-        createdByName: 'Admin'
-      },
-      {
-        id: 2,
-        title: 'Payment Processing Error',
-        category_id: 2,
-        priority_id: 2,
-        description: 'Payment gateway integration issues',
-        attachments: null,
-        contact_email: 'user2@example.com',
-        contact_phone: '098-765-4321',
-        expected_resolution_date: '2024-03-26',
-        additional_notes: 'Affecting checkout process',
-        status_id: 2,
-        assigned_to_id: 2,
-        created_by_id: 1,
-        created_at: '2024-03-19T15:30:00',
-        updated_at: '2024-03-20T09:00:00',
-        deleted: false,
-        statusName: 'In Progress',
-        categoryName: 'Billing',
-        priorityName: 'Medium',
-        assignedToName: 'Jane Smith',
-        createdByName: 'Support'
-      },
-      {
-        id: 3,
-        title: 'Feature Request: Dark Mode',
-        category_id: 3,
-        priority_id: 3,
-        description: 'Add dark mode support to the application',
-        attachments: null,
-        contact_email: 'user3@example.com',
-        contact_phone: '555-555-5555',
-        expected_resolution_date: '2024-04-01',
-        additional_notes: 'User preference enhancement',
-        status_id: 3,
-        assigned_to_id: null,
-        created_by_id: 3,
-        created_at: '2024-03-18T11:20:00',
-        updated_at: null,
-        deleted: false,
-        statusName: 'Pending',
-        categoryName: 'Feature',
-        priorityName: 'Low',
-        assignedToName: null,
-        createdByName: 'User'
-      }
-    ];
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
-    return tickets.find(t => t.id === id) || null;
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+      this.selectedFile = input.files[0];
+      const fakeUrl = URL.createObjectURL(this.selectedFile);
+      this.recentAttachments.push(fakeUrl);
+    }
+  }
+
+  onSubmitComment(): void {
+    if (this.commentForm.valid && this.ticket) {
+      const newComment: Comment = {
+        id: Date.now(),
+        ticketId: this.ticket.id,
+        message: this.commentForm.get('message')?.value,
+        attachments: this.recentAttachments,
+        userId: 1,
+        userName: 'Current User',
+        timestamp: new Date()
+      };
+
+      this.ticketService.addComment(newComment);
+
+      // Add to recent comments
+      this.recentComments.unshift(newComment);
+
+      // Show success message
+      this.snackBar.open('Your comment has been saved successfully', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+
+      // Reset form
+      this.commentForm.reset();
+      this.recentAttachments = [];
+      this.selectedFile = null;
+    }
   }
 
   getStatusColor(status: string): string {
@@ -156,36 +139,69 @@ export class TicketDetailComponent implements OnInit {
   }
 
   onBack(): void {
-    if (this.isDialog) {
-      this.dialogRef.close();
-    } else {
-      this.router.navigate(['/tickets']);
-    }
+    // This will be handled by the parent component
+    window.history.back();
   }
 
   onEdit(): void {
-    if (this.ticket) {
-      // Navigate to edit page or open edit dialog
-      this.router.navigate(['/tickets', this.ticket.id, 'edit']);
-    }
-  }
-
-  onClose(): void {
-    if (this.ticket) {
-      const updatedTicket = { ...this.ticket };
-      updatedTicket.statusName = 'Closed';
-      this.snackBar.open('Ticket closed successfully', 'Close', {
-        duration: 3000
-      });
-      if (this.isDialog) {
-        this.dialogRef.close(updatedTicket);
-      }
-    }
+    // This will be handled by the parent component
+    console.log('Edit ticket:', this.ticket?.id);
   }
 
   onAddComment(): void {
-    if (this.ticket) {
-      this.router.navigate(['/tickets', this.ticket.id, 'comment']);
+    // This will be handled by the parent component
+    console.log('Add comment to ticket:', this.ticket?.id);
+  }
+
+  editComment(comment: Comment): void {
+    this.editingComment = comment;
+    this.commentForm.patchValue({
+      message: comment.message
+    });
+    this.recentAttachments = [...comment.attachments];
+  }
+
+  cancelEdit(): void {
+    this.editingComment = null;
+    this.commentForm.reset();
+    this.recentAttachments = [];
+  }
+
+  updateComment(): void {
+    if (this.commentForm.valid && this.editingComment && this.ticket) {
+      const updatedComment: Comment = {
+        ...this.editingComment,
+        message: this.commentForm.get('message')?.value,
+        attachments: this.recentAttachments,
+        timestamp: new Date()
+      };
+
+      this.ticketService.updateComment(updatedComment);
+
+      // Show success message
+      this.snackBar.open('Comment updated successfully', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+
+      // Reset form and editing state
+      this.editingComment = null;
+      this.commentForm.reset();
+      this.recentAttachments = [];
+    }
+  }
+
+  deleteComment(comment: Comment): void {
+    if (confirm('Are you sure you want to delete this comment?')) {
+      this.ticketService.deleteComment(comment.id);
+
+      // Show success message
+      this.snackBar.open('Comment deleted successfully', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
     }
   }
 }

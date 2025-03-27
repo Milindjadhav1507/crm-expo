@@ -55,9 +55,62 @@
           <button class="nav_list" mat-raised-button color="warn" (click)="logout()">
             <mat-icon>logout</mat-icon> Logout
             <!-- <mat-icon>exit_to_app</mat-icon> -->
+=======
+<div class="fixed-top col-12 " *ngIf="showComponent">
+  <nav class="navbar navbar-expand-lg navbar-light">
+      <div class="container-fluid">
+          <a class="navbar-brand" style="margin-top: 0px !important;font-family: 'bootstrap-icons';font-weight: 800;color: #3f328a;">
+              <img src="https://esarwa.com/assets/homepage/e-logo-2.svg" alt="ESARWA Logo">
+          </a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+              <span class="navbar-toggler-icon"></span>
+
           </button>
-        </div>
+          <div class="collapse navbar-collapse" id="navbarNavDropdown">
+              <ul class="navbar-nav">
+                      <li class="nav-item" routerLink="/dashboard" routerLinkActive="active">
+                          <a class="nav-link">Dashboard</a>
+                      </li>
+
+                      <li class="nav-item" routerLink="/lead/lead-list" routerLinkActive="active">
+                          <a class="nav-link">Lead List</a>
+                      </li>
+
+
+                      <li class="nav-item" routerLink="/followup/follow-up-list" routerLinkActive="active">
+                          <a class="nav-link">Follow-Up List</a>
+                      </li>
+
+                      <li class="nav-item" routerLink="/ticket/list" routerLinkActive="active">
+                          <a class="nav-link">Ticket List</a>
+                      </li>
+
+                      <li class="nav-item" routerLink="/app-sidebar" routerLinkActive="active">
+                          <a class="nav-link">Settings</a>
+                      </li>
+                      <li class="nav-item" routerLink="/kanbanb" routerLinkActive="active">
+                          <a class="nav-link">Kanban</a>
+                      </li>
+                      <li class="nav-item" routerLink="/cal" routerLinkActive="active">
+                          <a class="nav-link">Calendar</a>
+                      </li>
+
+                  <div class="flex-shrink-0 dropdown">
+                      <a class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                        <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+                      </a>
+                      <ul class="dropdown-menu text-small shadow">
+                        <li><a class="dropdown-item">New project...</a></li>
+                        <li><a class="dropdown-item">Settings</a></li>
+                        <li><a class="dropdown-item">Profile</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item">Sign out</a></li>
+                      </ul>
+                    </div>
+              </ul>
+          </div>
       </div>
-    </div>
-  </div>
+  </nav>
+
+  <div class="header-strip"></div>
 </div>

@@ -14,6 +14,9 @@ import { RouterLink } from '@angular/router';
 import { Subject, debounceTime, distinctUntilChanged } from 'rxjs';
 import { TicketDetailComponent } from '../ticket-detail/ticket-detail.component';
 import { TicketGenerationFormComponent } from '../ticket-generation-form/ticket-generation-form.component';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { CrmApiService } from '../../crm-api.service';
 
 export interface Communication {
   id: number;
@@ -65,7 +68,10 @@ export interface Ticket {
     MatChipsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule
+    MatSelectModule,
+    MatMenuModule,
+    MatButtonToggleModule,
+    TicketDetailComponent
   ],
   templateUrl: './ticket-list.component.html',
   styleUrls: ['./ticket-list.component.scss']
@@ -77,6 +83,9 @@ export class TicketListComponent implements OnInit {
   statusFilter = new FormControl('');
   priorityFilter = new FormControl('');
   private searchSubject = new Subject<string>();
+  isGridView: boolean = true;
+  showDetails = false;
+  selectedTicket: Ticket | null = null;
 
   statusColors: { [key: string]: string } = {
     'Open': 'accent',
@@ -112,7 +121,8 @@ export class TicketListComponent implements OnInit {
 
   constructor(
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private api:CrmApiService
   ) {
     this.searchSubject
       .pipe(
@@ -124,10 +134,13 @@ export class TicketListComponent implements OnInit {
       });
   }
 
+  priorities:any
+  categories:any
+
   ngOnInit(): void {
     // Initialize with hardcoded data
     this.initializeHardcodedData();
-
+this.ticketlist();
     // Set up search control subscription
     this.searchControl.valueChanges.subscribe(value => {
       this.searchSubject.next(value || '');
@@ -141,6 +154,27 @@ export class TicketListComponent implements OnInit {
     this.priorityFilter.valueChanges.subscribe(() => {
       this.applyFilters();
     });
+
+
+    this.ticketType()
+    this.priority()
+
+
+  }
+
+
+  ticketType(){
+    this.api.get('ticket/getall_tickettypes/').subscribe((res:any)=>{
+      console.log(res);
+      this.categories=res.data
+    })
+  }
+
+  priority(){
+    this.api.get('ticket/getall_priority/').subscribe((res:any)=>{
+      console.log(res);
+      this.priorities=res.data
+    })
   }
 
   private initializeHardcodedData(): void {
@@ -261,23 +295,13 @@ export class TicketListComponent implements OnInit {
   }
 
   openTicketDetails(ticket: Ticket): void {
-    const dialogRef = this.dialog.open(TicketDetailComponent, {
-      width: '800px',
-      height: '80vh',
-      data: {
-        ticket: { ...ticket }
-      }
-    });
+    this.selectedTicket = ticket;
+    this.showDetails = true;
+  }
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        const index = this.tickets.findIndex(t => t.id === result.id);
-        if (index !== -1) {
-          this.tickets[index] = result;
-          this.applyFilters();
-        }
-      }
-    });
+  closeDetails(): void {
+    this.showDetails = false;
+    this.selectedTicket = null;
   }
 
   openTicketcreation(ticket: Ticket | null): void {
@@ -318,5 +342,48 @@ export class TicketListComponent implements OnInit {
         });
       }
     }
+  }
+
+  toggleView(view: 'grid' | 'list'): void {
+    this.isGridView = view === 'grid';
+  }
+
+
+  ticketlist() {
+    this.api.post('ticket/list_tickets/',null).subscribe({
+      next: (response: any) => {
+        if (response.status === 200) {
+          this.tickets = response.data;
+          this.filteredTickets = [...this.tickets];
+        }
+      },
+      error: (error) => {
+        this.snackBar.open('Error fetching tickets', 'Close', {
+          duration: 3000
+        });
+      }
+    });
+  }
+
+
+  deleteTicketById(id: number): void {
+    console.log(id);
+    this.api.get(`ticket/delete_ticket/${id}/`,null).subscribe({
+      next: (response: any) => {
+        if (response.status === 200) {
+          this.ticketlist();
+          this.tickets = response.data;
+          this.snackBar.open('Ticket deleted successfully', 'Close', {
+            duration: 3000
+          });
+        }
+      },
+      error: (error) => {
+        this.snackBar.open('Something went wrong', 'Close', {
+          duration: 3000
+        });
+      }
+    });
+
   }
 }
