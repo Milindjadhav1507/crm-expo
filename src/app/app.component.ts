@@ -17,6 +17,7 @@ import { AuthService } from './auth/auth.service';
 export class AppComponent {
   title = 'erpCRM';
   isLoginPage: boolean = false;
+  
 
   constructor(private router: Router) {}
 
