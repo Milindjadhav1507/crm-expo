@@ -1,4 +1,4 @@
-import { Component, ViewChild, ElementRef } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -14,6 +14,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ElementRef } from '@angular/core';
 import { CrmApiService } from '../crm-api.service';
 import * as echarts from 'echarts';
 import { CreateLeadComponent } from '../lead/create-lead/create-lead.component';
@@ -51,7 +52,7 @@ interface TableData {
     },
   ],
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrl: './dashboard.component.scss'
 })
 export class DashboardComponent {
   @ViewChild('barCanvas', { static: false }) barCanvas!: ElementRef;
@@ -83,25 +84,7 @@ export class DashboardComponent {
     backgroundColor?: string; // Optional background color property
     vs: string;
   }[] | undefined;
-  lineChart1: {
-    xAxis: { type: string; data: string[] };
-    yAxis: { type: string };
-    series: { data: number[]; type: string }[];
-  } = {
-    xAxis: {
-      type: 'category',
-      data: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
-    },
-    yAxis: {
-      type: 'value'
-    },
-    series: [
-      {
-        data: [120, 200, 150, 80, 70, 110, 130],
-        type: 'line'
-      }
-    ]
-  };
+  lineChart1: any;
   dognutChart: any = {
     data: {
       datasets: [{
@@ -121,26 +104,6 @@ ngOnInit(): void {
   this.fetchChartData()
   this.fetchDashboardData()
 this.fetchpermission()
-this.dataSource = [
-  {
-    leadName: 'John Doe',
-    email: 'john.doe@example.com',
-    phone: '123-456-7890',
-    statusName: 'New'
-  },
-  {
-    leadName: 'Jane Smith',
-    email: 'jane.smith@example.com',
-    phone: '987-654-3210',
-    statusName: 'Pending'
-  },
-  {
-    leadName: 'Alice Johnson',
-    email: 'alice.johnson@example.com',
-    phone: '456-789-1234',
-    statusName: 'Closed'
-  }
-];
 }
 fetchpermission(){
   // /crm/permissions/1/1
@@ -151,10 +114,10 @@ fetchpermission(){
 }
 getLeads() {
   // /crm/GetAllLead/s=a
-  // this.api.post('api/GetAllLead/s=', null).subscribe((res: any) => {
-  //   console.log(res)
-  //   this.dataSource = new MatTableDataSource(res.data)
-  // })
+  this.api.post('api/GetAllLead/s=', null).subscribe((res: any) => {
+    console.log(res)
+    this.dataSource = new MatTableDataSource(res.data)
+  })
 }
  editLead(lead: any) {
     console.log('Edit Lead:', lead);
@@ -166,7 +129,7 @@ getLeads() {
         disableClose: true, // Makes the backdrop static and disables keyboard close
         width: '600px', // Optional: Adjust dialog width
       });
-  
+
       dialogRef.afterClosed().subscribe(
         (result: any) => {
           console.log('Dialog closed with result:', result);
@@ -177,7 +140,7 @@ getLeads() {
           this.getLeads();
         }
       );
-  
+
     })
 
   }
@@ -196,7 +159,13 @@ getLeads() {
     }
   }
 fetchChartData() {
-  this.barChartOptions = {
+  // Dummy data for weekly leads
+  const dummyData = {
+    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+    data: [45, 52, 38, 64, 58, 50, 45]
+  };
+
+  this.lineChart1 = {
     color: ['#50a5f1'],
     tooltip: {
       trigger: 'axis',
@@ -213,7 +182,7 @@ fetchChartData() {
     xAxis: [
       {
         type: 'category',
-        data: [],
+        data: dummyData.labels,
         axisTick: {
           show: false
         },
@@ -241,24 +210,12 @@ fetchChartData() {
       name: 'Leads',
       type: 'bar',
       barWidth: '30%',
-      data: []
+      data: dummyData.data,
+      itemStyle: {
+        color: '#50a5f1'
+      }
     }]
   };
-  this.api.get('api/previous_leads/', null).subscribe(
-    (res: any) => {
-      console.log(res); // Log the response to inspect the format
-      const rawData = res.data; // Assuming the response matches the format you've shared
-      const labels = Object.keys(rawData[0]);
-      const data = Object.values(rawData[0]);
-      let v = 0;
-      this.barChartOptions.xAxis[0].data = labels
-      this.barChartOptions.series[0].data = data
-      console.log(this.barChartOptions);
-      this.lineChart1 = this.barChartOptions
-
-    });
-
-
 }
 
 fetchDashboardData() {
@@ -267,7 +224,7 @@ fetchDashboardData() {
       const data = res.data;
       const chartDom = document.getElementById('doughnutChart')!;
       const myChart = echarts.init(chartDom);
-  
+
       const option = {
         title: {
           text: 'Leads Overview',
@@ -311,16 +268,16 @@ fetchDashboardData() {
           }
         ]
       };
-  
+
       // Set the option and render the chart
       myChart.setOption(option);
-  
+
       // Make the chart responsive
       window.addEventListener('resize', () => {
         myChart.resize();
       });
-    
-  
+
+
       // const dognutChart = {
       //   data: {
       //     datasets: [{
@@ -396,29 +353,4 @@ getBadgeColor(status: any): any {
       return 'default';
   }
 }
-
-// Hardcoded dashboard data
-stats = {
-  totalTickets: 50,
-  // Hardcoded data for the line chart
-  // Removed duplicate declaration of lineChart1
-}
-
-  // Hardcoded data for the line chart
-  // Removed duplicate declaration of lineChart1
-
-  // Hardcoded data for the doughnut chart
-  doughnutData = {
-    labels: ['Closed', 'Pending', 'New'],
-    datasets: [
-      {
-        data: [50, 40, 30],
-        backgroundColor: ['#4caf50', '#ff9800', '#2196f3']
-      }
-    ]
-  };
-
-  // Hardcoded data for the recent leads table
-  // displayedColumns = ['index', 'leadName', 'email', 'phone', 'status_id'];
-  
 }
