@@ -25,19 +25,21 @@
 
     <!-- Lead List as Cards -->
     <div class="card-list">
-      <div 
+      <div
         *ngFor="let lead of filteredLeads"
         class="lead-card"
         (click)="onSelectLead(lead)"
         [class.selected]="lead === selectedLead"
       >
         <div class="card-content">
+          <!-- Add Ribbon -->
+          <div class="ribbon" [ngClass]="{'hot-lead': lead.leadType === 'Hot Lead', 'cold-lead': lead.leadType === 'Cold Lead', 'warm-lead': lead.leadType === 'Warm Lead'}">
+            <span>{{lead.leadType}}</span>
+          </div>
+
           <!-- Image Section -->
           <div class="image-section">
             <img [src]="lead.imageUrl" alt="{{ lead.name }}" class="avatar" />
-            <div class="status-badge" [ngClass]="lead.status.toLowerCase()">
-              {{ lead.status }}
-            </div>
           </div>
 
           <!-- Details Section -->
@@ -93,7 +95,7 @@
       </button>
       </div>
     </div>
-  
+
     <!-- Tabs Section -->
     <ul class="nav nav-tabs" id="leadTabs" role="tablist">
       <li class="nav-item" role="presentation">
@@ -297,21 +299,21 @@
             <form (ngSubmit)="addNote()">
               <div class="mb-3">
                 <label class="form-label">Note Content</label>
-                <textarea 
-                  class="form-control" 
-                  rows="3" 
-                  [(ngModel)]="newNote.content" 
+                <textarea
+                  class="form-control"
+                  rows="3"
+                  [(ngModel)]="newNote.content"
                   [ngModelOptions]="{standalone: true}"
                   placeholder="Enter your note here..."
                 ></textarea>
               </div>
-              
+
               <div class="mb-3">
                 <label class="form-label">Attach Document</label>
                 <div class="document-upload">
-                  <input 
-                    type="file" 
-                    class="form-control" 
+                  <input
+                    type="file"
+                    class="form-control"
                     (change)="onFileSelected($event)"
                     accept=".pdf,.doc,.docx,.txt"
                   >

@@ -85,11 +85,12 @@
   transition: all 0.3s ease;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
   background: white;
+  position: relative;
 
   &:hover {
-  transform: translateY(-2px);
+    transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
   }
 
@@ -118,19 +119,7 @@
   }
 
   .status-badge {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    padding: 4px 8px;
-    border-radius: 12px;
-    font-size: 12px;
-  font-weight: 500;
-    color: white;
-    background: #198754;
-
-    &.new { background: #0d6efd; }
-    &.contacted { background: #ffc107; }
-    &.qualified { background: #198754; }
+    display: none;
   }
 }
 
@@ -507,7 +496,7 @@
 
   .document-upload {
     margin-top: 8px;
-    
+
     small {
       display: block;
       margin-top: 4px;
@@ -906,6 +895,97 @@
     .info-grid {
       grid-template-columns: 1fr;
       gap: 16px;
+    }
+  }
+}
+
+// New Ribbon Styles
+.ribbon {
+  position: absolute;
+  right: -5px;
+  top: -5px;
+  z-index: 1;
+  overflow: hidden;
+  width: 75px;
+  height: 75px;
+  text-align: right;
+
+  span {
+    font-size: 12px;
+    font-weight: bold;
+    color: #FFF;
+    text-align: center;
+    line-height: 20px;
+    transform: rotate(45deg);
+    width: 100px;
+    display: block;
+    position: absolute;
+    top: 19px;
+    right: -21px;
+    box-shadow: 0 3px 10px -5px rgba(0, 0, 0, 1);
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 0px;
+      top: 100%;
+      z-index: -1;
+      border-width: 3px;
+      border-style: solid;
+      border-color: transparent;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      right: 0px;
+      top: 100%;
+      z-index: -1;
+      border-width: 3px;
+      border-style: solid;
+      border-color: transparent;
+    }
+  }
+
+  // Hot Lead Ribbon
+  &.hot-lead span {
+    background: #ff4081;
+    background: linear-gradient(#ff4081 0%, #e6005c 100%);
+    &::before {
+      border-left-color: #b3004d;
+      border-top-color: #b3004d;
+    }
+    &::after {
+      border-right-color: #b3004d;
+      border-top-color: #b3004d;
+    }
+  }
+
+  // Cold Lead Ribbon
+  &.cold-lead span {
+    background: #2196F3;
+    background: linear-gradient(#2196F3 0%, #0960a5 100%);
+    &::before {
+      border-left-color: #064475;
+      border-top-color: #064475;
+    }
+    &::after {
+      border-right-color: #064475;
+      border-top-color: #064475;
+    }
+  }
+
+  // Warm Lead Ribbon
+  &.warm-lead span {
+    background: #FF9800;
+    background: linear-gradient(#FF9800 0%, #cc7a00 100%);
+    &::before {
+      border-left-color: #995c00;
+      border-top-color: #995c00;
+    }
+    &::after {
+      border-right-color: #995c00;
+      border-top-color: #995c00;
     }
   }
 }

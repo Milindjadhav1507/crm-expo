@@ -3,11 +3,14 @@
 //     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 // }
 
+@import url('https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap');
+
 
 :host {
   // font-family: "Montserrat", serif;
   // font-family: "Roboto", sans-serif;  //Roboto font
-  font-family: "Noto Sans", sans-serif;
+  // font-family: "Noto Sans", sans-serif;
+  font-family: "Lexend Deca", sans-serif;
   background-color: #f8f9fa;
 }
 
