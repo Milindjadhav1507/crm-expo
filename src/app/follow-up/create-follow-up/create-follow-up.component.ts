@@ -29,7 +29,7 @@ export class CreateFollowUpComponent {
   statusOptions :any
   leads: any;
 // @Input() followupF: any;
-  constructor(private fb: FormBuilder,private api:CrmApiService,    
+  constructor(private fb: FormBuilder,private api:CrmApiService,
     public dialogRef: MatDialogRef<CreateFollowUpComponent>,
     @Inject(MAT_DIALOG_DATA) public followupF: any
 ) {
@@ -64,7 +64,7 @@ onClose(){
       if(this.followupF!=null){
         this.api.post(`UpdateFollowup/${this.followupF.id}`+"/",this.followupForm.value).subscribe((res:any)=>{
           if(res.status==200) {
-            this.dialogRef.close(); 
+            this.dialogRef.close();
             // this.toast.success({detail:'Follow-up updated successfully'});
           }
           console.log(res)
@@ -77,7 +77,7 @@ onClose(){
         console.log(res)
         // this.toast.success({detail:'Follow-up added successfully'});
         this.followupForm.reset();
-        this.dialogRef.close(); 
+        this.dialogRef.close();
         }
       })
     }
