@@ -227,7 +227,7 @@ fetchDashboardData() {
 
       const option = {
         title: {
-          text: 'Leads Overview',
+          text: 'Opportunities by Lead Source',
           left: 'center'
         },
         tooltip: {
@@ -236,35 +236,32 @@ fetchDashboardData() {
         },
         legend: {
           orient: 'vertical',
-          left: 'left',
-          data: ['Total Leads', 'Today\'s Lead', 'Total Open Leads', 'Total Closed Leads']
-        }, 
+          left: 'left'
+        },
         series: [
           {
-            name: 'Leads Data',
+            name: 'Lead Sources',
             type: 'pie',
-            radius: ['50%', '70%'], // Inner and outer radius for doughnut chart
-            avoidLabelOverlap: false,
-            label: {
-              show: false,
-              position: 'center'
-            },
+            radius: '80%',
+            data: [
+              { value: 20, name: 'Call', itemStyle: { color: '#7CB9E8' } },
+              { value: 32, name: 'Email', itemStyle: { color: '#0066b2' } },
+              { value: 16, name: 'Existing Customer', itemStyle: { color: '#F0E68C' } },
+              { value: 8, name: 'Partner', itemStyle: { color: '#FFA500' } },
+              { value: 6, name: 'Public Relations', itemStyle: { color: '#FF6B6B' } },
+              { value: 22, name: 'Web Site', itemStyle: { color: '#90EE90' } }
+            ],
             emphasis: {
-              label: {
-                show: true,
-                fontSize: '18',
-                fontWeight: 'bold'
+              itemStyle: {
+                shadowBlur: 10,
+                shadowOffsetX: 0,
+                shadowColor: 'rgba(0, 0, 0, 0.5)'
               }
             },
-            labelLine: {
-              show: false
-            },
-            data: [
-              { value: data.Total_leads, name: 'Total Leads' },
-              { value: data.Today_lead, name: 'Today\'s Lead' },
-              { value: data.Total_open_lead, name: 'Total Open Leads' },
-              { value: data.Total_close_lead, name: 'Total Closed Leads' }
-            ]
+            label: {
+              show: true,
+              formatter: '{b}: {d}%'
+            }
           }
         ]
       };
@@ -277,49 +274,39 @@ fetchDashboardData() {
         myChart.resize();
       });
 
-
-      // const dognutChart = {
-      //   data: {
-      //     datasets: [{
-      //       data: []
-      //     }]
-      //   }
-      // };
-      // this.dognutChart.data.datasets[0].data = [data.Total_leads, data.Today_lead, data.Total_open_lead, data.Total_close_lead];
-      // this.doughnutPercentage = ;
-      // Populate cards array with the fetched data
+      // Update cards with dashboard data
       this.cards = [
         {
           title: 'Total Leads',
           value: data.Total_leads,
-          progress: 10, // Example progress value, replace with actual logic
-          progressColor: 'green', // Replace with dynamic logic if needed
+          progress: 10,
+          progressColor: 'green',
           vs: 'vs last week',
-          backgroundColor: '#e3f2fd' // Light blue
+          backgroundColor: '#e3f2fd'
         },
         {
           title: 'Today Leads',
           value: data.Today_lead,
-          progress: 5, // Example progress value
+          progress: 5,
           progressColor: 'green',
           vs: 'vs yesterday',
-          backgroundColor: '#e8f5e9' // Light green
+          backgroundColor: '#e8f5e9'
         },
         {
           title: 'Total Open Leads',
           value: data.Total_open_lead,
-          progress: -3, // Example progress value
+          progress: -3,
           progressColor: 'red',
           vs: 'vs last month',
-          backgroundColor: '#fffde7' // Light yellow
+          backgroundColor: '#fffde7'
         },
         {
           title: 'Total Closed Leads',
           value: data.Total_close_lead,
-          progress: 0, // Example progress value
+          progress: 0,
           progressColor: 'green',
           vs: 'vs last year',
-          backgroundColor: '#ffebee' // Light red
+          backgroundColor: '#ffebee'
         },
       ];
     },

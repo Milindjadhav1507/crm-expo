@@ -1,57 +1,71 @@
-<div class="fixed-top col-12 " *ngIf="showComponent">
-  <nav class="navbar navbar-expand-lg navbar-light">
-      <div class="container-fluid">
-          <a class="navbar-brand" style="margin-top: 0px !important;font-family: 'bootstrap-icons';font-weight: 800;color: #3f328a;">
-              <img src="https://esarwa.com/assets/homepage/e-logo-2.svg" alt="ESARWA Logo">
-          </a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
-              <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNavDropdown">
-              <ul class="navbar-nav">
-                      <li class="nav-item" routerLink="/dashboard" routerLinkActive="active">
-                          <a class="nav-link">Dashboard</a>
-                      </li>
-
-                      <li class="nav-item" routerLink="/lead/lead-list" routerLinkActive="active">
-                          <a class="nav-link">Lead List</a>
-                      </li>
-
-
-                      <li class="nav-item" routerLink="/followup/follow-up-list" routerLinkActive="active">
-                          <a class="nav-link">Follow-Up List</a>
-                      </li>
-
-                      <li class="nav-item" routerLink="/ticket/list" routerLinkActive="active">
-                          <a class="nav-link">Ticket List</a>
-                      </li>
-
-                      <li class="nav-item" routerLink="/app-sidebar" routerLinkActive="active">
-                          <a class="nav-link">Settings</a>
-                      </li>
-                      <li class="nav-item" routerLink="/kanbanb" routerLinkActive="active">
-                          <a class="nav-link">Kanban</a>
-                      </li>
-                      <li class="nav-item" routerLink="/cal" routerLinkActive="active">
-                          <a class="nav-link">Calendar</a>
-                      </li>
-
-                  <div class="flex-shrink-0 dropdown">
-                      <a class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                        <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
-                      </a>
-                      <ul class="dropdown-menu text-small shadow">
-                        <li><a class="dropdown-item">New project...</a></li>
-                        <li><a class="dropdown-item">Settings</a></li>
-                        <li><a class="dropdown-item">Profile</a></li>
-                        <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item">Sign out</a></li>
-                      </ul>
+<div class="fixed-top col-12" *ngIf="showComponent">
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" style="margin-top: 0px !important;font-family: 'bootstrap-icons';font-weight: 800;color: #3f328a;">
+                <img src="https://esarwa.com/assets/homepage/e-logo-2.svg" alt="ESARWA Logo">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-center" id="navbarNavDropdown">
+                <ul class="navbar-nav">
+                    <li class="nav-item" routerLink="/dashboard" routerLinkActive="active">
+                        <a class="nav-link">Dashboard</a>
+                    </li>
+                    <li class="nav-item" routerLink="/lead/lead-list" routerLinkActive="active">
+                        <a class="nav-link">Lead List</a>
+                    </li>
+                    <!-- <li class="nav-item" routerLink="/followup/follow-up-list" routerLinkActive="active">
+                        <a class="nav-link">Follow-Up List</a>
+                    </li> -->
+                    <li class="nav-item" routerLink="/ticket/list" routerLinkActive="active">
+                        <a class="nav-link">Ticket List</a>
+                    </li>
+                    <li class="nav-item" routerLink="/kanbanb" routerLinkActive="active">
+                        <a class="nav-link">Kanban</a>
+                    </li>
+                    <li class="nav-item" routerLink="/cal" routerLinkActive="active">
+                        <a class="nav-link">Calendar</a>
+                    </li>
+                    <li class="nav-item" routerLink="/app-sidebar" routerLinkActive="active">
+                        <a class="nav-link">Settings</a>
+                    </li>
+                </ul>
+            </div>
+  
+            <!-- Profile Dropdown with Popover -->
+            <div class="profile-section"
+                 (mouseenter)="showUserInfo()" (mouseleave)="hideUserInfo()">
+                <div class="profile-image">
+                    <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+                    <div class="user-info-popover" *ngIf="isUserInfoVisible">
+                        <div class="user-details">
+                            <h4>{{thisIsMyData.full_name}}</h4>
+                            <p>{{thisIsMyData.mobile_no}}</p>
+                            <p>{{thisIsMyData.email}}</p>
+                            <span class="text-danger" (click)="logout()">Logout</span>
+                        </div>
                     </div>
-              </ul>
-          </div>
-      </div>
-  </nav>
-
-  <div class="header-strip"></div>
-</div>
+                </div>
+            </div>
+  
+            <!-- Profile Menu -->
+            <!-- <mat-menu #profileMenu="matMenu" class="profile-menu">
+                <button mat-menu-item (click)="viewProfile()">
+                    <mat-icon>person</mat-icon>
+                    <span>Profile</span>
+                </button>
+                <button mat-menu-item (click)="openSettings()">
+                    <mat-icon>settings</mat-icon>
+                    <span>Settings</span>
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="logout()" class="logout-button">
+                    <mat-icon>exit_to_app</mat-icon>
+                    <span>Logout</span>
+                </button>
+            </mat-menu> -->
+        </div>
+    </nav>
+    <div class="header-strip"></div>
+  </div>

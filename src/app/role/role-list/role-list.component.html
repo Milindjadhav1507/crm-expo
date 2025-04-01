@@ -1,0 +1,112 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Roles Management</h2>
+    </div>
+    <div class="col-auto">
+      <button mat-raised-button color="primary" (click)="openCreateModal()">
+        <mat-icon>add</mat-icon>
+        Add New Role
+      </button>
+    </div>
+  </div>
+
+  <mat-card>
+    <mat-card-content>
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Search Roles</mat-label>
+            <input matInput [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search by name or description">
+            <mat-icon matSuffix (click)="onSearch()">search</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table mat-table [dataSource]="roles" class="w-100">
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let role">{{role.name}}</td>
+          </ng-container>
+
+          <!-- Description Column -->
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <td mat-cell *matCellDef="let role">{{role.description}}</td>
+          </ng-container>
+
+          <!-- Level Column -->
+          <ng-container matColumnDef="level">
+            <th mat-header-cell *matHeaderCellDef>Level</th>
+            <td mat-cell *matCellDef="let role">{{role.level}}</td>
+          </ng-container>
+
+          <!-- Created At Column -->
+          <ng-container matColumnDef="created_at">
+            <th mat-header-cell *matHeaderCellDef>Created At</th>
+            <td mat-cell *matCellDef="let role">{{role.created_at | date:'medium'}}</td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let role">
+              <button mat-icon-button color="primary" (click)="openEditModal(role)" matTooltip="Edit Role">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteRole(role.id)" matTooltip="Delete Role">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <mat-paginator
+        [length]="totalItems"
+        [pageSize]="pageSize"
+        [pageIndex]="currentPage - 1"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        (page)="onPageChange($event)"
+        aria-label="Select page">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<!-- Role Modal -->
+<div class="modal fade" id="roleModal" tabindex="-1" aria-labelledby="roleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="roleModalLabel">{{newRole.id ? 'Edit Role' : 'Create New Role'}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="roleName" class="form-label">Role Name</label>
+            <input type="text" class="form-control" id="roleName" [(ngModel)]="newRole.name" name="name" required>
+          </div>
+          <div class="mb-3">
+            <label for="roleDescription" class="form-label">Description</label>
+            <textarea class="form-control" id="roleDescription" [(ngModel)]="newRole.description" name="description" rows="3"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="roleLevel" class="form-label">Level</label>
+            <input type="number" class="form-control" id="roleLevel" [(ngModel)]="newRole.level" name="level" min="1" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="saveRole()">Save</button>
+      </div>
+    </div>
+  </div>
+</div> 

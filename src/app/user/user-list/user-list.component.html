@@ -1,0 +1,154 @@
+<div class="container-fluid">
+  <div class="row mb-4">
+    <div class="col">
+      <h2>Users Management</h2>
+    </div>
+    <div class="col-auto">
+      <button mat-raised-button color="primary" (click)="openCreateModal()">
+        <mat-icon>add</mat-icon>
+        Add New User
+      </button>
+    </div>
+  </div>
+
+  <mat-card>
+    <mat-card-content>
+      <div class="row mb-3">
+        <div class="col-md-4">
+          <mat-form-field appearance="outline" class="w-100">
+            <mat-label>Search Users</mat-label>
+            <input matInput [(ngModel)]="searchQuery" (keyup.enter)="onSearch()" placeholder="Search by name or email">
+            <mat-icon matSuffix (click)="onSearch()">search</mat-icon>
+          </mat-form-field>
+        </div>
+      </div>
+
+      <div class="table-responsive">
+        <table mat-table [dataSource]="users" class="w-100">
+          <!-- Name Column -->
+          <ng-container matColumnDef="full_name">
+            <th mat-header-cell *matHeaderCellDef>Full Name</th>
+            <td mat-cell *matCellDef="let user">{{user.full_name}}</td>
+          </ng-container>
+
+          <!-- Email Column -->
+          <ng-container matColumnDef="email">
+            <th mat-header-cell *matHeaderCellDef>Email</th>
+            <td mat-cell *matCellDef="let user">{{user.email}}</td>
+          </ng-container>
+
+          <!-- Mobile Column -->
+          <ng-container matColumnDef="mobile_no">
+            <th mat-header-cell *matHeaderCellDef>Mobile</th>
+            <td mat-cell *matCellDef="let user">{{user.mobile_no}}</td>
+          </ng-container>
+
+          <!-- Role Column -->
+          <ng-container matColumnDef="role_name">
+            <th mat-header-cell *matHeaderCellDef>Role</th>
+            <td mat-cell *matCellDef="let user">{{user.role_name}}</td>
+          </ng-container>
+
+          <!-- Department Column -->
+          <ng-container matColumnDef="department_name">
+            <th mat-header-cell *matHeaderCellDef>Department</th>
+            <td mat-cell *matCellDef="let user">{{user.department_name}}</td>
+          </ng-container>
+
+          <!-- Branch Column -->
+          <ng-container matColumnDef="branch_name">
+            <th mat-header-cell *matHeaderCellDef>Branch</th>
+            <td mat-cell *matCellDef="let user">{{user.branch_name}}</td>
+          </ng-container>
+
+          <!-- Designation Column -->
+          <ng-container matColumnDef="designation_name">
+            <th mat-header-cell *matHeaderCellDef>Designation</th>
+            <td mat-cell *matCellDef="let user">{{user.designation_name}}</td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef>Actions</th>
+            <td mat-cell *matCellDef="let user">
+              <button mat-icon-button color="primary" (click)="openEditModal(user)" matTooltip="Edit User">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteUser(user.id)" matTooltip="Delete User">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <mat-paginator
+        [length]="totalItems"
+        [pageSize]="pageSize"
+        [pageIndex]="currentPage - 1"
+        [pageSizeOptions]="[5, 10, 25, 100]"
+        (page)="onPageChange($event)"
+        aria-label="Select page">
+      </mat-paginator>
+    </mat-card-content>
+  </mat-card>
+</div>
+
+<!-- User Modal -->
+<div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="userModalLabel">{{newUser.id ? 'Edit User' : 'Create New User'}}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="userName" class="form-label">Full Name</label>
+            <input type="text" class="form-control" id="userName" [(ngModel)]="newUser.full_name" name="full_name" required>
+          </div>
+          <div class="mb-3">
+            <label for="userEmail" class="form-label">Email</label>
+            <input type="email" class="form-control" id="userEmail" [(ngModel)]="newUser.email" name="email" required>
+          </div>
+          <div class="mb-3">
+            <label for="userMobile" class="form-label">Mobile Number</label>
+            <input type="text" class="form-control" id="userMobile" [(ngModel)]="newUser.mobile_no" name="mobile_no" required>
+          </div>
+          <div class="mb-3">
+            <label for="userRole" class="form-label">Role</label>
+            <mat-form-field appearance="outline" class="w-100">
+              <mat-select id="userRole" [(ngModel)]="newUser.role_id" name="role_id" (selectionChange)="onRoleChange($event.value)" required>
+                <mat-option [value]="null" disabled>Select a role</mat-option>
+                <mat-option *ngFor="let role of roles" [value]="role.id">
+                  {{role.name}}
+                </mat-option>
+              </mat-select>
+              <mat-error *ngIf="!newUser.role_id">Please select a role</mat-error>
+            </mat-form-field>
+          </div>
+          <div class="mb-3">
+            <label for="userDepartment" class="form-label">Department</label>
+            <input type="text" class="form-control" id="userDepartment" [(ngModel)]="newUser.department_name" name="department_name" required>
+          </div>
+          <div class="mb-3">
+            <label for="userBranch" class="form-label">Branch</label>
+            <input type="text" class="form-control" id="userBranch" [(ngModel)]="newUser.branch_name" name="branch_name" required>
+          </div>
+          <div class="mb-3">
+            <label for="userDesignation" class="form-label">Designation</label>
+            <input type="text" class="form-control" id="userDesignation" [(ngModel)]="newUser.designation_name" name="designation_name" required>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="saveUser()">Save</button>
+      </div>
+    </div>
+  </div>
+</div> 

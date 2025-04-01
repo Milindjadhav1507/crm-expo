@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, ViewChild, OnInit } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule } from '@angular/material/paginator';
@@ -14,6 +14,8 @@ import { DepartmentComponent } from '../department/department.component';
 import { NgIf } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatSort } from '@angular/material/sort';
+import { CrmApiService } from '../../crm-api.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-departmentlist',
@@ -24,7 +26,7 @@ import { MatSort } from '@angular/material/sort';
   templateUrl: './departmentlist.component.html',
   styleUrl: './departmentlist.component.scss'
 })
-export class DepartmentlistComponent {
+export class DepartmentlistComponent implements OnInit {
     @ViewChild(MatSort) set matSort(sort: MatSort){ this.dataSource.sort=sort;}
   departmentData: any = [];
   filterText: string = '';
@@ -42,116 +44,69 @@ export class DepartmentlistComponent {
   previousPage: boolean = false;
   loading: boolean = false;
 
-  constructor(private dialog: MatDialog) {
-    this.initializeDummyData();
-  }
+  constructor(
+    private dialog: MatDialog,
+    private api: CrmApiService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit() {
-    // No need to call API anymore
+    this.loadDepartments();
   }
 
-  private initializeDummyData() {
-    const dummyResponse = {
-      data: [
-        {
-          id: 1,
-          name: "Sales",
-          description: "",
-          branch: 1,
-          branch_name: "MAINy"
-        },
-        {
-          id: 2,
-          name: "ACCOUNTING",
-          description: "ACCOUNTING department",
-          branch: 3,
-          branch_name: "Mumbai Main Branch"
-        },
-        {
-          id: 3,
-          name: "Marketing",
-          description: "Responsible for creating and executing campaigns to attract, engage, and retain customers, as well as analyzing customer behavior and market trends.",
-          branch: 4,
-          branch_name: "Ambivali"
-        },
-        {
-          id: 4,
-          name: "Executive/Management",
-          description: "Leads and makes strategic decisions based on CRM data, ensuring alignment with business objectives and customer needs.",
-          branch: 5,
-          branch_name: "ssssssssss"
-        },
-        {
-          id: 5,
-          name: "IT/Technical Support",
-          description: "Maintains the technical infrastructure of CRM systems, providing technical support and system integrations.",
-          branch: 1,
-          branch_name: "MAINy"
-        },
-        {
-          id: 6,
-          name: "Operations",
-          description: "Handles the day-to-day operations that support customer interactions, ensuring efficient product/service delivery.",
-          branch: 3,
-          branch_name: "Mumbai Main Branch"
-        },
-        {
-          id: 7,
-          name: "Human Resources (HR)",
-          description: "Manages employee performance, training, and internal processes, ensuring employees meet the needs of customers.",
-          branch: 4,
-          branch_name: "Ambivali"
-        },
-        {
-          id: 8,
-          name: "Finance and Accounting",
-          description: "Manages billing, payments, and financial transactions for customer accounts, ensuring accuracy and compliance.",
-          branch: 5,
-          branch_name: "ssssssssss"
-        },
-        {
-          id: 9,
-          name: "Product Management",
-          description: "Oversees the development and improvement of products based on customer feedback and market trends.",
-          branch: 1,
-          branch_name: "MAINy"
-        },
-        {
-          id: 10,
-          name: "Customer Support/Service",
-          description: "Ensures customer satisfaction by resolving inquiries, managing service tickets, and providing ongoing support.",
-          branch: 3,
-          branch_name: "Mumbai Main Branch"
+  private loadDepartments() {
+    this.loading = true;
+    this.api.post('api/get_departments/s=', null).subscribe({
+      next: (response: any) => {
+        if (response && response.data) {
+          this.departmentData = response.data.map((dept: any, index: number) => ({
+            ...dept,
+            srNo: index + 1
+          }));
+          this.filteredBranches = this.departmentData;
+          this.totalData = response.pagination_data?.total_data || 0;
+          this.limit = response.pagination_data?.limit || 10;
+          this.totalPages = response.pagination_data?.total_pages || 0;
+          this.pageNumber = response.pagination_data?.page_number || 1;
+          this.nextPage = response.pagination_data?.next_page || false;
+          this.previousPage = response.pagination_data?.previous_page || false;
+          this.dataSource = new MatTableDataSource(this.departmentData);
+          this.dataSource.paginator = this.paginator;
+          this.dataSource.sort = this.matSort;
         }
-      ],
-      pagination_data: {
-        total_data: 15,
-        limit: 10,
-        total_pages: 2,
-        page_number: 1,
-        next_page: true,
-        previous_page: false
+        this.loading = false;
       },
-      status: 200
-    };
-
-    this.departmentData = dummyResponse.data;
-    this.filteredBranches = this.departmentData;
-    this.totalData = dummyResponse.pagination_data.total_data;
-    this.limit = dummyResponse.pagination_data.limit;
-    this.totalPages = dummyResponse.pagination_data.total_pages;
-    this.pageNumber = dummyResponse.pagination_data.page_number;
-    this.nextPage = dummyResponse.pagination_data.next_page;
-    this.previousPage = dummyResponse.pagination_data.previous_page;
-    this.dataSource = new MatTableDataSource(this.departmentData);
-    this.dataSource.paginator = this.paginator;
-    this.dataSource.sort = this.matSort;
+      error: (error) => {
+        console.error('Error loading departments:', error);
+        this.snackBar.open('Error loading departments', 'Close', {
+          duration: 3000
+        });
+        this.loading = false;
+      }
+    });
   }
 
   deleteBranch(id: number) {
     if (confirm('Are you sure you want to delete this department?')) {
-      this.departmentData = this.departmentData.filter((dept: any) => dept.id !== id);
-      this.dataSource = new MatTableDataSource(this.departmentData);
+      this.loading = true;
+      this.api.deleteDepartment(id).subscribe({
+        next: (response: any) => {
+          if (response.status === 200) {
+            this.snackBar.open('Department deleted successfully', 'Close', {
+              duration: 3000
+            });
+            this.loadDepartments(); // Reload the list
+          }
+          this.loading = false;
+        },
+        error: (error) => {
+          console.error('Error deleting department:', error);
+          this.snackBar.open('Error deleting department', 'Close', {
+            duration: 3000
+          });
+          this.loading = false;
+        }
+      });
     }
   }
 
@@ -163,11 +118,7 @@ export class DepartmentlistComponent {
 
     dialogRef.afterClosed().subscribe((result: any) => {
       if (result) {
-        const index = this.departmentData.findIndex((d: any) => d.id === departmentId);
-        if (index !== -1) {
-          this.departmentData[index] = result;
-          this.dataSource = new MatTableDataSource(this.departmentData);
-        }
+        this.loadDepartments(); // Reload the list after edit
       }
     });
   }
@@ -175,6 +126,7 @@ export class DepartmentlistComponent {
   onPageChange(event: any) {
     this.limit = event.pageSize;
     this.pageNumber = event.pageIndex + 1;
+    this.loadDepartments(); // Reload with new page
   }
 
   searchChange(event: any) {
