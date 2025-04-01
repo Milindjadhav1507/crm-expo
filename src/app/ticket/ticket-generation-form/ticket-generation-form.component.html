@@ -1,7 +1,8 @@
 <div class="ticket-form-container mat-elevation-z4">
   <div class="form-header">
     <h2>{{ isEditMode ? 'Edit Ticket' : 'Create New Ticket' }}</h2>
-    <p class="subtitle">{{ isEditMode ? 'Update the ticket details below' : 'Please fill in the details below to create a new support ticket' }}</p>
+    <p class="subtitle">{{ isEditMode ? 'Update the ticket details below' : 'Please fill in the details below to create
+      a new support ticket' }}</p>
   </div>
 
   <form [formGroup]="ticketForm" (ngSubmit)="onSubmit()" class="ticket-form">
@@ -42,14 +43,23 @@
       </mat-form-field>
     </div>
 
+    <!-- Status -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option *ngFor="let status of statuses" [value]="status.id">
+          {{status.name}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="getErrorMessage('status')">
+        {{ getErrorMessage('status') }}
+      </mat-error>
+    </mat-form-field>
+
     <!-- Description -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Description</mat-label>
-      <textarea
-        matInput
-        formControlName="description"
-        rows="6"
-        placeholder="Detailed description of the issue...">
+      <textarea matInput formControlName="description" rows="6" placeholder="Detailed description of the issue...">
       </textarea>
       <mat-error *ngIf="getErrorMessage('description')">
         {{ getErrorMessage('description') }}
@@ -60,11 +70,7 @@
     <div class="form-row">
       <mat-form-field appearance="outline">
         <mat-label>Contact Email</mat-label>
-        <input
-          matInput
-          type="email"
-          formControlName="contact_email"
-          placeholder="your@email.com">
+        <input matInput type="email" formControlName="contact_email" placeholder="your@email.com">
         <mat-error *ngIf="getErrorMessage('contact_email')">
           {{ getErrorMessage('contact_email') }}
         </mat-error>
@@ -72,11 +78,7 @@
 
       <mat-form-field appearance="outline">
         <mat-label>Contact Phone</mat-label>
-        <input
-          matInput
-          type="tel"
-          formControlName="contact_phone"
-          placeholder="10-digit phone number">
+        <input matInput type="tel" formControlName="contact_phone" placeholder="10-digit phone number">
         <mat-error *ngIf="getErrorMessage('contact_phone')">
           {{ getErrorMessage('contact_phone') }}
         </mat-error>
@@ -84,87 +86,53 @@
     </div>
 
     <!-- Expected Resolution Date -->
-    <!-- <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Expected Resolution Date</mat-label>
-      <input
-        matInput
-        [matDatepicker]="picker"
-        formControlName="expected_resolution_date"
-        [min]="maxDate">
-      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-      <mat-datepicker #picker></mat-datepicker>
-    </mat-form-field> -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Expected Resolution Date</mat-label>
-      <input
-        matInput
-        [matDatepicker]="picker"
-        formControlName="expected_resolution_date"
-        [min]="maxDate"
-        [value]="ticketForm.get('expected_resolution_date')?.value"
-        (dateChange)="formatDate($event.value)">
+      <input matInput [matDatepicker]="picker" formControlName="expected_resolution_date" [min]="maxDate"
+        placeholder="MM/DD/YYYY" readonly>
       <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
+      <mat-error *ngIf="getErrorMessage('expected_resolution_date')">
+        {{ getErrorMessage('expected_resolution_date') }}
+      </mat-error>
     </mat-form-field>
+
     <!-- Attachments -->
-    <!-- <div class="file-upload-section">
+    <div class="file-upload-section">
       <label class="mat-body-1">Attachments</label>
       <div class="file-upload-container mat-elevation-z1">
-        <input
-          type="file"
-          #fileInput
-          multiple
-          (change)="onFileSelected($event)"
-          accept="image/*,.pdf,.doc,.docx"
+        <input type="file" #fileInput multiple (change)="onFileSelected($event)" accept="image/*,.pdf,.doc,.docx"
           class="file-input">
-        <button
-          mat-stroked-button
-          type="button"
-          color="primary"
-          (click)="fileInput.click()">
+        <button mat-stroked-button type="button" color="primary" (click)="fileInput.click()">
           <mat-icon>cloud_upload</mat-icon>
           Choose Files
         </button>
       </div>
       <div class="attachments-list" *ngIf="ticketForm.get('attachments')?.value?.length">
-        <div class="attachment-item mat-elevation-z1" *ngFor="let file of ticketForm.get('attachments')?.value; let i = index">
+        <div class="attachment-item mat-elevation-z1"
+          *ngFor="let file of ticketForm.get('attachments')?.value; let i = index">
           <span class="file-name">{{ file.name }}</span>
-          <button
-            mat-icon-button
-            color="warn"
-            type="button"
-            (click)="removeAttachment(i)">
+          <button mat-icon-button color="warn" type="button" (click)="removeAttachment(i)">
             <mat-icon>close</mat-icon>
           </button>
         </div>
       </div>
-    </div> -->
+    </div>
 
     <!-- Additional Notes -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Additional Notes</mat-label>
-      <textarea
-        matInput
-        formControlName="additional_notes"
-        rows="3"
-        placeholder="Any additional information...">
+      <textarea matInput formControlName="additional_notes" rows="3" placeholder="Any additional information...">
       </textarea>
     </mat-form-field>
 
     <!-- Form Actions -->
     <div class="form-actions">
-      <button
-        mat-stroked-button
-        type="button"
-        (click)="cancel()">
+      <button mat-stroked-button type="button" (click)="cancel()">
         <mat-icon>close</mat-icon>
         Cancel
       </button>
-      <button
-        mat-raised-button
-        color="primary"
-        type="submit"
-        [disabled]="ticketForm.invalid || isSubmitting">
+      <button mat-raised-button color="primary" type="submit" [disabled]="ticketForm.invalid || isSubmitting">
         <mat-icon>send</mat-icon>
         {{ isSubmitting ? 'Submitting...' : (isEditMode ? 'Update Ticket' : 'Submit Ticket') }}
       </button>

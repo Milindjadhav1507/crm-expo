@@ -45,8 +45,30 @@
     </button>
   </div>
 
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="loading-state">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading tickets...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="hasError" class="error-state">
+    <mat-icon color="warn">error_outline</mat-icon>
+    <p>{{ errorMessage }}</p>
+  </div>
+
+  <!-- Empty State -->
+  <div *ngIf="!isLoading && !hasError && filteredTickets.length === 0" class="empty-state">
+    <mat-icon>inbox</mat-icon>
+    <p>No tickets found</p>
+    <button mat-raised-button color="primary" (click)="openTicketcreation(null)">
+      <mat-icon>add</mat-icon>
+      Create New Ticket
+    </button>
+  </div>
+
   <!-- Grid View -->
-  <div class="tickets-grid" *ngIf="isGridView">
+  <div class="tickets-grid" *ngIf="!isLoading && !hasError && isGridView && filteredTickets.length > 0">
     <mat-card *ngFor="let ticket of filteredTickets" class="ticket-card">
       <mat-card-header>
         <mat-card-title>
@@ -71,7 +93,7 @@
         <div class="meta-info">
           <span class="created-at">
             <mat-icon>schedule</mat-icon>
-            {{formatDate(ticket.created_at)}}
+            {{formatDate(ticket.expected_resolution_date)}}
           </span>
           <span class="contact-info">
             <mat-icon>email</mat-icon>
@@ -111,7 +133,7 @@
   </div>
 
   <!-- List View -->
-  <div class="tickets-list" *ngIf="!isGridView">
+  <div class="tickets-list" *ngIf="!isLoading && !hasError && !isGridView && filteredTickets.length > 0">
     <mat-card *ngFor="let ticket of filteredTickets" class="ticket-list-item">
       <div class="list-item-content">
         <div class="list-item-header">
@@ -133,7 +155,7 @@
           <div class="meta-info">
             <span class="created-at">
               <mat-icon>schedule</mat-icon>
-              {{formatDate(ticket.created_at)}}
+              {{formatDate(ticket.expected_resolution_date)}}
             </span>
             <span class="contact-info">
               <mat-icon>email</mat-icon>
@@ -166,11 +188,6 @@
         </div>
       </div>
     </mat-card>
-  </div>
-
-  <div *ngIf="filteredTickets.length === 0" class="no-tickets">
-    <mat-icon>search_off</mat-icon>
-    <p>No tickets found matching your criteria</p>
   </div>
 </div>
 
