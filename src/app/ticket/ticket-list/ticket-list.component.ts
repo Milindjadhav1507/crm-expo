@@ -16,6 +16,7 @@ import { TicketDetailComponent } from '../ticket-detail/ticket-detail.component'
 import { TicketGenerationFormComponent } from '../ticket-generation-form/ticket-generation-form.component';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CrmApiService } from '../../crm-api.service';
 
 export interface Communication {
@@ -71,6 +72,7 @@ export interface Ticket {
     MatSelectModule,
     MatMenuModule,
     MatButtonToggleModule,
+    MatProgressSpinnerModule,
     TicketDetailComponent
   ],
   templateUrl: './ticket-list.component.html',
@@ -86,6 +88,9 @@ export class TicketListComponent implements OnInit {
   isGridView: boolean = true;
   showDetails = false;
   selectedTicket: Ticket | null = null;
+  isLoading = false;
+  hasError = false;
+  errorMessage = '';
 
   statusColors: { [key: string]: string } = {
     'Open': 'accent',
@@ -118,6 +123,7 @@ export class TicketListComponent implements OnInit {
     { value: 'Medium', label: 'Medium' },
     { value: 'Low', label: 'Low' }
   ];
+  status: any;
 
   constructor(
     private dialog: MatDialog,
@@ -158,6 +164,7 @@ this.ticketlist();
 
     this.ticketType()
     this.priority()
+    this.getStatus()
 
 
   }
@@ -170,85 +177,93 @@ this.ticketlist();
     })
   }
 
+
+
   priority(){
     this.api.get('ticket/getall_priority/').subscribe((res:any)=>{
       console.log(res);
       this.priorities=res.data
     })
   }
+  getStatus(){
+    this.api.get('ticket/getall_status/').subscribe((res:any)=>{
+      console.log(res);
+      this.status=res.data
+    })
+  }
 
   private initializeHardcodedData(): void {
     // Hardcoded ticket data
     this.tickets = [
-      {
-        id: 1,
-        title: 'System Login Issue',
-        category_id: 1,
-        priority_id: 1,
-        description: 'Users unable to login to the system',
-        attachments: null,
-        contact_email: 'user1@example.com',
-        contact_phone: '123-456-7890',
-        expected_resolution_date: '2024-03-25',
-        additional_notes: 'Affecting multiple users',
-        status_id: 1,
-        assigned_to_id: 1,
-        created_by_id: 2,
-        created_at: '2024-03-20T10:00:00',
-        updated_at: null,
-        deleted: false,
-        statusName: 'Open',
-        categoryName: 'Technical',
-        priorityName: 'High',
-        assignedToName: 'John Doe',
-        createdByName: 'Admin'
-      },
-      {
-        id: 2,
-        title: 'Payment Processing Error',
-        category_id: 2,
-        priority_id: 2,
-        description: 'Payment gateway integration issues',
-        attachments: null,
-        contact_email: 'user2@example.com',
-        contact_phone: '098-765-4321',
-        expected_resolution_date: '2024-03-26',
-        additional_notes: 'Affecting checkout process',
-        status_id: 2,
-        assigned_to_id: 2,
-        created_by_id: 1,
-        created_at: '2024-03-19T15:30:00',
-        updated_at: '2024-03-20T09:00:00',
-        deleted: false,
-        statusName: 'In Progress',
-        categoryName: 'Billing',
-        priorityName: 'Medium',
-        assignedToName: 'Jane Smith',
-        createdByName: 'Support'
-      },
-      {
-        id: 3,
-        title: 'Feature Request: Dark Mode',
-        category_id: 3,
-        priority_id: 3,
-        description: 'Add dark mode support to the application',
-        attachments: null,
-        contact_email: 'user3@example.com',
-        contact_phone: '555-555-5555',
-        expected_resolution_date: '2024-04-01',
-        additional_notes: 'User preference enhancement',
-        status_id: 3,
-        assigned_to_id: null,
-        created_by_id: 3,
-        created_at: '2024-03-18T11:20:00',
-        updated_at: null,
-        deleted: false,
-        statusName: 'Pending',
-        categoryName: 'Feature',
-        priorityName: 'Low',
-        assignedToName: null,
-        createdByName: 'User'
-      }
+      // {
+      //   id: 1,
+      //   title: 'System Login Issue',
+      //   category_id: 1,
+      //   priority_id: 1,
+      //   description: 'Users unable to login to the system',
+      //   attachments: null,
+      //   contact_email: 'user1@example.com',
+      //   contact_phone: '123-456-7890',
+      //   expected_resolution_date: '2024-03-25',
+      //   additional_notes: 'Affecting multiple users',
+      //   status_id: 1,
+      //   assigned_to_id: 1,
+      //   created_by_id: 2,
+      //   created_at: '2024-03-20T10:00:00',
+      //   updated_at: null,
+      //   deleted: false,
+      //   statusName: 'Open',
+      //   categoryName: 'Technical',
+      //   priorityName: 'High',
+      //   assignedToName: 'John Doe',
+      //   createdByName: 'Admin'
+      // },
+      // {
+      //   id: 2,
+      //   title: 'Payment Processing Error',
+      //   category_id: 2,
+      //   priority_id: 2,
+      //   description: 'Payment gateway integration issues',
+      //   attachments: null,
+      //   contact_email: 'user2@example.com',
+      //   contact_phone: '098-765-4321',
+      //   expected_resolution_date: '2024-03-26',
+      //   additional_notes: 'Affecting checkout process',
+      //   status_id: 2,
+      //   assigned_to_id: 2,
+      //   created_by_id: 1,
+      //   created_at: '2024-03-19T15:30:00',
+      //   updated_at: '2024-03-20T09:00:00',
+      //   deleted: false,
+      //   statusName: 'In Progress',
+      //   categoryName: 'Billing',
+      //   priorityName: 'Medium',
+      //   assignedToName: 'Jane Smith',
+      //   createdByName: 'Support'
+      // },
+      // {
+      //   id: 3,
+      //   title: 'Feature Request: Dark Mode',
+      //   category_id: 3,
+      //   priority_id: 3,
+      //   description: 'Add dark mode support to the application',
+      //   attachments: null,
+      //   contact_email: 'user3@example.com',
+      //   contact_phone: '555-555-5555',
+      //   expected_resolution_date: '2024-04-01',
+      //   additional_notes: 'User preference enhancement',
+      //   status_id: 3,
+      //   assigned_to_id: null,
+      //   created_by_id: 3,
+      //   created_at: '2024-03-18T11:20:00',
+      //   updated_at: null,
+      //   deleted: false,
+      //   statusName: 'Pending',
+      //   categoryName: 'Feature',
+      //   priorityName: 'Low',
+      //   assignedToName: null,
+      //   createdByName: 'User'
+      // }
     ];
 
     this.filteredTickets = [...this.tickets];
@@ -290,8 +305,17 @@ this.ticketlist();
     return this.priorityColors[priority] || 'primary';
   }
 
-  formatDate(date: string): string {
-    return new Date(date).toLocaleDateString();
+  formatDate(date: string | null): string {
+    if (!date) return 'Not set';
+    try {
+      return new Date(date).toLocaleDateString('en-GB', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      });
+    } catch (error) {
+      return 'Invalid date';
+    }
   }
 
   openTicketDetails(ticket: Ticket): void {
@@ -322,7 +346,7 @@ this.ticketlist();
   }
 
   loadTickets() {
-    this.api.get('ticket/list_tickets/').subscribe({
+    this.api.post('ticket/list_tickets/',null).subscribe({
       next: (response: any) => {
         if (response.status === 200) {
           this.tickets = response.data;
@@ -359,17 +383,25 @@ this.ticketlist();
 
 
   ticketlist() {
+    this.isLoading = true;
+    this.hasError = false;
     this.api.post('ticket/list_tickets/',null).subscribe({
-      next: (response: any) => {
-        if (response.status === 200) {
-          this.tickets = response.data;
-          this.filteredTickets = [...this.tickets];
+      next: (res: any) => {
+        this.isLoading = false;
+        if (res.status === 200 && res.data && res.data.length > 0) {
+          this.tickets = res.data;
+          this.filteredTickets = res.data;
+        } else {
+          this.tickets = [];
+          this.filteredTickets = [];
         }
       },
       error: (error) => {
-        this.snackBar.open('Error fetching tickets', 'Close', {
-          duration: 3000
-        });
+        this.isLoading = false;
+        this.hasError = true;
+        this.errorMessage = 'Failed to load tickets. Please try again later.';
+        this.tickets = [];
+        this.filteredTickets = [];
       }
     });
   }
