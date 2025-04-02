@@ -16,6 +16,7 @@ export interface Ticket {
     category_id?: number;
     priority_id?: number;
     assigned_to_id?: number | null;
+    assigned_to?: number | null;
     created_by_id?: number;
     created_at?: string;
     updated_at?: string | null;
