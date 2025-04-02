@@ -10,6 +10,7 @@ import { MatListModule } from '@angular/material/list';
 import { MatSelectModule } from '@angular/material/select';
 import { RouterLink } from '@angular/router';
 import * as bootstrap from 'bootstrap';
+import { CrmApiService } from '../../crm-api.service';
 
 interface TimelineActivity {
     id: number;
@@ -59,6 +60,11 @@ export class LeadListComponent implements OnInit {
     searchQuery: string = '';
     loading: boolean = true;
     selectedFilter: string = 'all';
+    statusMap: { [key: number]: string } = {}; // Map to store status ID to name mapping
+    leadSourceOptions: any[] = [];
+    leadTypeOptions: any[] = [];
+    statusOptions: any[] = [];
+    users: any[] = []; // Array to store user list
 
     newLead: any = {
         name: '',
@@ -69,16 +75,14 @@ export class LeadListComponent implements OnInit {
         notes: '',
         document: null,
         company: '',
-        assignedTo: '',  // Store the username directly
+        assignedTo: '',  // Store the user ID
+        country: '',
+        state: 1,
+        city: '',
+        status: 1,
+        attachment: '',
+        deleted: false
     };
-
-    users = [
-        'John Doe',
-        'Jane Smith',
-        'Robert Johnson',
-        'Emily Davis',
-        'Michael Wilson'
-    ];
 
     leadTypes = ['Hot', 'Warm', 'Cold']; // Available lead types
 
@@ -194,100 +198,100 @@ export class LeadListComponent implements OnInit {
         }
     ];
 
-    constructor() { }
+    constructor(private api: CrmApiService) { }
 
     ngOnInit(): void {
-        this.loadHardcodedLeads();
-        this.filterLeads();
+        this.getLeads();
+        this.loadStatuses();
+        this.loadLeadSources();
+        this.loadLeadTypes();
+        this.getLeadById(1);
+        this.getUsers();
     }
 
-    loadHardcodedLeads(): void {
-        this.leads = [
-            {
-                id: 'L001',
-                name: 'Aarav Patel',
-                email: 'aarav.patel@example.com',
-                phone: '9123456780',
-                leadSource: 'Website',
-                leadType: 'Hot Lead',
-                company: 'Myrah Consulting Services Pvt Ltd',
-                status: 'New',
-                createdDate: '2024-02-01',
-                notes: 'Interested in product demo',
-                imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Aarav Patel',
-                assignedTo: 'John Doe'  // Example
-            },
-            {
-                id: 'L002',
-                name: 'Aanya Singh',
-                email: 'aanya.singh@example.com',
-                phone: '9123456781',
-                leadSource: 'Referral',
-                leadType: 'Cold Lead',
-                company: 'Esarwa Infosoft Pvt Ltd',
-                status: 'Contacted',
-                createdDate: '2024-02-02',
-                notes: 'Follow-up required',
-                imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Aanya Singh',
-                assignedTo: 'Jane Smith'
-            },
-            {
-                id: 'L003',
-                name: 'Advait Sharma',
-                email: 'advait.sharma@example.com',
-                phone: '9123456782',
-                leadSource: 'Social Media',
-                leadType: 'Warm Lead',
-                company: 'Company 3',
-                status: 'Qualified',
-                createdDate: '2024-02-03',
-                notes: 'Interested in product demo',
-                imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Advait Sharma',
-                 assignedTo: 'Robert Johnson'
-            },
-            {
-                id: 'L004',
-                name: 'Ananya Gupta',
-                email: 'ananya.gupta@example.com',
-                phone: '9123456783',
-                leadSource: 'Email Campaign',
-                leadType: 'Hot Lead',
-                company: 'Company 4',
-                status: 'New',
-                createdDate: '2024-02-04',
-                notes: 'Follow-up required',
-                imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Ananya Gupta',
-                 assignedTo: 'Emily Davis'
-            },
-            {
-                id: 'L005',
-                name: 'Arjun Kumar',
-                email: 'arjun.kumar@example.com',
-                phone: '9123456784',
-                leadSource: 'Event',
-                leadType: 'Cold Lead',
-                company: 'Company 5',
-                status: 'Contacted',
-                createdDate: '2024-02-05',
-                notes: 'Interested in product demo',
-                imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Arjun Kumar',
-                 assignedTo: 'Michael Wilson'
-            },
-            { id: 'L011', name: 'Riya Mehta', email: 'riya.mehta@example.com', phone: '9123456790', leadSource: 'Website', leadType: 'Cold Lead', company: 'Company 11', status: 'Contacted', createdDate: '2024-02-11', notes: 'Requested brochure', imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Riya Mehta',  assignedTo: 'John Doe' },
-            { id: 'L012', name: 'Yash Verma', email: 'yash.verma@example.com', phone: '9123456791', leadSource: 'Referral', leadType: 'Warm Lead', company: 'Company 12', status: 'Qualified', createdDate: '2024-02-12', notes: 'Interested in partnership', imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Yash Verma',  assignedTo: 'Jane Smith' },
-            { id: 'L013', name: 'Sanya Kapoor', email: 'sanya.kapoor@example.com', phone: '9123456792', leadSource: 'Social Media', leadType: 'Hot Lead', company: 'Company 13', status: 'New', createdDate: '2024-02-13', notes: 'Wants product demo', imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Sanya Kapoor',  assignedTo: 'Robert Johnson' },
-            { id: 'L014', name: 'Ayaan Malik', email: 'ayaan.malik@example.com', phone: '9123456793', leadSource: 'Event', leadType: 'Cold Lead', company: 'Company 14', status: 'Contacted', createdDate: '2024-02-14', notes: 'Asked for pricing details', imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Ayaan Malik',  assignedTo: 'Emily Davis' },
-            { id: 'L015', name: 'Ishita Bansal', email: 'ishita.bansal@example.com', phone: '9123456794', leadSource: 'Website', leadType: 'Warm Lead', company: 'Company 15', status: 'Qualified', createdDate: '2024-02-15', notes: 'Looking for long-term contract', imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Ishita Bansal',  assignedTo: 'Michael Wilson' },
 
-            // Add more leads as needed (up to 25)
-        ];
+    loadStatuses() {
+        this.api.getAllStatus().subscribe({
+            next: (response: any) => {
+                if (response.data) {
+                    // Create a map of status ID to status name
+                    this.statusMap = response.data.reduce((acc: any, status: any) => {
+                        acc[status.id] = status.name;
+                        return acc;
+                    }, {});
+                }
 
-        this.filterLeads();
-        this.loading = false; // Stop skeleton loading
+            },
+            error: (error) => {
+                console.error('Error loading statuses:', error);
+            }
+        });
+    }
+
+    loadLeadSources() {
+        this.api.get('api/GetAllLeadSource/').subscribe({
+            next: (response: any) => {
+                if (response.data) {
+                    this.leadSourceOptions = response.data;
+                }
+            },
+            error: (error) => {
+                console.error('Error loading lead sources:', error);
+            }
+        });
+    }
+
+    loadLeadTypes() {
+        this.api.get('api/GetAllLeadType/').subscribe({
+            next: (response: any) => {
+                if (response.data) {
+                    this.leadTypeOptions = response.data;
+                }
+            },
+            error: (error) => {
+                console.error('Error loading lead types:', error);
+            }
+        });
+    }
+
+    getLeads() {
+        this.loading = true;
+        this.api.post('api/GetAllLead/s=', null).subscribe((res: any) => {
+            this.leads = res.data.map((lead: any) => ({
+                id: lead.id,
+                name: lead.leadName,
+                email: lead.email,
+                phone: lead.phone,
+                leadSource: lead.leadSourceName,
+                leadType: lead.leadTypeName,
+                company: lead.country || 'N/A',
+                status: this.statusMap[lead.status_id] || lead.statusName,
+                createdDate: lead.created_at,
+                notes: lead.notes || '',
+                imageUrl: `https://api.dicebear.com/7.x/initials/svg?seed=${lead.leadName}`,
+                assignedTo: lead.assignedtoName || 'Unassigned',
+                assignedTo_id: lead.assignedTo_id,
+                country: lead.country,
+                city: lead.city,
+                state_id: lead.state_id,
+                leadSource_id: lead.leadSource_id,
+                leadType_id: lead.leadType_id,
+                status_id: lead.status_id,
+                attachment: lead.attachment
+            }));
+            this.filterLeads();
+            this.loading = false;
+        });
     }
 
     toggleView(mode: 'list' | 'grid'): void {
         this.displayMode = mode;
+    }
+
+    getLeadById(id: number): void {
+        this.api.getLeadById(id).subscribe((res: any) => {
+            console.log(res);
+        });
     }
 
     filterLeads(): void {
@@ -359,31 +363,92 @@ export class LeadListComponent implements OnInit {
         this.applyPagination();
     }
 
-    onFileSelect(event: any) {
-        if (event.target.files.length > 0) {
-            this.newLead.document = event.target.files[0];
+    onFileSelected(event: any) {
+        const file = event.target.files[0];
+        if (file) {
+            // Store the file object
+            this.newLead.attachment = file;
         }
     }
 
     createLead() {
-        if (!this.newLead.name || !this.newLead.number || !this.newLead.email) {
-            alert('Name, Number, and Email are required.');
+        if (!this.validateLeadForm()) {
             return;
         }
 
-        console.log('Lead Created:', this.newLead);
+        // Create base lead data without attachment
+        const leadData: any = {
+            leadName: this.newLead.name,
+            email: this.newLead.email,
+            phone: this.newLead.number,
+            country: this.newLead.country,
+            state: this.newLead.state,
+            city: this.newLead.city,
+            leadSource: this.newLead.leadSource,
+            leadType: this.newLead.leadType,
+            notes: this.newLead.notes,
+            status: this.newLead.status,
+            assignedTo: this.newLead.assignedTo, // This will be the user ID
+            deleted: false
+        };
 
-        const modalElement = document.getElementById('createLeadModal');
-        if (modalElement) {
-            const modal = bootstrap.Modal.getInstance(modalElement);
-            if (modal) {
-                modal.hide();
-            } else {
-                const newModal = new bootstrap.Modal(modalElement);
-                newModal.hide();
-            }
+        // Only add attachment if it exists
+        if (this.newLead.attachment) {
+            leadData.attachment = this.newLead.attachment;
         }
 
+        if (this.selectedLead) {
+            // Update existing lead
+            this.api.updateLead(this.selectedLead.id, leadData).subscribe({
+                next: (response) => {
+                    if (response.success) {
+                        alert('Lead updated successfully!');
+                        this.resetLeadForm();
+                        this.getLeads();
+                        const modalElement = document.getElementById('createLeadModal');
+                        if (modalElement) {
+                            const modal = bootstrap.Modal.getInstance(modalElement);
+                            if (modal) {
+                                modal.hide();
+                            }
+                        }
+                    } else {
+                        alert('Failed to update lead. Please try again.');
+                    }
+                },
+                error: (error) => {
+                    console.error('Error updating lead:', error);
+                    alert('Error updating lead. Please try again.');
+                }
+            });
+        } else {
+            // Create new lead
+            this.api.createLead(leadData).subscribe({
+                next: (response) => {
+                    if (response.success) {
+                        alert('Lead created successfully!');
+                        this.resetLeadForm();
+                        this.getLeads();
+                        const modalElement = document.getElementById('createLeadModal');
+                        if (modalElement) {
+                            const modal = bootstrap.Modal.getInstance(modalElement);
+                            if (modal) {
+                                modal.hide();
+                            }
+                        }
+                    } else {
+                        alert('Failed to create lead. Please try again.');
+                    }
+                },
+                error: (error) => {
+                    console.error('Error creating lead:', error);
+                    alert('Error creating lead. Please try again.');
+                }
+            });
+        }
+    }
+
+    resetLeadForm() {
         this.newLead = {
             name: '',
             number: '',
@@ -393,8 +458,29 @@ export class LeadListComponent implements OnInit {
             notes: '',
             document: null,
             company: '',
-            assignedTo: '',  // Reset assignedTo (username)
+            assignedTo: '',
+            country: '',
+            state: 1,
+            city: '',
+            status: 1,
+            attachment: '',
+            deleted: false
         };
+        this.selectedLead = null;
+
+        // Reset modal title
+        const modalTitle = document.getElementById('createLeadModalLabel');
+        if (modalTitle) {
+            modalTitle.textContent = 'Create New Lead';
+        }
+    }
+
+    validateLeadForm(): boolean {
+        if (!this.newLead.name || !this.newLead.email || !this.newLead.number) {
+            alert('Please fill in all required fields');
+            return false;
+        }
+        return true;
     }
 
     openFollowUpModal(lead: any, event: Event) {
@@ -433,11 +519,62 @@ export class LeadListComponent implements OnInit {
         // Add logic to save follow-up data
     }
 
-        //Delete lead logic
     deleteLead(leadId: string, event: Event) {
         event.stopPropagation();
-        this.leads = this.leads.filter(lead => lead.id !== leadId);
-        this.filterLeads();
+        if (confirm('Are you sure you want to delete this lead?')) {
+            this.api.get(`api/DeleteLead/${leadId}`, null).subscribe((res: any) => {
+                if (res.status == 200) {
+                    this.getLeads();
+                }
+            });
+        }
+    }
+
+    editLead(lead: any) {
+        // Get lead details first
+        this.api.getLeadById(lead.id).subscribe({
+            next: (response: any) => {
+                if (response.data) {
+                    // Populate the form with lead data
+                    this.newLead = {
+                        name: response.data.leadName,
+                        number: response.data.phone,
+                        email: response.data.email,
+                        company: response.data.company,
+                        country: response.data.country,
+                        state: response.data.state,
+                        city: response.data.city,
+                        leadSource: response.data.leadSource_id,
+                        leadType: response.data.leadType_id,
+                        notes: response.data.notes,
+                        status: response.data.status_id,
+                        assignedTo: response.data.assignedTo_id, // This will be the user ID
+                        attachment: response.data.attachment,
+                        deleted: response.data.deleted
+                    };
+
+                    // Store the lead ID for update
+                    this.selectedLead = lead;
+
+                    // Open the modal
+                    const modalElement = document.getElementById('createLeadModal');
+                    if (modalElement) {
+                        const modal = new bootstrap.Modal(modalElement);
+                        modal.show();
+                    }
+
+                    // Update modal title
+                    const modalTitle = document.getElementById('createLeadModalLabel');
+                    if (modalTitle) {
+                        modalTitle.textContent = 'Edit Lead';
+                    }
+                }
+            },
+            error: (error) => {
+                console.error('Error fetching lead details:', error);
+                alert('Error fetching lead details. Please try again.');
+            }
+        });
     }
 
     getTimelineActivitiesByDate(date: string): TimelineActivity[] {
@@ -454,5 +591,27 @@ export class LeadListComponent implements OnInit {
 
     getIconBgClass(activity: TimelineActivity): string {
         return `bg-${activity.iconColor}`;
+    }
+
+    getUsers() {
+        this.api.get('api/GetAllEmployee/', null).subscribe((res: any) => {
+            if (res.data) {
+                this.users = res.data.map((user: any) => ({
+                    id: user.id,
+                    name: user.full_name,
+                    email: user.email,
+                    mobile_no: user.mobile_no,
+                    role_name: user.role_name,
+                    department_name: user.department_name,
+                    branch_name: user.branch_name,
+                    designation_name: user.designation_name
+                }));
+                console.log('Users loaded:', this.users);
+            }
+        });
+    }
+
+    getUserDetails(userId: number): any {
+        return this.users.find(user => user.id === userId);
     }
 }

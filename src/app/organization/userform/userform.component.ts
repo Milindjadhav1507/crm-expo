@@ -10,6 +10,13 @@ import { CrmApiService } from '../../crm-api.service';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { UserListComponent } from '../user-list/user-list.component';
 
+interface Role {
+  id: number;
+  name: string;
+  description: string;
+  level: number;
+}
+
 @Component({
   selector: 'app-userform',
   standalone: true,
@@ -19,90 +26,132 @@ import { UserListComponent } from '../user-list/user-list.component';
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
-    MatButtonModule,MatCardContent,MatCardTitle,MatCardHeader,MatCard,NgFor
+    MatButtonModule,
+    MatCardContent,
+    MatCardTitle,
+    MatCardHeader,
+    MatCard,
+    NgFor
   ],
   templateUrl: './userform.component.html',
   styleUrls: ['./userform.component.scss']
 })
 export class UserformComponent implements OnInit {
   userForm: FormGroup;
-  roles: string[] = ['Admin', 'Manager', 'User']; // This should be fetched from your role service
+  roles: Role[] = [];
   designationData: any;
   departmentData: any;
-  rolesdata: any;
-  branchData:any
-  constructor(private fb: FormBuilder,private api:CrmApiService,
-     @Optional() public dialogRef: MatDialogRef<UserListComponent,any>,
-                    @Optional()  @Inject(MAT_DIALOG_DATA) public data: any
+  branchData: any;
+
+  constructor(
+    private fb: FormBuilder,
+    private api: CrmApiService,
+    @Optional() public dialogRef: MatDialogRef<UserformComponent>,
+    @Optional() @Inject(MAT_DIALOG_DATA) public data: any
   ) {
     this.userForm = this.fb.group({
-      first_name: ['', [Validators.required]],
-      last_name: ['', [Validators.required]],
+      first_name: ['', Validators.required],
+      last_name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      mobile_no: [''],
-      role: ['', [Validators.required]],
-      // password: [''],
-      department: ['', [Validators.required]],
-      designation: ['', [Validators.required]],
-      branch: ['', [Validators.required]],
+      mobile_no: ['', Validators.required],
+      role_id: [null, Validators.required],
+      department_id: [null],
+      branch_id: [null],
+      designation_id: [null, Validators.required]
+    });
+    this.initForm();
+  }
+
+  ngOnInit() {
+    this.getrole();
+    this.getDepartment();
+    this.getBranch();
+    this.getDesignation();
+  }
+
+  initForm() {
+    if (this.data) {
+      this.userForm.patchValue(this.data);
+    }
+  }
+
+  getrole() {
+    this.api.getRoles('').subscribe({
+      next: (res: any) => {
+        if (res && res.data) {
+          this.roles = res.data.map((role: any) => ({
+            id: role.id,
+            name: role.name,
+            description: role.description,
+            level: role.level
+          }));
+          console.log('Roles loaded in form:', this.roles);
+          
+          // If we have data for editing, set the role
+          if (this.data && this.data.role_id) {
+            this.userForm.patchValue({
+              role_id: this.data.role_id
+            });
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Error loading roles:', error);
+      }
     });
   }
 
-  ngOnInit(): void {
-    // You can fetch roles from your service here
-    this.getdesignation();
-    this.getdepartmentall();
-    this.getrole();
-    this.branchget()
-    if (this.data!=null) {
-      this.getparticularuser()}
-  }
-  getparticularuser(){
-    this.api.get('api/particular_employee/'+this.data.userId+'/').subscribe((res:any)=>{
-      this.userForm.patchValue(res.data)
-    })
-  }
-  branchget() {
-    this.api.post('api/allbranch/s=',null).subscribe((res:any)=>{
-      this.branchData=res.data
-    })
-  }
-  getdesignation(){
-    this.api.post('api/designation_level/',null).subscribe((res:any)=>{
-     
-      this.designationData = res.data;
-
-    })
-  }
-  getdepartmentall(){
-      this.api.post('api/get_departments/s=',null).subscribe((res:any)=>{
-       
-        this.departmentData = res.data;
-        
-      })
-    }
-    getrole(){
-      this.api.post('api/roles_level/',null).subscribe((res:any)=>{
-        console.log(res)
-        this.rolesdata = res.data;
-      })
-    }
-  onSubmit(): void {
-    console.log(this.userForm.value);
-    if (this.userForm.valid) {
-      console.log(this.userForm.value);
-      if(this.data==null){
-      // Add your API call here to save the user
-      this.api.post('api/create_employee/',this.userForm.value).subscribe((res:any) => { 
-        if (res.status==200){
-          console.log('User created successfully:', res);
+  getDepartment() {
+    this.api.post('api/get_departments/s=', null).subscribe({
+      next: (res: any) => {
+        this.departmentData = res.data || [];
+        if (this.data && this.data.department_id) {
+          this.userForm.patchValue({
+            department_id: this.data.department_id
+          });
         }
-      });}else{
-        this.api.post('api/edit_employee/'+this.data.userId+'/',this.userForm.value).subscribe((res:any) => { 
-        if (res.status==200){
-          console.log('User updated successfully:', res);
-        }})
+      },
+      error: (error) => {
+        console.error('Error loading departments:', error);
       }
+    });
+  }
+
+  getBranch() {
+    this.api.post('api/allbranch/s=', null).subscribe({
+      next: (res: any) => {
+        this.branchData = res.data || [];
+        if (this.data && this.data.branch_id) {
+          this.userForm.patchValue({
+            branch_id: this.data.branch_id
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Error loading branches:', error);
+      }
+    });
+  }
+
+  getDesignation() {
+    this.api.post('api/designation_level/', null).subscribe({
+      next: (res: any) => {
+        this.designationData = res.data || [];
+        if (this.data && this.data.designation_id) {
+          this.userForm.patchValue({
+            designation_id: this.data.designation_id
+          });
+        }
+      },
+      error: (error) => {
+        console.error('Error loading designations:', error);
+      }
+    });
+  }
+
+  onSubmit() {
+    if (this.userForm.valid) {
+      this.dialogRef.close(this.userForm.value);
     }
   }
 }

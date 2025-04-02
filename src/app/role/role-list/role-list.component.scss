@@ -1,0 +1,65 @@
+.container-fluid {
+  padding: 20px;
+}
+
+.mat-mdc-card {
+  margin-bottom: 20px;
+}
+
+.table-responsive {
+  margin-bottom: 20px;
+}
+
+.mat-mdc-table {
+  width: 100%;
+}
+
+.mat-column-actions {
+  width: 100px;
+  text-align: center;
+}
+
+.mat-mdc-row:hover {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+.mat-mdc-header-cell {
+  font-weight: bold;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.mat-mdc-cell {
+  padding: 16px;
+}
+
+.mat-icon-button {
+  margin: 0 4px;
+}
+
+.modal-dialog {
+  max-width: 500px;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.btn-close {
+  padding: 1rem;
+  margin: -0.5rem -0.5rem -0.5rem auto;
+}
+
+.modal-footer {
+  padding: 1rem;
+  border-top: 1px solid #dee2e6;
+}
+
+.modal-header {
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.modal-body {
+  padding: 1rem;
+} 

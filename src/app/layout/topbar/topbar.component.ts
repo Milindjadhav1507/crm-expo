@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatDividerModule } from '@angular/material/divider';
 import { CrmApiService } from '../../crm-api.service';
 import { filter } from 'rxjs/operators';
+
 import { AuthService } from '../../auth/auth.service';
 
 interface UserData {
@@ -37,7 +38,9 @@ export class TopbarComponent implements OnInit {
   userData: UserData | null = null;
   thisIsMyData: any;
 
+
   constructor(private router: Router, private api: CrmApiService,private authService: AuthService) {
+
     // Listen to route changes
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
@@ -76,6 +79,7 @@ export class TopbarComponent implements OnInit {
   }
 
   logout() {
+
     // localStorage.clear(); // Clear any stored tokens/data
     // this.router.navigate(['/login']);
     this.authService.logout();
@@ -87,3 +91,4 @@ export class TopbarComponent implements OnInit {
   //   this.sidenav.close();
   // }
 }
+
