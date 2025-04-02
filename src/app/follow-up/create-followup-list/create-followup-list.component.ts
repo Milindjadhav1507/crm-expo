@@ -63,7 +63,7 @@ export class CreateFollowupListComponent {
   selectedFile: File | null = null;
 
   constructor(private dialog: MatDialog, private fb: FormBuilder) {
-    this.loadHardcodedLeads(); 
+    this.loadHardcodedLeads();
     this.filterLeads(); // Apply initial filter// Load hardcoded data
     this.selectedLead = this.filteredLeads[0]; // Set the first lead as selected by default
     this.editForm = this.fb.group({
@@ -75,7 +75,7 @@ export class CreateFollowupListComponent {
     });
   }
 
-  
+
 
    // Open the edit modal
    openEditModal(lead: any): void {
@@ -117,7 +117,7 @@ export class CreateFollowupListComponent {
 
   statusOptions: string[] = ['All', 'New', 'Contacted', 'Qualified'];
 
- 
+
 
   loadHardcodedLeads(): void {
     this.leads = [
@@ -532,17 +532,17 @@ export class CreateFollowupListComponent {
         ],
         meetings: []
       },
-      { 
-        id: 'L011', 
-        name: 'Riya Mehta', 
-        email: 'riya.mehta@example.com', 
-        phone: '9123456790', 
-        leadSource: 'Website', 
-        leadType: 'Cold Lead', 
-        company: 'Company 11', 
-        status: 'Contacted', 
-        createdDate: '2024-02-11', 
-        notes: 'Requested brochure', 
+      {
+        id: 'L011',
+        name: 'Riya Mehta',
+        email: 'riya.mehta@example.com',
+        phone: '9123456790',
+        leadSource: 'Website',
+        leadType: 'Cold Lead',
+        company: 'Company 11',
+        status: 'Contacted',
+        createdDate: '2024-02-11',
+        notes: 'Requested brochure',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Riya Mehta',
         activities: [
           {
@@ -569,17 +569,17 @@ export class CreateFollowupListComponent {
         ],
         meetings: []
       },
-      { 
-        id: 'L012', 
-        name: 'Yash Verma', 
-        email: 'yash.verma@example.com', 
-        phone: '9123456791', 
-        leadSource: 'Referral', 
-        leadType: 'Warm Lead', 
-        company: 'Company 12', 
-        status: 'Qualified', 
-        createdDate: '2024-02-12', 
-        notes: 'Interested in partnership', 
+      {
+        id: 'L012',
+        name: 'Yash Verma',
+        email: 'yash.verma@example.com',
+        phone: '9123456791',
+        leadSource: 'Referral',
+        leadType: 'Warm Lead',
+        company: 'Company 12',
+        status: 'Qualified',
+        createdDate: '2024-02-12',
+        notes: 'Interested in partnership',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Yash Verma',
         activities: [
           {
@@ -606,17 +606,17 @@ export class CreateFollowupListComponent {
         ],
         meetings: []
       },
-      { 
-        id: 'L013', 
-        name: 'Sanya Kapoor', 
-        email: 'sanya.kapoor@example.com', 
-        phone: '9123456792', 
-        leadSource: 'Social Media', 
-        leadType: 'Hot Lead', 
-        company: 'Company 13', 
-        status: 'New', 
-        createdDate: '2024-02-13', 
-        notes: 'Wants product demo', 
+      {
+        id: 'L013',
+        name: 'Sanya Kapoor',
+        email: 'sanya.kapoor@example.com',
+        phone: '9123456792',
+        leadSource: 'Social Media',
+        leadType: 'Hot Lead',
+        company: 'Company 13',
+        status: 'New',
+        createdDate: '2024-02-13',
+        notes: 'Wants product demo',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Sanya Kapoor',
         activities: [
           {
@@ -650,191 +650,191 @@ export class CreateFollowupListComponent {
         ],
         meetings: []
       },
-      { 
-        id: 'L014', 
-        name: 'Ayaan Malik', 
-        email: 'ayaan.malik@example.com', 
-        phone: '9123456793', 
-        leadSource: 'Event', 
-        leadType: 'Cold Lead', 
-        company: 'Company 14', 
-        status: 'Contacted', 
-        createdDate: '2024-02-14', 
-        notes: 'Asked for pricing details', 
+      {
+        id: 'L014',
+        name: 'Ayaan Malik',
+        email: 'ayaan.malik@example.com',
+        phone: '9123456793',
+        leadSource: 'Event',
+        leadType: 'Cold Lead',
+        company: 'Company 14',
+        status: 'Contacted',
+        createdDate: '2024-02-14',
+        notes: 'Asked for pricing details',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Ayaan Malik',
         activities: [],
         meetings: []
       },
-      { 
-        id: 'L015', 
-        name: 'Ishita Bansal', 
-        email: 'ishita.bansal@example.com', 
-        phone: '9123456794', 
-        leadSource: 'Website', 
-        leadType: 'Warm Lead', 
-        company: 'Company 15', 
-        status: 'Qualified', 
-        createdDate: '2024-02-15', 
-        notes: 'Looking for long-term contract', 
+      {
+        id: 'L015',
+        name: 'Ishita Bansal',
+        email: 'ishita.bansal@example.com',
+        phone: '9123456794',
+        leadSource: 'Website',
+        leadType: 'Warm Lead',
+        company: 'Company 15',
+        status: 'Qualified',
+        createdDate: '2024-02-15',
+        notes: 'Looking for long-term contract',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Ishita Bansal',
         activities: [],
         meetings: []
       },
-      { 
-        id: 'L016', 
-        name: 'Kabir Sethi', 
-        email: 'kabir.sethi@example.com', 
-        phone: '9123456795', 
-        leadSource: 'Referral', 
-        leadType: 'Hot Lead', 
-        company: 'Company 16', 
-        status: 'New', 
-        createdDate: '2024-02-16', 
-        notes: 'Interested in bulk order', 
+      {
+        id: 'L016',
+        name: 'Kabir Sethi',
+        email: 'kabir.sethi@example.com',
+        phone: '9123456795',
+        leadSource: 'Referral',
+        leadType: 'Hot Lead',
+        company: 'Company 16',
+        status: 'New',
+        createdDate: '2024-02-16',
+        notes: 'Interested in bulk order',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Kabir Sethi',
         activities: [],
         meetings: []
       },
-      { 
-        id: 'L017', 
-        name: 'Meera Nair', 
-        email: 'meera.nair@example.com', 
-        phone: '9123456796', 
-        leadSource: 'Social Media', 
-        leadType: 'Cold Lead', 
-        company: 'Company 17', 
-        status: 'Contacted', 
-        createdDate: '2024-02-17', 
-        notes: 'Requested price quote', 
+      {
+        id: 'L017',
+        name: 'Meera Nair',
+        email: 'meera.nair@example.com',
+        phone: '9123456796',
+        leadSource: 'Social Media',
+        leadType: 'Cold Lead',
+        company: 'Company 17',
+        status: 'Contacted',
+        createdDate: '2024-02-17',
+        notes: 'Requested price quote',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Meera Nair',
         activities: [],
         meetings: []
       },
-      { 
-        id: 'L018', 
-        name: 'Rajesh Khanna', 
-        email: 'rajesh.khanna@example.com', 
-        phone: '9123456797', 
-        leadSource: 'Website', 
-        leadType: 'Warm Lead', 
-        company: 'Company 18', 
-        status: 'Qualified', 
-        createdDate: '2024-02-18', 
-        notes: 'Looking for demo session', 
+      {
+        id: 'L018',
+        name: 'Rajesh Khanna',
+        email: 'rajesh.khanna@example.com',
+        phone: '9123456797',
+        leadSource: 'Website',
+        leadType: 'Warm Lead',
+        company: 'Company 18',
+        status: 'Qualified',
+        createdDate: '2024-02-18',
+        notes: 'Looking for demo session',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Rajesh Khanna',
         activities: [],
         meetings: []
       },
-      { 
-        id: 'L019', 
-        name: 'Simran Chatterjee', 
-        email: 'simran.chatterjee@example.com', 
-        phone: '9123456798', 
-        leadSource: 'Email Campaign', 
-        leadType: 'Hot Lead', 
-        company: 'Company 19', 
-        status: 'New', 
-        createdDate: '2024-02-19', 
-        notes: 'Wants product samples', 
+      {
+        id: 'L019',
+        name: 'Simran Chatterjee',
+        email: 'simran.chatterjee@example.com',
+        phone: '9123456798',
+        leadSource: 'Email Campaign',
+        leadType: 'Hot Lead',
+        company: 'Company 19',
+        status: 'New',
+        createdDate: '2024-02-19',
+        notes: 'Wants product samples',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Simran Chatterjee',
         activities: [],
         meetings: []
       },
-      { 
-        id: 'L020', 
-        name: 'Devendra Yadav', 
-        email: 'devendra.yadav@example.com', 
-        phone: '9123456799', 
-        leadSource: 'Event', 
-        leadType: 'Cold Lead', 
-        company: 'Company 20', 
-        status: 'Contacted', 
-        createdDate: '2024-02-20', 
-        notes: 'Asked for company profile', 
+      {
+        id: 'L020',
+        name: 'Devendra Yadav',
+        email: 'devendra.yadav@example.com',
+        phone: '9123456799',
+        leadSource: 'Event',
+        leadType: 'Cold Lead',
+        company: 'Company 20',
+        status: 'Contacted',
+        createdDate: '2024-02-20',
+        notes: 'Asked for company profile',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Devendra Yadav',
         activities: [],
         meetings: []
       },
-      { 
-        id: 'L021', 
-        name: 'Neha Saxena', 
-        email: 'neha.saxena@example.com', 
-        phone: '9123456800', 
-        leadSource: 'Website', 
-        leadType: 'Warm Lead', 
-        company: 'Company 21', 
-        status: 'Qualified', 
-        createdDate: '2024-02-21', 
-        notes: 'Needs follow-up', 
+      {
+        id: 'L021',
+        name: 'Neha Saxena',
+        email: 'neha.saxena@example.com',
+        phone: '9123456800',
+        leadSource: 'Website',
+        leadType: 'Warm Lead',
+        company: 'Company 21',
+        status: 'Qualified',
+        createdDate: '2024-02-21',
+        notes: 'Needs follow-up',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Neha Saxena',
         activities: [],
         meetings: []
       },
-      { 
-        id: 'L022', 
-        name: 'Aryan Joshi', 
-        email: 'aryan.joshi@example.com', 
-        phone: '9123456801', 
-        leadSource: 'Referral', 
-        leadType: 'Hot Lead', 
-        company: 'Company 22', 
-        status: 'New', 
-        createdDate: '2024-02-22', 
-        notes: 'Interested in partnership', 
+      {
+        id: 'L022',
+        name: 'Aryan Joshi',
+        email: 'aryan.joshi@example.com',
+        phone: '9123456801',
+        leadSource: 'Referral',
+        leadType: 'Hot Lead',
+        company: 'Company 22',
+        status: 'New',
+        createdDate: '2024-02-22',
+        notes: 'Interested in partnership',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Aryan Joshi',
         activities: [],
         meetings: []
       },
-      { 
-        id: 'L023', 
-        name: 'Tara Iyer', 
-        email: 'tara.iyer@example.com', 
-        phone: '9123456802', 
-        leadSource: 'Social Media', 
-        leadType: 'Cold Lead', 
-        company: 'Company 23', 
-        status: 'Contacted', 
-        createdDate: '2024-02-23', 
-        notes: 'Requested free trial', 
+      {
+        id: 'L023',
+        name: 'Tara Iyer',
+        email: 'tara.iyer@example.com',
+        phone: '9123456802',
+        leadSource: 'Social Media',
+        leadType: 'Cold Lead',
+        company: 'Company 23',
+        status: 'Contacted',
+        createdDate: '2024-02-23',
+        notes: 'Requested free trial',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Tara Iyer',
         activities: [],
         meetings: []
       },
-      { 
-        id: 'L024', 
-        name: 'Harsh Vardhan', 
-        email: 'harsh.vardhan@example.com', 
-        phone: '9123456803', 
-        leadSource: 'Email Campaign', 
-        leadType: 'Warm Lead', 
-        company: 'Company 24', 
-        status: 'Qualified', 
-        createdDate: '2024-02-24', 
-        notes: 'Looking for exclusive deal', 
+      {
+        id: 'L024',
+        name: 'Harsh Vardhan',
+        email: 'harsh.vardhan@example.com',
+        phone: '9123456803',
+        leadSource: 'Email Campaign',
+        leadType: 'Warm Lead',
+        company: 'Company 24',
+        status: 'Qualified',
+        createdDate: '2024-02-24',
+        notes: 'Looking for exclusive deal',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Harsh Vardhan',
         activities: [],
         meetings: []
       },
-      { 
-        id: 'L025', 
-        name: 'Radhika Rao', 
-        email: 'radhika.rao@example.com', 
-        phone: '9123456804', 
-        leadSource: 'Event', 
-        leadType: 'Hot Lead', 
-        company: 'Company 25', 
-        status: 'New', 
-        createdDate: '2024-02-25', 
-        notes: 'Asked about warranty', 
+      {
+        id: 'L025',
+        name: 'Radhika Rao',
+        email: 'radhika.rao@example.com',
+        phone: '9123456804',
+        leadSource: 'Event',
+        leadType: 'Hot Lead',
+        company: 'Company 25',
+        status: 'New',
+        createdDate: '2024-02-25',
+        notes: 'Asked about warranty',
         imageUrl: 'https://api.dicebear.com/7.x/initials/svg?seed=Radhika Rao',
         activities: [],
         meetings: []
       }
     ];
-  
-    
+
+
   }
-  
+
   // Function to handle lead selection
   onSelectLead(lead: any): void {
     this.selectedLead = lead;
@@ -878,12 +878,12 @@ export class CreateFollowupListComponent {
       console.log('Follow-Up Data:', this.followUpData);
       // Add your logic to save the follow-up data
     }
-  
+
     // Cancel the follow-up
     onCancelFollowUp(): void {
       this.dialog.closeAll();
     }
-  
+
 
   // Save the edited lead
   onSaveEdit(): void {

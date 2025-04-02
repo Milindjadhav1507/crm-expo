@@ -17,9 +17,10 @@
             <span class="input-group-text bg-white border-end-0">
               <i class="fa fa-search text-muted"></i>
             </span>
-            <input type="text" class="form-control border-start-0 search-input" 
-                   placeholder="Search leads..." 
-                   [(ngModel)]="searchQuery" 
+            <input type="text" class="form-control border-start-0 search-input"
+                   placeholder="Search leads..."
+                   [(ngModel)]="searchQuery"
+
                    (input)="filterLeads()">
           </div>
     </div>
@@ -41,19 +42,22 @@
 
         <!-- Action Buttons -->
         <div class="col-md-4 text-md-end text-center">
+          <button class="btn btn-warning me-2">
+            <i class="fa fa-plus me-1"></i> Import Leads
+          </button>
           <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#createLeadModal">
             <i class="fa fa-plus me-1"></i> Create Lead
-      </button>
+          </button>
           <div class="btn-group">
-            <button class="btn btn-outline-primary view-toggle-btn" 
-                    [class.active]="displayMode === 'list'" 
+            <button class="btn btn-outline-primary view-toggle-btn"
+                    [class.active]="displayMode === 'list'"
         (click)="toggleView('list')">
-              <i class="fa fa-list me-1"></i> List
+              <i class="fa fa-list me-1"></i>
       </button>
-            <button class="btn btn-outline-primary view-toggle-btn" 
-                    [class.active]="displayMode === 'grid'" 
+            <button class="btn btn-outline-primary view-toggle-btn"
+                    [class.active]="displayMode === 'grid'"
         (click)="toggleView('grid')">
-              <i class="fa fa-th me-1"></i> Grid
+              <i class="fa fa-th me-1"></i>
       </button>
     </div>
         </div>

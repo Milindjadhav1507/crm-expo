@@ -236,7 +236,9 @@ fetchDashboardData() {
         },
         legend: {
           orient: 'vertical',
+
           left: 'left'
+
         },
         series: [
           {

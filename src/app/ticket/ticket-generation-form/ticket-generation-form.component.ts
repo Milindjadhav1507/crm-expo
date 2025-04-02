@@ -1,8 +1,8 @@
 import { CommonModule, NgFor, NgIf } from '@angular/common';
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, Inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatNativeDateModule, DateAdapter, MAT_DATE_LOCALE, MAT_DATE_FORMATS, NativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -12,6 +12,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { Ticket, TicketStatus } from '../ticket.interface';
 import { CrmApiService } from '../../crm-api.service';
+import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-ticket-generation-form',
@@ -25,10 +26,20 @@ import { CrmApiService } from '../../crm-api.service';
     MatButtonModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    MatIconModule,NgFor,NgIf
+    MatIconModule,
+    NgFor,
+    NgIf
+  ],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'en-US' },
+    { provide: MAT_DATE_FORMATS, useValue: {
+      parse: { dateInput: 'MM/DD/YYYY' },
+      display: { dateInput: 'MM/DD/YYYY' }
+    }},
+    { provide: DateAdapter, useClass: NativeDateAdapter }
   ],
   templateUrl: './ticket-generation-form.component.html',
-  styleUrls: ['./ticket-generation-form.component.scss']
+  styleUrls: ['./ticket-generation-form.component.scss'],
 })
 export class TicketGenerationFormComponent implements OnInit {
   @Input() ticket: Ticket | null = null;
@@ -36,6 +47,7 @@ export class TicketGenerationFormComponent implements OnInit {
   ticketForm!: FormGroup;
   isSubmitting = false;
   maxDate = new Date();
+  isEditMode = false;
 
   // priorities = [
   //   { value: 'high', label: 'High' },
@@ -51,11 +63,15 @@ export class TicketGenerationFormComponent implements OnInit {
   //   { value: 'other', label: 'Other' }
   // ];
 categories:any
+  statuses: any;
+
   constructor(
     private fb: FormBuilder,
     private router: Router,
     private snackBar: MatSnackBar,
-    private api:CrmApiService
+    private api:CrmApiService,
+    @Inject(MAT_DIALOG_DATA) public data: { ticket: Ticket | null },
+    private dialogRef: MatDialogRef<TicketGenerationFormComponent>
   ) {
     this.initForm();
   }
@@ -64,19 +80,57 @@ categories:any
     // Any initialization logic
     this.ticketType()
     this.priority()
+    this.getStatuses()
+
+    if (this.data.ticket) {
+      this.isEditMode = true;
+      this.patchFormData(this.data.ticket);
+    }
+  }
+
+  private patchFormData(ticket: Ticket) {
+    const formData: any = {
+      title: ticket.title || '',
+      category: ticket.category || '',
+      priority: ticket.priority || '',
+      description: ticket.description || '',
+      contact_email: ticket.contact_email || '',
+      contact_phone: ticket.contact_phone || '',
+      additional_notes: ticket.additional_notes || '',
+      status: ticket.status || ''
+    };
+
+    // Handle expected_resolution_date
+    if (ticket.expected_resolution_date) {
+      try {
+        const date = new Date(ticket.expected_resolution_date);
+        if (!isNaN(date.getTime())) {
+          formData.expected_resolution_date = date;
+        }
+      } catch (error) {
+        console.error('Error parsing date:', error);
+      }
+    }
+
+    this.ticketForm.patchValue(formData);
   }
 
   ticketType(){
     this.api.get('ticket/getall_tickettypes/').subscribe((res:any)=>{
-      console.log(res);
       this.categories=res.data
     })
   }
   priority(){
     this.api.get('ticket/getall_priority/').subscribe((res:any)=>{
-      console.log(res);
       this.priorities=res.data
     })
+  }
+  getStatuses() {
+    this.api.get('ticket/getall_status/').subscribe((res: any) => {
+      if (res.status === 200 && res.data) {
+        this.statuses = res.data;
+      }
+    });
   }
   private initForm(): void {
     this.ticketForm = this.fb.group({
@@ -87,8 +141,9 @@ categories:any
       attachments: [],
       contact_email: ['', [Validators.email]],
       contact_phone: ['', [Validators.pattern('^[0-9]{10}$')]],
-      expected_resolution_date: [''],
-      additional_notes: ['']
+      expected_resolution_date: [null, [Validators.required]],
+      additional_notes: [''],
+      status: ['', Validators.required]
     });
   }
 
@@ -139,42 +194,49 @@ categories:any
     if (this.ticketForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       try {
-        const formData = this.ticketForm.value;
+        const formData = this.ticketForm.getRawValue();
+        let response;
 
-        const newTicket: Partial<Ticket> = {
-          title: formData.title,
-          category: formData.category,
-          priority: formData.priority,
-          description: formData.description,
-          attachments: formData.attachments || '',
-          contact_email: formData.contact_email || '',
-          contact_phone: formData.contact_phone || '',
-          expected_resolution_date: formData.expected_resolution_date || null,
-          additional_notes: formData.additional_notes || '',
-          // status: TicketStatus.OPEN,
-          // createdAt: new Date(),
-          // communicationHistory: []
+        // Format the date before sending
+        const formattedData = {
+          ...formData,
+          expected_resolution_date: formData.expected_resolution_date ?
+            this.formatDateForApi(formData.expected_resolution_date) : null
         };
 
-        // API call using async/await
-        const response = await this.api.post('ticket/create_ticket/', newTicket).toPromise();
-
-        if (response.status === 200) {
-          console.log('Ticket created successfully:', response);
+        if (this.isEditMode && this.data.ticket) {
+          const updatePayload = {
+            ...formattedData,
+            id: this.data.ticket.id,
+            status_id: formData.status
+          };
+          response = await this.api.post(`ticket/update_ticket/`, updatePayload).toPromise();
+          this.snackBar.open('Ticket updated successfully!', 'Close', {
+            duration: 3000,
+            horizontalPosition: 'end',
+            verticalPosition: 'top'
+          });
+        } else {
+          const createPayload = {
+            ...formattedData,
+            status_id: formData.status
+          };
+          response = await this.api.post('ticket/create_ticket/', createPayload).toPromise();
           this.snackBar.open('Ticket created successfully!', 'Close', {
             duration: 3000,
             horizontalPosition: 'end',
             verticalPosition: 'top'
           });
+        }
 
-          this.ticketCreated.emit(response.data); // Emit the created ticket
-          this.router.navigate(['/tickets']);
+        if (response.status === 200) {
+          this.ticketCreated.emit(response.data);
+          this.dialogRef.close(response.data);
         } else {
           throw new Error('Unexpected response from server');
         }
       } catch (error) {
-        console.error('Error creating ticket:', error);
-        this.snackBar.open('Error creating ticket. Please try again.', 'Close', {
+        this.snackBar.open('Error saving ticket. Please try again.', 'Close', {
           duration: 3000,
           horizontalPosition: 'end',
           verticalPosition: 'top'
@@ -187,7 +249,6 @@ categories:any
     }
   }
 
-
   private markFormGroupTouched(formGroup: FormGroup) {
     Object.values(formGroup.controls).forEach(control => {
       control.markAsTouched();
@@ -198,10 +259,11 @@ categories:any
   }
 
   cancel() {
-    this.router.navigate(['/tickets']);
+    this.dialogRef.close();
   }
-  formatDate(date: any) {
-    if (date) {
+  formatDate(event: any) {
+    if (event) {
+      const date = new Date(event);
       const formattedDate = this.convertToYYYYMMDD(date);
       this.ticketForm.patchValue({ expected_resolution_date: formattedDate });
     }
@@ -215,5 +277,10 @@ categories:any
 
   private padZero(num: number): string {
     return num < 10 ? '0' + num : num.toString();
+  }
+
+  private formatDateForApi(date: Date): string {
+    const d = new Date(date);
+    return d.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
   }
 }

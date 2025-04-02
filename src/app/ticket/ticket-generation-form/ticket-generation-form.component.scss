@@ -15,8 +15,8 @@ $error-color: #f44336;
 $shadow-color: rgba(0, 0, 0, 0.1);
 
 .ticket-form-container {
-  max-width: 800px;
-  margin: 2rem auto;
+  max-width: 100%;
+  // margin: 2rem auto;
   padding: 2rem;
   background: white;
   border-radius: 8px;
@@ -138,7 +138,7 @@ $shadow-color: rgba(0, 0, 0, 0.1);
 
     .form-actions {
       flex-direction: column-reverse;
-      
+
       button {
         width: 100%;
       }

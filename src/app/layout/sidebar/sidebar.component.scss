@@ -7,7 +7,7 @@ $hover-color: rgba(255, 255, 255, 0.1);
 $transition-speed: 0.3s;
 
 .container {
-    margin-top: 2%;
+    margin-top: 60px;
     font-family: 'Inter', 'Roboto', sans-serif;
 }
 
@@ -18,12 +18,12 @@ $transition-speed: 0.3s;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     overflow: hidden;
     display: flex;
-    
+
     &.toggled {
         #sidebar-wrapper {
             margin-left: -280px;
         }
-        
+
         #page-content-wrapper {
             margin-left: 0;
         }
@@ -94,7 +94,7 @@ $transition-speed: 0.3s;
     align-items: center;
     gap: 12px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    
+
     .brand-icon {
         color: $accent-color;
         font-size: 24px;
@@ -127,7 +127,7 @@ $transition-speed: 0.3s;
     display: flex;
     align-items: center;
     gap: 12px;
-    
+
     mat-icon {
         color: rgba(255, 255, 255, 0.7);
         transition: color $transition-speed ease;
@@ -165,19 +165,19 @@ $transition-speed: 0.3s;
     .main-wrapper {
         flex-direction: column;
     }
-    
+
     .sidebar {
         position: fixed;
         z-index: 1000;
         border-radius: 16px 16px 0 0;
         margin-left: 0 !important;
-        
+
         &.toggled {
             margin-top: -100%;
             margin-left: 0 !important;
         }
     }
-    
+
     #page-content-wrapper {
         margin-left: 0 !important;
     }

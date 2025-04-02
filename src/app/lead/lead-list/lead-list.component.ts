@@ -209,6 +209,7 @@ export class LeadListComponent implements OnInit {
         this.getUsers();
     }
 
+
     loadStatuses() {
         this.api.getAllStatus().subscribe({
             next: (response: any) => {
@@ -219,6 +220,7 @@ export class LeadListComponent implements OnInit {
                         return acc;
                     }, {});
                 }
+
             },
             error: (error) => {
                 console.error('Error loading statuses:', error);
