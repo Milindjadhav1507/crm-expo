@@ -64,6 +64,7 @@ export class TicketGenerationFormComponent implements OnInit {
   // ];
 categories:any
   statuses: any;
+  employeeList: any;
 
   constructor(
     private fb: FormBuilder,
@@ -81,6 +82,7 @@ categories:any
     this.ticketType()
     this.priority()
     this.getStatuses()
+    this.getAllEmployees();
 
     if (this.data.ticket) {
       this.isEditMode = true;
@@ -97,7 +99,8 @@ categories:any
       contact_email: ticket.contact_email || '',
       contact_phone: ticket.contact_phone || '',
       additional_notes: ticket.additional_notes || '',
-      status: ticket.status || ''
+      status: ticket.status || '',
+      assigned_to: ticket.assigned_to || ''
     };
 
     // Handle expected_resolution_date
@@ -118,6 +121,13 @@ categories:any
   ticketType(){
     this.api.get('ticket/getall_tickettypes/').subscribe((res:any)=>{
       this.categories=res.data
+    })
+  }
+
+  getAllEmployees(){
+    this.api.get('api/get_employee/s=').subscribe((res:any)=>{
+      console.log(res);
+      this.employeeList=res.data
     })
   }
   priority(){
@@ -143,7 +153,8 @@ categories:any
       contact_phone: ['', [Validators.pattern('^[0-9]{10}$')]],
       expected_resolution_date: [null, [Validators.required]],
       additional_notes: [''],
-      status: ['', Validators.required]
+      status: ['', Validators.required],
+      assigned_to: ['', ],
     });
   }
 
@@ -208,7 +219,8 @@ categories:any
           const updatePayload = {
             ...formattedData,
             id: this.data.ticket.id,
-            status_id: formData.status
+            status_id: formData.status,
+            assigned_to: formData.assigned_to
           };
           response = await this.api.post(`ticket/update_ticket/`, updatePayload).toPromise();
           this.snackBar.open('Ticket updated successfully!', 'Close', {
