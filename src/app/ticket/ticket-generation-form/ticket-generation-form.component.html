@@ -41,20 +41,23 @@
           {{ getErrorMessage('priority') }}
         </mat-error>
       </mat-form-field>
+
+
+
     </div>
 
-    <!-- Status -->
     <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Status</mat-label>
-      <mat-select formControlName="status">
-        <mat-option *ngFor="let status of statuses" [value]="status.id">
-          {{status.name}}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="getErrorMessage('status')">
-        {{ getErrorMessage('status') }}
-      </mat-error>
-    </mat-form-field>
+        <mat-label>Assign To</mat-label>
+        <mat-select formControlName="assigned_to">
+          <mat-option *ngFor="let emp of employeeList" [value]="emp.id">
+            {{emp.full_name}}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="getErrorMessage('assigned_to')">
+          {{ getErrorMessage('assigned_to') }}
+        </mat-error>
+      </mat-form-field>
+
 
     <!-- Description -->
     <mat-form-field appearance="outline" class="full-width">
@@ -101,16 +104,14 @@
     <div class="file-upload-section">
       <label class="mat-body-1">Attachments</label>
       <div class="file-upload-container mat-elevation-z1">
-        <input type="file" #fileInput multiple (change)="onFileSelected($event)" accept="image/*,.pdf,.doc,.docx"
-          class="file-input">
+        <input type="file" #fileInput multiple (change)="onFileSelected($event)" accept="image/*,.pdf,.doc,.docx" class="file-input">
         <button mat-stroked-button type="button" color="primary" (click)="fileInput.click()">
           <mat-icon>cloud_upload</mat-icon>
           Choose Files
         </button>
       </div>
       <div class="attachments-list" *ngIf="ticketForm.get('attachments')?.value?.length">
-        <div class="attachment-item mat-elevation-z1"
-          *ngFor="let file of ticketForm.get('attachments')?.value; let i = index">
+        <div class="attachment-item mat-elevation-z1" *ngFor="let file of ticketForm.get('attachments')?.value; let i = index">
           <span class="file-name">{{ file.name }}</span>
           <button mat-icon-button color="warn" type="button" (click)="removeAttachment(i)">
             <mat-icon>close</mat-icon>
@@ -118,6 +119,19 @@
         </div>
       </div>
     </div>
+
+    <!-- Status -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status">
+        <mat-option *ngFor="let status of statuses" [value]="status.id">
+          {{status.name}}
+        </mat-option>
+      </mat-select>
+      <mat-error *ngIf="getErrorMessage('status')">
+        {{ getErrorMessage('status') }}
+      </mat-error>
+    </mat-form-field>
 
     <!-- Additional Notes -->
     <mat-form-field appearance="outline" class="full-width">

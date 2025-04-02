@@ -97,13 +97,8 @@
 
                     <!-- Attachment Button -->
                     <div class="attachment-section">
-                      <input type="file"
-                             #fileInput
-                             (change)="onFileSelected($event)"
-                             style="display: none">
-                      <button type="button"
-                              mat-stroked-button
-                              (click)="fileInput.click()">
+                      <input type="file" #fileInput (change)="onFileSelected($event)" style="display: none">
+                      <button type="button" mat-stroked-button (click)="fileInput.click()">
                         <mat-icon>attach_file</mat-icon>
                         Add Attachment
                       </button>
@@ -121,10 +116,7 @@
                     </div>
 
                     <div class="form-actions">
-                      <button mat-raised-button
-                              color="primary"
-                              type="submit"
-                              [disabled]="!commentForm.valid">
+                      <button mat-raised-button color="primary" type="submit" [disabled]="!commentForm.valid">
                         Post Comment
                       </button>
                     </div>
@@ -239,13 +231,8 @@
 
                 <!-- Attachment Button -->
                 <div class="attachment-section">
-                  <input type="file"
-                         #fileInput
-                         (change)="onFileSelected($event)"
-                         style="display: none">
-                  <button type="button"
-                          mat-stroked-button
-                          (click)="fileInput.click()">
+                  <input type="file" #fileInput (change)="onFileSelected($event)" style="display: none">
+                  <button type="button" mat-stroked-button (click)="fileInput.click()">
                     <mat-icon>attach_file</mat-icon>
                     Add Attachment
                   </button>
@@ -263,15 +250,10 @@
                 </div>
 
                 <div class="form-actions">
-                  <button mat-raised-button
-                          color="primary"
-                          type="submit"
-                          [disabled]="!commentForm.valid">
+                  <button mat-raised-button color="primary" type="submit" [disabled]="!commentForm.valid">
                     Update Comment
                   </button>
-                  <button mat-stroked-button
-                          type="button"
-                          (click)="cancelEdit()">
+                  <button mat-stroked-button type="button" (click)="cancelEdit()">
                     Cancel
                   </button>
                 </div>
